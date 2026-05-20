@@ -31,6 +31,7 @@ export default function MesaTruco({
   mostrandoMano,
   trucoCantado, ultimoEnCantar,
   trucoPendiente, envidoPendiente, florPendiente,
+  florIniciada, esMano,
   florResuelta,
   bloqueado,
   jugarCarta,
@@ -93,23 +94,13 @@ export default function MesaTruco({
             </>
           )}
 
-          {(florJ || florM) && !florResuelta && !florPendiente && (
+          {florJ && florM && !florResuelta && !florPendiente && !florIniciada && esMano && (
             <>
               <div className="h-px bg-gray-700 my-1" />
-              {florJ && !florM && (
-                <p className="text-xs text-yellow-400 font-bold text-center">Tenés Flor (+3)</p>
-              )}
-              {!florJ && florM && (
-                <p className="text-xs text-yellow-400 font-bold text-center">{nombreRival} tiene Flor</p>
-              )}
-              {florJ && florM && (
-                <>
-                  <p className="text-xs text-yellow-400 font-bold uppercase tracking-wider text-center">Flor</p>
-                  <BtnCanto onClick={() => cantarFlor('flor')} color="yellow">La mía es Flor</BtnCanto>
-                  <BtnCanto onClick={() => cantarFlor('conFlor')} color="yellow">Con Flor Envido</BtnCanto>
-                  <BtnCanto onClick={() => cantarFlor('contraFlor')} color="yellow">Contra Flor al Resto</BtnCanto>
-                </>
-              )}
+              <p className="text-xs text-yellow-400 font-bold uppercase tracking-wider text-center">Flor</p>
+              <BtnCanto onClick={() => cantarFlor('flor')} color="yellow">La mía es Flor</BtnCanto>
+              <BtnCanto onClick={() => cantarFlor('conFlor')} color="yellow">Con Flor Envido</BtnCanto>
+              <BtnCanto onClick={() => cantarFlor('contraFlor')} color="yellow">Contra Flor al Resto</BtnCanto>
             </>
           )}
 
@@ -117,12 +108,22 @@ export default function MesaTruco({
             <>
               <div className="h-px bg-gray-700 my-1" />
               <p className="text-xs text-yellow-400 font-bold uppercase tracking-wider text-center">
-                {nombreRival} cantó {florCantada === 'flor' ? 'Flor' : florCantada === 'conFlor' ? 'Con Flor' : 'Contra Flor'}
+                {florCantada === 'flor'
+                  ? `${nombreRival} dijo: La mía es Flor`
+                  : `${nombreRival} cantó ${florCantada === 'conFlor' ? 'Con Flor Envido' : 'Contra Flor al Resto'}`}
               </p>
-              <BtnCanto onClick={responderFlorQuiero} color="yellow">Quiero ✓</BtnCanto>
-              <BtnCanto onClick={responderFlorNoQuiero} color="yellow">No quiero ✗</BtnCanto>
-              {florCantada === 'flor' && <BtnCanto onClick={() => cantarFlor('conFlor')} color="yellow">Con Flor ↑</BtnCanto>}
-              {florCantada !== 'contraFlor' && <BtnCanto onClick={() => cantarFlor('contraFlor')} color="yellow">Contra Flor ↑</BtnCanto>}
+              {florCantada === 'flor' ? (
+                <>
+                  <BtnCanto onClick={() => cantarFlor('flor')} color="yellow">La mía es Flor</BtnCanto>
+                  <BtnCanto onClick={() => cantarFlor('conFlor')} color="yellow">Con Flor Envido</BtnCanto>
+                  <BtnCanto onClick={() => cantarFlor('contraFlor')} color="yellow">Contra Flor al Resto</BtnCanto>
+                </>
+              ) : (
+                <>
+                  <BtnCanto onClick={responderFlorQuiero} color="yellow">Quiero ✓</BtnCanto>
+                  <BtnCanto onClick={responderFlorNoQuiero} color="yellow">No quiero ✗</BtnCanto>
+                </>
+              )}
             </>
           )}
         </div>
@@ -330,8 +331,8 @@ export default function MesaTruco({
               </div>
             )}
 
-            {/* Botones: ambos tienen flor → cantar (visible en todos los tamaños) */}
-            {florJ && florM && !florResuelta && !florPendiente && (
+            {/* Botones: ambos tienen flor → solo mano puede iniciar */}
+            {florJ && florM && !florResuelta && !florPendiente && !florIniciada && esMano && (
               <div className="px-4 pb-3 flex flex-col gap-2">
                 <p className="text-yellow-400 text-xs font-bold text-center uppercase tracking-wider">Ambos tienen Flor — Cantá</p>
                 <BtnCanto onClick={() => cantarFlor('flor')} color="yellow">La mía es Flor</BtnCanto>
@@ -342,18 +343,28 @@ export default function MesaTruco({
               </div>
             )}
 
-            {/* Botones: responder flor del rival (visible en todos los tamaños) */}
+            {/* Botones: responder flor */}
             {florPendiente && (
               <div className="px-4 pb-3 flex flex-col gap-2">
                 <p className="text-yellow-400 text-xs font-bold text-center">
-                  {nombreRival} cantó {florCantada === 'flor' ? 'Flor' : florCantada === 'conFlor' ? 'Con Flor Envido' : 'Contra Flor al Resto'}
+                  {florCantada === 'flor'
+                    ? `${nombreRival} dijo: La mía es Flor`
+                    : `${nombreRival} cantó ${florCantada === 'conFlor' ? 'Con Flor Envido' : 'Contra Flor al Resto'}`}
                 </p>
-                <div className="grid grid-cols-2 gap-2">
-                  <BtnCanto onClick={responderFlorQuiero} color="yellow">Quiero ✓</BtnCanto>
-                  <BtnCanto onClick={responderFlorNoQuiero} color="yellow">No quiero ✗</BtnCanto>
-                </div>
-                {florCantada === 'flor' && <BtnCanto onClick={() => cantarFlor('conFlor')} color="yellow">Con Flor Envido ↑</BtnCanto>}
-                {florCantada !== 'contraFlor' && <BtnCanto onClick={() => cantarFlor('contraFlor')} color="yellow">Contra Flor al Resto ↑</BtnCanto>}
+                {florCantada === 'flor' ? (
+                  <div className="flex flex-col gap-2">
+                    <BtnCanto onClick={() => cantarFlor('flor')} color="yellow">La mía es Flor</BtnCanto>
+                    <div className="grid grid-cols-2 gap-2">
+                      <BtnCanto onClick={() => cantarFlor('conFlor')} color="yellow">Con Flor Envido</BtnCanto>
+                      <BtnCanto onClick={() => cantarFlor('contraFlor')} color="yellow">Contra Flor al Resto</BtnCanto>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-2">
+                    <BtnCanto onClick={responderFlorQuiero} color="yellow">Quiero ✓</BtnCanto>
+                    <BtnCanto onClick={responderFlorNoQuiero} color="yellow">No quiero ✗</BtnCanto>
+                  </div>
+                )}
               </div>
             )}
 
@@ -463,8 +474,11 @@ export default function MesaTruco({
         {onIrseMazo && !rondaTerminada && !bloqueado && (
           <button
             onClick={onIrseMazo}
-            className="text-gray-600 hover:text-red-400 text-[10px] font-semibold uppercase tracking-widest transition-colors border border-transparent hover:border-red-900/40 px-3 py-1 rounded-lg"
+            className="flex items-center gap-1.5 text-red-400/70 hover:text-red-300 text-xs font-semibold uppercase tracking-widest transition-all border border-red-900/30 hover:border-red-700/60 hover:bg-red-950/30 px-4 py-2 rounded-xl"
           >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/>
+            </svg>
             Irse al mazo
           </button>
         )}
@@ -490,19 +504,27 @@ export default function MesaTruco({
           {florPendiente && (
             <div className="flex flex-col gap-1">
               <p className="text-xs text-yellow-400 font-bold text-center">
-                {nombreRival} cantó {florCantada === 'flor' ? 'Flor' : florCantada === 'conFlor' ? 'Con Flor' : 'Contra Flor'}
+                {florCantada === 'flor'
+                  ? `${nombreRival} dijo: La mía es Flor`
+                  : `${nombreRival} cantó ${florCantada === 'conFlor' ? 'Con Flor Envido' : 'Contra Flor al Resto'}`}
               </p>
-              <div className="grid grid-cols-2 gap-1">
-                <BtnCanto onClick={responderFlorQuiero} color="yellow">Quiero ✓</BtnCanto>
-                <BtnCanto onClick={responderFlorNoQuiero} color="yellow">No quiero ✗</BtnCanto>
-              </div>
-              {florCantada === 'flor' && <BtnCanto onClick={() => cantarFlor('conFlor')} color="yellow">Con Flor ↑</BtnCanto>}
-              {florCantada !== 'contraFlor' && <BtnCanto onClick={() => cantarFlor('contraFlor')} color="yellow">Contra Flor ↑</BtnCanto>}
+              {florCantada === 'flor' ? (
+                <>
+                  <BtnCanto onClick={() => cantarFlor('flor')} color="yellow">La mía es Flor</BtnCanto>
+                  <BtnCanto onClick={() => cantarFlor('conFlor')} color="yellow">Con Flor Envido</BtnCanto>
+                  <BtnCanto onClick={() => cantarFlor('contraFlor')} color="yellow">Contra Flor al Resto</BtnCanto>
+                </>
+              ) : (
+                <div className="grid grid-cols-2 gap-1">
+                  <BtnCanto onClick={responderFlorQuiero} color="yellow">Quiero ✓</BtnCanto>
+                  <BtnCanto onClick={responderFlorNoQuiero} color="yellow">No quiero ✗</BtnCanto>
+                </div>
+              )}
             </div>
           )}
 
-          {/* Flor — ambos tienen, sin apuesta */}
-          {florJ && florM && !florResuelta && !florPendiente && (
+          {/* Flor — solo mano puede iniciar */}
+          {florJ && florM && !florResuelta && !florPendiente && !florIniciada && esMano && (
             <div className="flex flex-col gap-1">
               <p className="text-xs text-yellow-400 font-bold uppercase tracking-wider text-center">Flor</p>
               <BtnCanto onClick={() => cantarFlor('flor')} color="yellow">La mía es Flor</BtnCanto>

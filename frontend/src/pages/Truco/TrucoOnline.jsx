@@ -93,6 +93,7 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
   const [rivalTieneFlor, setRivalTieneFlor] = useState(false)
 
   const [florActiva, setFlorActiva]         = useState(false)
+  const [florIniciada, setFlorIniciada]     = useState(false)
   const [florEnJuego, setFlorEnJuego]       = useState(false)
   const [florCantadaPor, setFlorCantadaPor] = useState(null)
   const [nivelFlor, setNivelFlor]           = useState(null)
@@ -116,6 +117,10 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
   const rivals2v2Ref       = useRef([])
   const rivalInfoRef       = useRef({ userId: null, nombre: 'Rival', photoURL: '' })
   const rivalEloRef        = useRef(1000)
+  const pantallaRef        = useRef('lobby')
+  const ptsJRef            = useRef(0)
+  const ptsMRef            = useRef(0)
+  const guardarPartidaRef  = useRef(null)
   const [eloDelta, setEloDelta] = useState(null)
   usePageTitle('Truco Online')
   const navigate           = useNavigate()
@@ -125,6 +130,9 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
   manoJRef.current      = manoJ
   partner2v2Ref.current = partner2v2
   rivals2v2Ref.current  = rivals2v2
+  pantallaRef.current   = pantalla
+  ptsJRef.current       = ptsJ
+  ptsMRef.current       = ptsM
 
   const puedeSubirEnvido      = envidoPendiente && nivelEnvido !== 'falta'
   const puedeSubirRealEnvido  = envidoPendiente && nivelEnvido !== 'falta'
@@ -220,6 +228,7 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
       setEloDelta({ delta, nuevoElo })
     } catch (e) { console.error('Error actualizando ELO:', e) }
   }
+  guardarPartidaRef.current = guardarPartida
 
   const aplicarEstado = (estado) => {
     setManoJ(estado.miMano)
@@ -253,6 +262,7 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
     setEnvidoAcumulado(estado.envidoAcumulado)
     setFlorResuelta(estado.florResuelta)
     setFlorActiva(estado.florActiva)
+    setFlorIniciada(estado.florIniciada ?? false)
     setFlorEnJuego(estado.florEnJuego)
     setFlorPendiente(estado.florPendiente)
     setFlorCantada(estado.florCantadaPor)
@@ -293,6 +303,7 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
     setEnvidoAcumulado(estado.envidoAcumulado)
     setFlorResuelta(estado.florResuelta ?? true)
     setFlorActiva(estado.florActiva)
+    setFlorIniciada(estado.florIniciada ?? false)
     setFlorEnJuego(estado.florEnJuego)
     setFlorPendiente(estado.florPendiente)
     setFlorCantada(estado.florCantadaPor)
@@ -442,10 +453,17 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
       addLog([`${nombre} reconectó — continúa la partida`])
     })
 
-    socket.on('rival_desconectado', ({ nombre } = {}) => {
+    socket.on('rival_desconectado', ({ nombre, porAbandonar } = {}) => {
       setRivalReconectando(false)
-      setError(`${nombre || 'El rival'} se desconectó`)
-      setPantalla('lobby')
+      if (porAbandonar && pantallaRef.current === 'juego') {
+        guardarPartidaRef.current?.('yo', ptsJRef.current, ptsMRef.current)
+        setGanador('yo')
+        setPantalla('resultado')
+        addLog([`${nombre || 'El rival'} abandonó la partida`])
+      } else {
+        setError(`${nombre || 'El rival'} se desconectó`)
+        setPantalla('lobby')
+      }
     })
 
     socket.on('reconectado_a_partida', ({ salaId: sid, modalidad: mod }) => {
@@ -517,7 +535,7 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
   const puedeJugar          = turno === 'yo' && !bloqueado && florResuelta
 
   useTurnNotification(pantalla === 'juego' && puedeJugar)
-  const puedeEnvido         = !envidoResuelto && !florJ && !florM && florResuelta && manoActual === 0 && !primeraJugada && !bloqueado
+  const puedeEnvido         = !envidoResuelto && !florJ && !florM && florResuelta && manoActual === 0 && !primeraJugada && !bloqueado && turno === 'yo'
   const puedeTruco          = !trucoResuelto && florResuelta && !mostrandoMano && !esperandoRespuesta
   const puedeIniciarTruco   = puedeTruco && !trucoCantado && !trucoPendiente && turno === 'yo'
   const cantanteEsRival     = cantanteOriginalTruco === 'rival' || cantanteOriginalTruco === 'rival_equipo'
@@ -1128,6 +1146,7 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
           envidoPendiente={envidoPendiente} trucoResuelto={trucoResuelto}
           nivelEnvido={nivelEnvido} envidoResuelto={envidoResuelto}
           florJ={florJ} florM={florM} florActiva={florActiva}
+          florIniciada={florIniciada} esMano={esMano}
           florEnJuego={florEnJuego} florPendiente={florPendiente}
           florResuelta={florResuelta} florCantada={florCantada}
           nivelFlor={nivelFlor} florCantadaPor={florCantadaPor}

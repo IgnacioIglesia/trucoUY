@@ -114,7 +114,8 @@ module.exports = function registerTruco(io, socket, state) {
   socket.on('salir_sala', () => {
     const salaId = socket.salaId
     if (salaId && salas[salaId]) {
-      socket.to(salaId).emit('rival_desconectado', { motivo: 'salió voluntariamente' })
+      const porAbandonar = salas[salaId].estado === 'jugando'
+      socket.to(salaId).emit('rival_desconectado', { nombre: socket.nombre, porAbandonar })
       delete salas[salaId]; delete trucoGames[salaId]
       socket.leave(salaId); socket.salaId = null
       socket.emit('sala_cerrada', { mensaje: 'Saliste de la sala' })
@@ -177,7 +178,8 @@ module.exports = function registerTruco(io, socket, state) {
       const userId = socket.userId
       if (!userId) {
         // No userId → can't reconnect, destroy immediately
-        socket.to(salaId).emit('rival_desconectado', { nombre: socket.nombre || 'Jugador' })
+        const porAbandonar = salas[salaId]?.estado === 'jugando'
+        socket.to(salaId).emit('rival_desconectado', { nombre: socket.nombre || 'Jugador', porAbandonar })
         delete salas[salaId]; delete trucoGames[salaId]
         guardarSalas()
         return
@@ -187,7 +189,8 @@ module.exports = function registerTruco(io, socket, state) {
       socket.to(salaId).emit('rival_reconectando', { nombre: socket.nombre || 'Jugador' })
       const timeout = setTimeout(() => {
         if (!salas[salaId]) return
-        socket.to(salaId).emit('rival_desconectado', { nombre: socket.nombre || 'Jugador' })
+        const porAbandonar = salas[salaId]?.estado === 'jugando'
+        socket.to(salaId).emit('rival_desconectado', { nombre: socket.nombre || 'Jugador', porAbandonar })
         delete salas[salaId]; delete trucoGames[salaId]
         state.pendingDisconnects.delete(userId)
         guardarSalas()

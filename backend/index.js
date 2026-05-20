@@ -113,9 +113,11 @@ app.get('/', (_req, res) => res.json({
 }))
 
 app.get('/salas', (_req, res) => res.json(
-  Object.entries(salas).map(([id, s]) => ({
-    id, jugadores: s.jugadores.map(j => j.nombre), modalidad: s.modalidad, estado: s.estado,
-  }))
+  Object.entries(salas)
+    .filter(([_, s]) => s.estado === 'esperando' && s.jugadores.every(j => io.sockets.sockets.has(j.id)))
+    .map(([id, s]) => ({
+      id, jugadores: s.jugadores.map(j => j.nombre), modalidad: s.modalidad, estado: s.estado,
+    }))
 ))
 
 // ── Socket.io ────────────────────────────────────────────────────────────────
