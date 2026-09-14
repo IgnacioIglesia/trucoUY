@@ -267,10 +267,45 @@ export default function Home() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { suit: '⚡', title: 'Instantáneo', desc: 'Abrís el link y en segundos ya estás jugando. Sin descargas, sin instalaciones.' },
-              { suit: '♠', title: 'Multijugador', desc: 'Jugá 1vs1 o 2vs2 con amigos de cualquier parte. Compartí el código y listo.', serif: true },
-              { suit: '📱', title: 'Cualquier pantalla', desc: 'Funciona perfecto en celular, tablet y computadora.' },
-              { suit: '🆓', title: 'Siempre gratis', desc: 'Sin suscripciones ni pagos. TrucoUY es completamente gratuito.' },
+              {
+                icon: (
+                  <svg width="32" height="32" viewBox="0 0 24 24" style={{ color: GOLD }}>
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" fill="currentColor" />
+                  </svg>
+                ),
+                title: 'Instantáneo',
+                desc: 'Abrís el link y en segundos ya estás jugando. Sin descargas, sin instalaciones.',
+              },
+              {
+                icon: (
+                  <span className="font-serif leading-none select-none" style={{ fontSize: 32, color: GOLD }}>♠</span>
+                ),
+                title: 'Multijugador',
+                desc: 'Jugá 1vs1 o 2vs2 con amigos de cualquier parte. Compartí el código y listo.',
+              },
+              {
+                icon: (
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={GOLD} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="2" y="3" width="20" height="14" rx="2" />
+                    <path d="M8 21h8M12 17v4" />
+                  </svg>
+                ),
+                title: 'Cualquier pantalla',
+                desc: 'Funciona perfecto en celular, tablet y computadora.',
+              },
+              {
+                icon: (
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={GOLD} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 12 20 22 4 22 4 12" />
+                    <rect x="2" y="7" width="20" height="5" />
+                    <line x1="12" y1="22" x2="12" y2="7" />
+                    <path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z" />
+                    <path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z" />
+                  </svg>
+                ),
+                title: 'Siempre gratis',
+                desc: 'Sin suscripciones ni pagos. TrucoUY es completamente gratuito.',
+              },
             ].map((f, i) => (
               <div
                 key={f.title}
@@ -283,8 +318,7 @@ export default function Home() {
                   transition: `opacity 0.55s ease ${i * 90}ms, transform 0.55s ease ${i * 90}ms`,
                 }}
               >
-                <span className={`text-3xl leading-none ${f.serif ? 'font-serif' : ''}`}
-                      style={f.serif ? { color: GOLD } : {}}>{f.suit}</span>
+                {f.icon}
                 <h3 className="text-white font-bold text-sm">{f.title}</h3>
                 <p className="text-gray-500 text-sm leading-relaxed">{f.desc}</p>
               </div>

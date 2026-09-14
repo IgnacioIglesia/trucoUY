@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 export default function Avatar({ usuario, size = 'md' }) {
   const sizes = {
     sm:  'w-7 h-7 text-xs',
@@ -6,22 +8,28 @@ export default function Avatar({ usuario, size = 'md' }) {
     xl:  'w-24 h-24 text-3xl',
   }
   const cls = sizes[size] ?? sizes.md
+  const [imgFailed, setImgFailed] = useState(false)
 
-  if (usuario?.photoURL) {
+  const iniciales = (usuario?.displayName || usuario?.email || '?').slice(0, 2).toUpperCase()
+  const borderStyle = { border: '2px solid rgba(201,168,60,0.35)' }
+
+  if (usuario?.photoURL && !imgFailed) {
     return (
       <img
         src={usuario.photoURL}
         alt=""
-        className={`${cls} rounded-full object-cover border-2 border-purple-500/40 flex-shrink-0`}
-        onError={e => { e.currentTarget.style.display = 'none'; e.currentTarget.nextSibling.style.display = 'flex' }}
+        className={`${cls} rounded-full object-cover flex-shrink-0`}
+        style={borderStyle}
+        referrerPolicy="no-referrer"
+        onError={() => setImgFailed(true)}
       />
     )
   }
 
-  const iniciales = (usuario?.displayName || usuario?.email || '?').slice(0, 2).toUpperCase()
   return (
-    <div className={`${cls} rounded-full bg-purple-700 border-2 border-purple-500/40 flex items-center justify-center font-bold text-white flex-shrink-0`}>
-      {iniciales}
+    <div className={`${cls} rounded-full flex items-center justify-center font-bold flex-shrink-0`}
+         style={{ ...borderStyle, background: 'rgba(201,168,60,0.15)', color: '#c9a83c' }}>
+      <span>{iniciales}</span>
     </div>
   )
 }

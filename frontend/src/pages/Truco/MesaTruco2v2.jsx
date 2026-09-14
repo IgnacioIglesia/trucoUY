@@ -250,7 +250,7 @@ export default function MesaTruco2v2({
         {/* Mesa central — full width */}
         <div className="w-full">
           <div className={`w-full rounded-2xl overflow-hidden shadow-2xl transition-all border ${mostrandoMano ? 'border-yellow-500/40' : 'border-white/[0.07]'}`}
-            style={{ background: 'linear-gradient(175deg, #1a0f38 0%, #110b24 50%, #0b0718 100%)' }}>
+            style={{ background: 'radial-gradient(rgba(201,168,60,0.022) 1px, transparent 1px) 0 0 / 22px 22px, radial-gradient(ellipse 75% 55% at 50% 50%, rgba(201,168,60,0.055) 0%, transparent 70%), #07090d' }}>
 
             {/* Header */}
             <div className="flex items-center justify-between px-3 py-2 bg-black/30 border-b border-white/[0.06]">
@@ -262,7 +262,7 @@ export default function MesaTruco2v2({
                       resultados?.[i] === 'jugador' ? 'bg-green-800 border-green-600 text-green-200' :
                       resultados?.[i] === 'maquina' ? 'bg-red-900 border-red-700 text-red-200' :
                       resultados?.[i] === 'empate'  ? 'bg-gray-700 border-gray-500 text-gray-300' :
-                      i === manoActual              ? 'bg-purple-900/70 border-purple-500/80 text-purple-200' :
+                      i === manoActual              ? 'bg-yellow-950/50 border-yellow-600/50 text-yellow-400' :
                                                       'bg-white/5 border-white/10 text-gray-600'
                     }`}>
                       {resultados?.[i] === 'jugador' ? '✓' : resultados?.[i] === 'maquina' ? '✗' : resultados?.[i] === 'empate' ? '=' : i + 1}
@@ -276,7 +276,7 @@ export default function MesaTruco2v2({
                   : resultadoUltimaMano === 'maquina' ? 'bg-red-900/60 border-red-700 text-red-300'
                   : 'bg-gray-700/60 border-gray-600 text-gray-300'
                 : bloqueado ? 'bg-black/40 border-white/10 text-gray-500'
-                : esMiTurno ? 'bg-purple-900/60 border-purple-700 text-purple-300'
+                : esMiTurno ? 'bg-yellow-950/50 border-yellow-600/50 text-yellow-400'
                 : 'bg-black/40 border-white/10 text-gray-400'
               }`}>
                 {mostrandoMano
@@ -293,6 +293,20 @@ export default function MesaTruco2v2({
 
             {/* Mesa body — cross layout with absolute positioning */}
             <div className="relative h-[280px] sm:h-[360px] lg:h-[420px]">
+
+              {/* Decoración de mesa */}
+              <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                <div className="absolute inset-5 rounded-[50%]"
+                     style={{ border: '1px solid rgba(201,168,60,0.09)' }} />
+                <span className="absolute top-2 left-2 font-serif select-none"
+                      style={{ fontSize: 13, color: 'rgba(201,168,60,0.12)', lineHeight: 1 }}>♠</span>
+                <span className="absolute top-2 right-2 font-serif select-none"
+                      style={{ fontSize: 13, color: 'rgba(201,168,60,0.12)', lineHeight: 1 }}>♣</span>
+                <span className="absolute bottom-2 left-2 font-serif select-none"
+                      style={{ fontSize: 13, color: 'rgba(201,168,60,0.12)', lineHeight: 1 }}>♦</span>
+                <span className="absolute bottom-2 right-2 font-serif select-none"
+                      style={{ fontSize: 13, color: 'rgba(201,168,60,0.12)', lineHeight: 1 }}>♥</span>
+              </div>
 
               {/* Muestra — top left */}
               <div className="absolute top-3 left-3 flex flex-col items-center gap-0.5 z-10">
@@ -368,7 +382,7 @@ export default function MesaTruco2v2({
                   ? <CartaComp carta={jugadaYo.carta} muestra={muestra} jugada enMesa />
                   : <div className="w-[68px] h-24 rounded-lg border border-dashed border-white/[0.08]" />
                 }
-                <span className="text-purple-400 text-[10px] font-semibold">Vos</span>
+                <span className="text-yellow-500 text-[10px] font-semibold">Vos</span>
               </div>
             </div>
 
@@ -425,14 +439,14 @@ export default function MesaTruco2v2({
         </div>
 
         {/* Timer */}
-        {puedeJugar && timerSeg < 30 && (
+        {puedeJugar && timerSeg < 45 && (
           <div className="w-full max-w-xs mx-auto px-2">
             <div className="w-full h-1.5 bg-gray-700 rounded-full overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all duration-1000 ease-linear ${
-                  timerSeg > 15 ? 'bg-green-500' : timerSeg > 8 ? 'bg-yellow-500' : 'bg-red-500'
+                  timerSeg > 20 ? 'bg-green-500' : timerSeg > 10 ? 'bg-yellow-500' : 'bg-red-500'
                 }`}
-                style={{ width: `${(timerSeg / 30) * 100}%` }}
+                style={{ width: `${(timerSeg / 45) * 100}%` }}
               />
             </div>
             {timerSeg <= 10 && (
@@ -451,7 +465,7 @@ export default function MesaTruco2v2({
           : 'Elegí una carta — doble click para jugar'}
         </p>
 
-        {cartaSel && <p className="text-purple-400 text-xs animate-pulse">Clickeá de nuevo para jugar</p>}
+        {cartaSel && <p className="text-yellow-500 text-xs animate-pulse">Clickeá de nuevo para jugar</p>}
 
         {/* Mis cartas */}
         <div className="relative w-full max-w-xl" style={{ height: '160px' }}>
@@ -488,9 +502,9 @@ export default function MesaTruco2v2({
           <div className="relative">
             <Avatar usuario={{ displayName: miNombre, photoURL: miPhotoURL }} size="md" />
             {globoYo && (
-              <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 bg-purple-800 border border-purple-600 text-white text-xs px-3 py-1.5 rounded-2xl shadow-lg max-w-[200px] z-30 whitespace-nowrap">
+              <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 bg-[#1a1710] border border-yellow-700/50 text-yellow-200 text-xs px-3 py-1.5 rounded-2xl shadow-lg max-w-[200px] z-30 whitespace-nowrap">
                 {globoYo}
-                <div className="absolute -left-1.5 top-1/2 -translate-y-1/2 w-3 h-3 bg-purple-800 border-l border-b border-purple-600 rotate-45" />
+                <div className="absolute -left-1.5 top-1/2 -translate-y-1/2 w-3 h-3 bg-[#1a1710] border-l border-b border-yellow-700/50 rotate-45" />
               </div>
             )}
           </div>

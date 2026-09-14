@@ -3,23 +3,31 @@ import { CartaComp, CartaMuestra, BtnCanto, TanteadorPalillos, PlayerPopup } fro
 import Avatar from '../../components/Avatar'
 
 function LogEntry({ msg, reciente }) {
-  const isChat      = msg.startsWith('💬')
+  const isChat      = msg.startsWith('[C]')
   const isSeparator = msg.startsWith('───')
-  const isWin       = msg.startsWith('✅')
-  const isLoss      = msg.startsWith('❌')
-  const isFlor      = msg.startsWith('🌸') || msg.startsWith('⚘')
-  const isEnvido    = msg.startsWith('🎴')
+  const isWin       = msg.startsWith('[+]')
+  const isLoss      = msg.startsWith('[-]')
+  const isTie       = msg.startsWith('[=]')
+  const isFlor      = msg.startsWith('[F]')
+  const isEnvido    = msg.startsWith('[E]')
+  const isTruco     = msg.startsWith('[T]')
 
-  const color = isChat      ? 'text-blue-300'
-    : isSeparator           ? 'text-gray-600 text-center'
-    : isWin && reciente     ? 'text-green-400 font-semibold'
-    : isLoss && reciente    ? 'text-red-400 font-semibold'
-    : isFlor                ? 'text-yellow-400'
-    : isEnvido              ? 'text-blue-300'
-    : reciente              ? 'text-white font-semibold'
-    : 'text-gray-500'
+  const display = msg.replace(/^\[[-+C=EFT]\] /, '')
 
-  return <p className={`text-xs mb-1 ${color}`}>{msg}</p>
+  const color = isChat                  ? 'text-yellow-300/70'
+    : isSeparator                       ? 'text-gray-600 text-center'
+    : isWin && reciente                 ? 'text-green-400 font-semibold'
+    : isLoss && reciente                ? 'text-red-400 font-semibold'
+    : isTie                             ? 'text-gray-500'
+    : isFlor                            ? 'text-yellow-400'
+    : isEnvido                          ? 'text-yellow-400/80'
+    : isTruco                           ? 'text-gray-300'
+    : isWin                             ? 'text-green-500/60'
+    : isLoss                            ? 'text-red-400/50'
+    : reciente                          ? 'text-white font-semibold'
+    : 'text-gray-400'
+
+  return <p className={`text-xs mb-1 ${color}`}>{display}</p>
 }
 
 export default function MesaTruco({
@@ -77,7 +85,7 @@ export default function MesaTruco({
       {/* ── MODAL CONFIRMAR SALIR ── */}
       {confirmSalir && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
-          <div className="bg-[#0d0b1a] border border-white/10 rounded-2xl p-6 max-w-sm w-full flex flex-col gap-5 shadow-2xl">
+          <div className="bg-[#0e0c0a] border border-white/10 rounded-2xl p-6 max-w-sm w-full flex flex-col gap-5 shadow-2xl">
             <div className="flex flex-col gap-1.5">
               <h3 className="text-white font-extrabold text-lg">¿Abandonar la partida?</h3>
               <p className="text-gray-400 text-sm">Tu rival ganará automáticamente y perderás ELO.</p>
@@ -103,7 +111,7 @@ export default function MesaTruco({
       {/* ── MODAL CONFIRMAR IRSE AL MAZO ── */}
       {confirmMazo && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
-          <div className="bg-[#0d0b1a] border border-white/10 rounded-2xl p-6 max-w-sm w-full flex flex-col gap-5 shadow-2xl">
+          <div className="bg-[#0e0c0a] border border-white/10 rounded-2xl p-6 max-w-sm w-full flex flex-col gap-5 shadow-2xl">
             <div className="flex flex-col gap-1.5">
               <h3 className="text-white font-extrabold text-lg">¿Irse al mazo?</h3>
               <p className="text-gray-400 text-sm">Perdés la ronda y el rival gana los puntos de truco cantado.</p>
@@ -132,21 +140,21 @@ export default function MesaTruco({
 
           {!envidoPendiente && !florPendiente && !florJ && !florM && (
             <>
-              <p className="text-xs text-blue-400 font-bold uppercase tracking-wider text-center">Envido</p>
-              <BtnCanto onClick={() => cantarEnvido('envido')} disabled={!puedeEnvido} color="blue">Envido</BtnCanto>
-              <BtnCanto onClick={() => cantarEnvido('real')} disabled={!puedeEnvido} color="blue">Real Envido</BtnCanto>
-              <BtnCanto onClick={() => cantarEnvido('falta')} disabled={!puedeEnvido} color="blue">Falta Envido</BtnCanto>
+              <p className="text-xs font-bold uppercase tracking-wider text-center" style={{ color: '#c9a83c' }}>Envido</p>
+              <BtnCanto onClick={() => cantarEnvido('envido')} disabled={!puedeEnvido} color="gold">Envido</BtnCanto>
+              <BtnCanto onClick={() => cantarEnvido('real')} disabled={!puedeEnvido} color="gold">Real Envido</BtnCanto>
+              <BtnCanto onClick={() => cantarEnvido('falta')} disabled={!puedeEnvido} color="gold">Falta Envido</BtnCanto>
             </>
           )}
 
           {envidoPendiente && (
             <>
-              <p className="text-xs text-blue-400 font-bold uppercase tracking-wider text-center">
+              <p className="text-xs font-bold uppercase tracking-wider text-center" style={{ color: '#c9a83c' }}>
                 {nombreRival} cantó {nivelEnvido === 'real' ? 'Real Envido' : nivelEnvido === 'falta' ? 'Falta Envido' : 'Envido'}
               </p>
-              {puedeSubirEnvido && <BtnCanto onClick={() => onSubirEnvidoConNivel?.('envido')} color="blue">Envido ↑</BtnCanto>}
-              {puedeSubirRealEnvido && <BtnCanto onClick={() => onSubirEnvidoConNivel?.('real')} color="blue">Real Envido ↑</BtnCanto>}
-              {puedeSubirFaltaEnvido && <BtnCanto onClick={() => onSubirEnvidoConNivel?.('falta')} color="blue">Falta Envido ↑</BtnCanto>}
+              {puedeSubirEnvido && <BtnCanto onClick={() => onSubirEnvidoConNivel?.('envido')} color="gold">Envido ↑</BtnCanto>}
+              {puedeSubirRealEnvido && <BtnCanto onClick={() => onSubirEnvidoConNivel?.('real')} color="gold">Real Envido ↑</BtnCanto>}
+              {puedeSubirFaltaEnvido && <BtnCanto onClick={() => onSubirEnvidoConNivel?.('falta')} color="gold">Falta Envido ↑</BtnCanto>}
             </>
           )}
 
@@ -189,12 +197,12 @@ export default function MesaTruco({
 
           {/* Chat desktop — left panel */}
           <div className="h-52 flex flex-col gap-1">
-            <p className="text-blue-400 text-[10px] font-semibold uppercase tracking-widest text-center">Chat</p>
-            <div className="bg-blue-950/40 border border-blue-800/40 rounded-xl p-2 flex-1 min-h-0 overflow-y-auto flex flex-col gap-0.5">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-center" style={{ color: '#c9a83c' }}>Chat</p>
+            <div className="rounded-xl p-2 flex-1 min-h-0 overflow-y-auto flex flex-col gap-0.5" style={{ background: 'rgba(201,168,60,0.05)', border: '1px solid rgba(201,168,60,0.12)' }}>
               {log.filter(m => m.startsWith('💬')).slice(0, 4).length === 0
-                ? <p className="text-blue-800 text-xs text-center italic">Sin mensajes</p>
+                ? <p className="text-xs text-center italic" style={{ color: 'rgba(201,168,60,0.3)' }}>Sin mensajes</p>
                 : log.filter(m => m.startsWith('💬')).slice(0, 4).map((msg, i) => (
-                    <p key={i} className={`text-xs ${i === 0 ? 'text-blue-200 font-semibold' : 'text-blue-400/60'}`}>{msg}</p>
+                    <p key={i} className={`text-xs ${i === 0 ? 'text-yellow-200 font-semibold' : 'text-yellow-400/50'}`}>{msg}</p>
                   ))
               }
             </div>
@@ -205,10 +213,11 @@ export default function MesaTruco({
                 onKeyDown={e => e.key === 'Enter' && enviar()}
                 maxLength={80}
                 placeholder="Escribí..."
-                className="flex-1 bg-gray-900 border border-gray-700 focus:border-blue-500 rounded-lg px-2 py-1.5 text-white text-xs focus:outline-none placeholder-gray-600"
+                className="flex-1 bg-white/[0.04] border border-white/10 focus:border-yellow-600/40 rounded-lg px-2 py-1.5 text-white text-xs focus:outline-none placeholder-gray-600"
               />
               <button onClick={enviar} disabled={!chatInput.trim()}
-                className="bg-blue-700 hover:bg-blue-600 disabled:opacity-30 text-white px-2.5 rounded-lg text-xs font-bold transition">
+                className="disabled:opacity-30 text-[#07090d] px-2.5 rounded-lg text-xs font-bold transition hover:opacity-90"
+                style={{ background: '#c9a83c' }}>
                 →
               </button>
             </div>
@@ -251,10 +260,28 @@ export default function MesaTruco({
               title="Ver perfil"
             >
               {rivalPhotoURL
-                ? <img src={rivalPhotoURL} alt="" className="w-12 h-12 rounded-full object-cover border-2 border-red-600" />
-                : <div className="w-12 h-12 rounded-full bg-red-900 border-2 border-red-600 flex items-center justify-center">
-                    <span className="text-white font-extrabold text-lg">{inicialesRival}</span>
-                  </div>
+                ? <img src={rivalPhotoURL} alt="" className="w-12 h-12 rounded-full object-cover"
+                    style={{ border: '2px solid rgba(201,168,60,0.45)' }} />
+                : !rivalUserId
+                  ? (
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
+                         style={{ background: 'rgba(201,168,60,0.08)', border: '2px solid rgba(201,168,60,0.4)' }}>
+                      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#c9a83c" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="8" width="18" height="13" rx="2"/>
+                        <circle cx="9" cy="13" r="1.2" fill="#c9a83c" stroke="none"/>
+                        <circle cx="15" cy="13" r="1.2" fill="#c9a83c" stroke="none"/>
+                        <path d="M9 17h6"/>
+                        <path d="M12 8V5"/>
+                        <circle cx="12" cy="4" r="1" fill="#c9a83c" stroke="none"/>
+                      </svg>
+                    </div>
+                  )
+                  : (
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
+                         style={{ background: 'rgba(201,168,60,0.1)', border: '2px solid rgba(201,168,60,0.4)' }}>
+                      <span className="font-extrabold text-lg" style={{ color: '#c9a83c' }}>{inicialesRival}</span>
+                    </div>
+                  )
               }
             </button>
             {globoRival && (
@@ -304,7 +331,7 @@ export default function MesaTruco({
 
           {/* Mesa */}
           <div className={`w-full rounded-2xl overflow-hidden shadow-2xl transition-all border ${mostrandoMano ? 'border-yellow-500/40' : 'border-white/[0.07]'}`}
-            style={{ background: 'linear-gradient(175deg, #1a0f38 0%, #110b24 50%, #0b0718 100%)' }}>
+            style={{ background: 'radial-gradient(rgba(201,168,60,0.022) 1px, transparent 1px) 0 0 / 22px 22px, radial-gradient(ellipse 75% 55% at 50% 50%, rgba(201,168,60,0.055) 0%, transparent 70%), #07090d' }}>
 
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-2.5 bg-black/30 border-b border-white/[0.06]">
@@ -316,7 +343,7 @@ export default function MesaTruco({
                       resultados[i] === 'jugador' ? 'bg-green-800 border-green-600 text-green-200' :
                       resultados[i] === 'maquina' ? 'bg-red-900 border-red-700 text-red-200' :
                       resultados[i] === 'empate'  ? 'bg-gray-700 border-gray-500 text-gray-300' :
-                      i === manoActual            ? 'bg-purple-900/70 border-purple-500/80 text-purple-200' :
+                      i === manoActual            ? 'bg-yellow-950/50 border-yellow-600/50 text-yellow-400' :
                                                     'bg-white/5 border-white/10 text-gray-600'
                     }`}>
                       {resultados[i] === 'jugador' ? '✓' : resultados[i] === 'maquina' ? '✗' : resultados[i] === 'empate' ? '=' : i + 1}
@@ -331,7 +358,7 @@ export default function MesaTruco({
                     : resultadoUltimaMano === 'maquina' ? 'bg-red-900/60 border-red-700 text-red-300'
                     : 'bg-gray-700/60 border-gray-600 text-gray-300'
                   : bloqueado ? 'bg-black/40 border-white/10 text-gray-500'
-                  : turno === 'yo' || turno === 'jugador' ? 'bg-purple-900/60 border-purple-700 text-purple-300'
+                  : turno === 'yo' || turno === 'jugador' ? 'bg-yellow-950/50 border-yellow-600/50 text-yellow-400'
                   : 'bg-black/40 border-white/10 text-gray-400'
                 }`}>
                   {mostrandoMano
@@ -351,6 +378,21 @@ export default function MesaTruco({
 
             {/* Cartas en mesa */}
             <div className="relative flex flex-col items-center gap-5 py-8 lg:py-10 px-4">
+
+              {/* Decoración de mesa */}
+              <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                <div className="absolute inset-6 rounded-[50%]"
+                     style={{ border: '1px solid rgba(201,168,60,0.09)' }} />
+                <span className="absolute top-3 left-3 font-serif select-none"
+                      style={{ fontSize: 14, color: 'rgba(201,168,60,0.12)', lineHeight: 1 }}>♠</span>
+                <span className="absolute top-3 right-3 font-serif select-none"
+                      style={{ fontSize: 14, color: 'rgba(201,168,60,0.12)', lineHeight: 1 }}>♣</span>
+                <span className="absolute bottom-3 left-3 font-serif select-none"
+                      style={{ fontSize: 14, color: 'rgba(201,168,60,0.12)', lineHeight: 1 }}>♦</span>
+                <span className="absolute bottom-3 right-3 font-serif select-none"
+                      style={{ fontSize: 14, color: 'rgba(201,168,60,0.12)', lineHeight: 1 }}>♥</span>
+              </div>
+
               <div className="absolute top-3 left-4 flex flex-col items-center gap-1">
                 <span className="text-yellow-500/70 text-[10px] font-bold uppercase tracking-widest">Muestra</span>
                 {muestra && <CartaMuestra carta={muestra} />}
@@ -370,9 +412,9 @@ export default function MesaTruco({
                     }
 
                     <div className="flex items-center gap-2 w-40">
-                      <div className="flex-1 h-px" style={{ background: 'linear-gradient(to right, transparent, rgba(255,255,255,0.15))' }} />
-                      <div className="w-1.5 h-1.5 rounded-full bg-white/25 flex-shrink-0" />
-                      <div className="flex-1 h-px" style={{ background: 'linear-gradient(to left, transparent, rgba(255,255,255,0.15))' }} />
+                      <div className="flex-1 h-px" style={{ background: 'linear-gradient(to right, transparent, rgba(201,168,60,0.25))' }} />
+                      <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: 'rgba(201,168,60,0.45)' }} />
+                      <div className="flex-1 h-px" style={{ background: 'linear-gradient(to left, transparent, rgba(201,168,60,0.25))' }} />
                     </div>
 
                     {cjJ[displayIdx]
@@ -447,12 +489,12 @@ export default function MesaTruco({
             {/* Responder truco */}
             {trucoPendiente && (
               <div className="px-4 pb-4 flex flex-col gap-2">
-                <p className="text-red-400 text-xs font-bold text-center uppercase tracking-wider">
+                <p className="text-xs font-bold text-center uppercase tracking-wider" style={{ color: '#e87070' }}>
                   {nombreRival} cantó {trucoCantado === 'truco' ? 'Truco' : trucoCantado === 'retruco' ? 'Retruco' : 'Vale Cuatro'}
                 </p>
                 <div className="grid grid-cols-2 gap-2">
-                  <BtnCanto onClick={responderTrucoQuiero} color="red">Quiero ✓</BtnCanto>
-                  <BtnCanto onClick={responderTrucoNoQuiero} color="red">No quiero ✗</BtnCanto>
+                  <BtnCanto onClick={responderTrucoQuiero} color="gold">Quiero ✓</BtnCanto>
+                  <BtnCanto onClick={responderTrucoNoQuiero} color="gold">No quiero ✗</BtnCanto>
                 </div>
               </div>
             )}
@@ -460,12 +502,12 @@ export default function MesaTruco({
             {/* Responder envido */}
             {envidoPendiente && (
               <div className="px-4 pb-4 flex flex-col gap-2">
-                <p className="text-blue-400 text-xs font-bold text-center uppercase tracking-wider">
+                <p className="text-xs font-bold text-center uppercase tracking-wider" style={{ color: '#c9a83c' }}>
                   {nombreRival} cantó {nivelEnvido === 'real' ? 'Real Envido' : nivelEnvido === 'falta' ? 'Falta Envido' : 'Envido'}
                 </p>
                 <div className="grid grid-cols-2 gap-2">
-                  <BtnCanto onClick={responderEnvidoQuiero} color="blue">Quiero ✓</BtnCanto>
-                  <BtnCanto onClick={responderEnvidoNoQuiero} color="blue">No quiero ✗</BtnCanto>
+                  <BtnCanto onClick={responderEnvidoQuiero} color="gold">Quiero ✓</BtnCanto>
+                  <BtnCanto onClick={responderEnvidoNoQuiero} color="gold">No quiero ✗</BtnCanto>
                 </div>
               </div>
             )}
@@ -512,15 +554,15 @@ export default function MesaTruco({
             <div className="flex items-center justify-between mb-1">
               <span className="text-[10px] text-gray-500 uppercase tracking-widest font-semibold">Tu turno</span>
               <span className={`text-sm font-extrabold tabular-nums transition-colors ${
-                timerSeg > 15 ? 'text-green-400' : timerSeg > 8 ? 'text-yellow-400' : 'text-red-400 animate-pulse'
+                timerSeg > 20 ? 'text-green-400' : timerSeg > 10 ? 'text-yellow-400' : 'text-red-400 animate-pulse'
               }`}>{timerSeg}s</span>
             </div>
             <div className="w-full h-2 bg-gray-800 rounded-full overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all duration-1000 ease-linear ${
-                  timerSeg > 15 ? 'bg-green-500' : timerSeg > 8 ? 'bg-yellow-500' : 'bg-red-500'
+                  timerSeg > 20 ? 'bg-green-500' : timerSeg > 10 ? 'bg-yellow-500' : 'bg-red-500'
                 }`}
-                style={{ width: `${(timerSeg / 30) * 100}%` }}
+                style={{ width: `${(timerSeg / 45) * 100}%` }}
               />
             </div>
           </div>
@@ -537,7 +579,7 @@ export default function MesaTruco({
           : 'Elegí una carta — doble click para jugar'}
         </p>
 
-        {cartaSel && <p className="text-purple-400 text-xs animate-pulse">Clickeá de nuevo para jugar</p>}
+        {cartaSel && <p className="text-yellow-500 text-xs animate-pulse">Clickeá de nuevo para jugar</p>}
 
         {/* Irse al mazo + Salir */}
         <div className="flex items-center gap-3">
@@ -569,9 +611,9 @@ export default function MesaTruco({
           <div className="relative">
             <Avatar usuario={{ displayName: miNombre, photoURL: miPhotoURL }} size="md" />
             {globoYo && (
-              <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 bg-purple-800 border border-purple-600 text-white text-xs px-3 py-1.5 rounded-2xl shadow-lg max-w-[200px] z-30 whitespace-nowrap">
+              <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 bg-[#1a1710] border border-yellow-700/50 text-yellow-200 text-xs px-3 py-1.5 rounded-2xl shadow-lg max-w-[200px] z-30 whitespace-nowrap">
                 {globoYo}
-                <div className="absolute -left-1.5 top-1/2 -translate-y-1/2 w-3 h-3 bg-purple-800 border-l border-b border-purple-600 rotate-45" />
+                <div className="absolute -left-1.5 top-1/2 -translate-y-1/2 w-3 h-3 bg-[#1a1710] border-l border-b border-yellow-700/50 rotate-45" />
               </div>
             )}
           </div>
@@ -617,40 +659,38 @@ export default function MesaTruco({
           {/* Envido */}
           {!envidoPendiente && !florJ && !florM && (
             <div className="flex gap-1">
-              <BtnCanto onClick={() => cantarEnvido('envido')} disabled={!puedeEnvido} color="blue">Envido</BtnCanto>
-              <BtnCanto onClick={() => cantarEnvido('real')} disabled={!puedeEnvido} color="blue">Real E.</BtnCanto>
-              <BtnCanto onClick={() => cantarEnvido('falta')} disabled={!puedeEnvido} color="blue">Falta E.</BtnCanto>
+              <BtnCanto onClick={() => cantarEnvido('envido')} disabled={!puedeEnvido} color="gold">Envido</BtnCanto>
+              <BtnCanto onClick={() => cantarEnvido('real')} disabled={!puedeEnvido} color="gold">Real E.</BtnCanto>
+              <BtnCanto onClick={() => cantarEnvido('falta')} disabled={!puedeEnvido} color="gold">Falta E.</BtnCanto>
             </div>
           )}
 
           {/* Envido pendiente — subida */}
           {envidoPendiente && (
             <div className="flex flex-col gap-1">
-              {puedeSubirEnvido     && <BtnCanto onClick={() => onSubirEnvidoConNivel?.('envido')} color="blue">Envido ↑</BtnCanto>}
-              {puedeSubirRealEnvido && <BtnCanto onClick={() => onSubirEnvidoConNivel?.('real')}   color="blue">Real E. ↑</BtnCanto>}
-              {puedeSubirFaltaEnvido && <BtnCanto onClick={() => onSubirEnvidoConNivel?.('falta')} color="blue">Falta E. ↑</BtnCanto>}
+              {puedeSubirEnvido     && <BtnCanto onClick={() => onSubirEnvidoConNivel?.('envido')} color="gold">Envido ↑</BtnCanto>}
+              {puedeSubirRealEnvido && <BtnCanto onClick={() => onSubirEnvidoConNivel?.('real')}   color="gold">Real E. ↑</BtnCanto>}
+              {puedeSubirFaltaEnvido && <BtnCanto onClick={() => onSubirEnvidoConNivel?.('falta')} color="gold">Falta E. ↑</BtnCanto>}
             </div>
           )}
 
           {/* Truco */}
           <div className="flex gap-1">
-            <BtnCanto onClick={() => cantarTruco('truco')}   disabled={!puedeIniciarTruco}                       color="red">Truco</BtnCanto>
-            <BtnCanto onClick={() => cantarTruco('retruco')} disabled={!(puedeIniciarRetruco || puedeRetruco)}   color="red">Retruco</BtnCanto>
-            <BtnCanto onClick={() => cantarTruco('vale4')}   disabled={!(puedeIniciarVale4  || puedeVale4)}      color="red">Vale 4</BtnCanto>
+            <BtnCanto onClick={() => cantarTruco('truco')}   disabled={!puedeIniciarTruco}                       color="gold">Truco</BtnCanto>
+            <BtnCanto onClick={() => cantarTruco('retruco')} disabled={!(puedeIniciarRetruco || puedeRetruco)}   color="gold">Retruco</BtnCanto>
+            <BtnCanto onClick={() => cantarTruco('vale4')}   disabled={!(puedeIniciarVale4  || puedeVale4)}      color="gold">Vale 4</BtnCanto>
           </div>
         </div>
 
         {/* Chat — mobile: mensajes recientes + input */}
         <div className="lg:hidden w-full flex flex-col gap-1.5">
-          {/* Últimos 3 mensajes de chat */}
           {log.filter(m => m.startsWith('💬')).slice(0, 3).length > 0 && (
-            <div className="bg-blue-950/60 border border-blue-800/50 rounded-xl px-3 py-2 flex flex-col gap-0.5">
+            <div className="rounded-xl px-3 py-2 flex flex-col gap-0.5" style={{ background: 'rgba(201,168,60,0.05)', border: '1px solid rgba(201,168,60,0.12)' }}>
               {log.filter(m => m.startsWith('💬')).slice(0, 3).map((msg, i) => (
-                <p key={i} className={`text-xs ${i === 0 ? 'text-blue-200 font-semibold' : 'text-blue-400/70'}`}>{msg}</p>
+                <p key={i} className={`text-xs ${i === 0 ? 'text-yellow-200 font-semibold' : 'text-yellow-400/50'}`}>{msg}</p>
               ))}
             </div>
           )}
-          {/* Input */}
           <div className="flex gap-2">
             <input
               value={chatInput}
@@ -658,10 +698,11 @@ export default function MesaTruco({
               onKeyDown={e => e.key === 'Enter' && enviar()}
               maxLength={80}
               placeholder="Escribí algo al rival..."
-              className="flex-1 bg-gray-900 border border-gray-700 focus:border-blue-500 rounded-xl px-3 py-2 text-white text-xs focus:outline-none placeholder-gray-600"
+              className="flex-1 bg-white/[0.04] border border-white/10 focus:border-yellow-600/40 rounded-xl px-3 py-2 text-white text-xs focus:outline-none placeholder-gray-600"
             />
             <button onClick={enviar} disabled={!chatInput.trim()}
-              className="bg-blue-700 hover:bg-blue-600 disabled:opacity-30 text-white px-3 py-2 rounded-xl text-xs font-bold transition">
+              className="disabled:opacity-30 text-[#07090d] px-3 py-2 rounded-xl text-xs font-bold transition hover:opacity-90"
+              style={{ background: '#c9a83c' }}>
               →
             </button>
           </div>
@@ -669,9 +710,9 @@ export default function MesaTruco({
 
         {/* Historial — mobile */}
         <div className="lg:hidden w-full">
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-3 max-h-24 overflow-y-auto">
+          <div className="rounded-2xl p-3 max-h-24 overflow-y-auto" style={{ background: '#0c0b09', border: '1px solid rgba(255,255,255,0.06)' }}>
             {log.length === 0
-              ? <p className="text-gray-600 text-xs text-center">El historial aparecerá acá</p>
+              ? <p className="text-gray-500 text-xs text-center">El historial aparecerá acá</p>
               : log.filter(m => !m.startsWith('💬')).slice(0, 8).map((msg, i) => <LogEntry key={i} msg={msg} reciente={i === 0} />)
             }
           </div>
@@ -681,18 +722,18 @@ export default function MesaTruco({
       {/* ── PANEL DERECHO — solo desktop ── */}
       <div className="hidden lg:flex flex-col gap-3 w-52 flex-shrink-0">
         <div className="flex flex-col gap-2">
-          <p className="text-xs text-red-400 font-bold uppercase tracking-wider text-center">Truco</p>
-          <BtnCanto onClick={() => cantarTruco('truco')}   disabled={!puedeIniciarTruco}                     color="red">Truco</BtnCanto>
-          <BtnCanto onClick={() => cantarTruco('retruco')} disabled={!(puedeIniciarRetruco || puedeRetruco)} color="red">Retruco</BtnCanto>
-          <BtnCanto onClick={() => cantarTruco('vale4')}   disabled={!(puedeIniciarVale4  || puedeVale4)}    color="red">Vale Cuatro</BtnCanto>
+          <p className="text-xs font-bold uppercase tracking-wider text-center" style={{ color: '#e87070' }}>Truco</p>
+          <BtnCanto onClick={() => cantarTruco('truco')}   disabled={!puedeIniciarTruco}                     color="gold">Truco</BtnCanto>
+          <BtnCanto onClick={() => cantarTruco('retruco')} disabled={!(puedeIniciarRetruco || puedeRetruco)} color="gold">Retruco</BtnCanto>
+          <BtnCanto onClick={() => cantarTruco('vale4')}   disabled={!(puedeIniciarVale4  || puedeVale4)}    color="gold">Vale Cuatro</BtnCanto>
         </div>
 
         {/* Historial de juego */}
         <div className="h-[525px] flex flex-col gap-2">
-          <p className="text-gray-500 text-[10px] font-semibold uppercase tracking-widest mb-1 text-center flex-shrink-0">Historial</p>
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-3 overflow-y-auto flex-1 min-h-0">
+          <p className="text-[10px] font-semibold uppercase tracking-widest mb-1 text-center flex-shrink-0" style={{ color: 'rgba(201,168,60,0.5)' }}>Historial</p>
+          <div className="rounded-2xl p-3 overflow-y-auto flex-1 min-h-0" style={{ background: '#0c0b09', border: '1px solid rgba(255,255,255,0.06)' }}>
             {log.filter(m => !m.startsWith('💬')).length === 0
-              ? <p className="text-gray-600 text-xs text-center">El historial aparecerá acá</p>
+              ? <p className="text-gray-500 text-xs text-center">El historial aparecerá acá</p>
               : log.filter(m => !m.startsWith('💬')).map((msg, i) => <LogEntry key={i} msg={msg} reciente={i === 0} />)
             }
           </div>

@@ -51,6 +51,11 @@ export default function Truco() {
   const [florPendiente, setFlorPendiente] = useState(false)
   const [florCantada, setFlorCantada] = useState(null)
 
+  const [timerSeg, setTimerSeg] = useState(45)
+  const timerRef  = useRef(null)
+  const manoJRef  = useRef(manoJ)
+  manoJRef.current = manoJ
+
   const addLog = (msg) => setLog(p => [msg, ...p].slice(0, 50))
 
   const revisarGanador = useCallback((pj, pm) => {
@@ -81,20 +86,20 @@ export default function Truco() {
     setFlorJ(fj); setFlorM(fm); setRivalTieneFlor(fm); setFlorCantada(null)
 
     addLog(`─── Nueva ronda ───`)
-    addLog(`📋 Muestra: ${m.numero} de ${m.palo}`)
-    if (fj) addLog('🌸 Tenés Flor')
-    if (fm) addLog('🌸 Máquina tiene Flor')
+    addLog(`Muestra: ${m.numero} de ${m.palo}`)
+    if (fj) addLog('[F] Tenés Flor')
+    if (fm) addLog('[F] Máquina tiene Flor')
 
-    if (fj && fm) { setFlorResuelta(false); setFlorPendiente(true); addLog('⚘ Ambos tienen Flor') }
-    if (!fj && fm) setTimeout(() => { setPtsM(p => p + 3); addLog('🤖 +3 máquina'); setFlorResuelta(true); setEnvidoResuelto(true) }, 800)
-    if (fj && !fm) setTimeout(() => { setPtsJ(p => p + 3); addLog('🌸 +3 vos'); setFlorResuelta(true); setEnvidoResuelto(true) }, 800)
+    if (fj && fm) { setFlorResuelta(false); setFlorPendiente(true); addLog('[F] Ambos tienen Flor') }
+    if (!fj && fm) setTimeout(() => { setPtsM(p => p + 3); addLog('[-] Flor automática — +3 pts para la máquina'); setFlorResuelta(true); setEnvidoResuelto(true) }, 800)
+    if (fj && !fm) setTimeout(() => { setPtsJ(p => p + 3); addLog('[+] Flor automática — +3 pts para vos'); setFlorResuelta(true); setEnvidoResuelto(true) }, 800)
 
     return { m, nj, nm, nuevoEsMano, fj, fm }
   }
 
   const iniciar = () => {
     setPtsJ(0); setPtsM(0); setGanador(null); setLog([]); setPantalla('juego')
-    addLog('🎮 ¡Partida iniciada!')
+    addLog('─── Partida iniciada ───')
     repartir(false, true)
   }
 
@@ -102,8 +107,8 @@ export default function Truco() {
     let pj = pjAct, pm = pmAct
     if (!trucoResuelto) {
       const val = { truco: 2, retruco: 3, vale4: 4 }[trucoCantado] || 1
-      if (gan === 'jugador') { pj += val; addLog(`✅ +${val}`) }
-      else if (gan === 'maquina') { pm += val; addLog(`❌ +${val} máquina`) }
+      if (gan === 'jugador') { pj += val; addLog(`[+] Ronda de truco: +${val} pts para vos`) }
+      else if (gan === 'maquina') { pm += val; addLog(`[-] Ronda de truco: +${val} pts para la máquina`) }
     }
     setPtsJ(pj); setPtsM(pm)
     if (pj >= limite) { setGanador('jugador'); setPantalla('resultado'); return }
@@ -119,9 +124,9 @@ export default function Truco() {
     const res = ganadorMano(cJ, cM, muestraAct)
     const nuevosRes = [...resAct, res]
     setResultados(nuevosRes); setMostrandoMano(true)
-    if (res === 'jugador') addLog('✅ Mano')
-    else if (res === 'maquina') addLog('❌ Mano máquina')
-    else addLog('🤝 Empate')
+    if (res === 'jugador') addLog('[+] Ganaste la mano')
+    else if (res === 'maquina') addLog('[-] Máquina ganó la mano')
+    else addLog('[=] Mano empatada')
     setTimeout(() => {
       setMostrandoMano(false)
       const gan = ganadorRonda(nuevosRes, eManoAct ? 'jugador' : 'maquina')
@@ -142,16 +147,17 @@ export default function Truco() {
     const carta = [...disp].sort((a, b) => jerarquia(b, muestraAct || muestra) - jerarquia(a, muestraAct || muestra))[0]
     const nuevoCjM = [...(cjMAct || cjM), carta]
     setCjM(nuevoCjM)
-    addLog(`🤖 Jugó ${carta.numero} de ${carta.palo}`)
+    addLog(`Máquina: ${carta.numero} de ${carta.palo}`)
     if ((cjJAct || cjJ).length > idx) resolverMano((cjJAct || cjJ)[idx], carta, cjJAct || cjJ, nuevoCjM, resAct || resultados, idx, muestraAct || muestra, mJAct || manoJ, mMAct || manoM, pjAct ?? ptsJ, pmAct ?? ptsM, eManoAct ?? esMano)
     else setTurno('jugador')
   }, [manoM, manoJ, muestra, ptsJ, ptsM, esMano, cjJ, cjM, resultados, resolverMano])
 
   const jugarCarta = (carta) => {
     if (turno !== 'jugador' || esperando || !florResuelta || mostrandoMano) return
+    clearInterval(timerRef.current); setTimerSeg(45)
     const nuevoCjJ = [...cjJ, carta]; setCjJ(nuevoCjJ); setCartaSel(null)
     if (!primeraJugada) setPrimeraJugada(true)
-    addLog(`🃏 Jugaste ${carta.numero} de ${carta.palo}`)
+    addLog(`Vos: ${carta.numero} de ${carta.palo}`)
     if (cjM.length > manoActual) resolverMano(carta, cjM[manoActual], nuevoCjJ, cjM, resultados, manoActual, muestra, manoJ, manoM, ptsJ, ptsM, esMano)
     else { setTurno('maquina'); setTimeout(() => maquinaJugarFn(nuevoCjJ, cjM, resultados, manoActual, muestra, manoM, manoJ, ptsJ, ptsM, esMano), 500) }
   }
@@ -159,18 +165,18 @@ export default function Truco() {
   // FLOR
   const cantarFlor = (nivel) => {
     setFlorCantada(nivel); setEsperando(true)
-    addLog(`🌸 ${nivel === 'flor' ? 'La mía es Flor' : nivel === 'conFlor' ? 'Con Flor' : 'Contra Flor'}`)
+    addLog(`[F] Cantaste: ${nivel === 'flor' ? 'La mía es Flor' : nivel === 'conFlor' ? 'Con Flor Envido' : 'Contra Flor al Resto'}`)
     setTimeout(() => {
       if (Math.random() < 0.3) {
         const pts = nivel === 'flor' ? 3 : nivel === 'conFlor' ? 3 : 5
-        addLog(`🤖 No quiere — +${pts}`); setPtsJ(p => p + pts)
+        addLog(`[+] Máquina no quiere la flor — +${pts} pts para vos`); setPtsJ(p => p + pts)
         setFlorResuelta(true); setFlorPendiente(false); setEnvidoResuelto(true); setEsperando(false); return
       }
       const vj = calcularFlor(manoJ, muestra), vm = calcularFlor(manoM, muestra)
       const pts = nivel === 'flor' ? 3 : nivel === 'conFlor' ? 6 : limite - Math.min(ptsJ, ptsM)
-      addLog(`⚘ Flor: vos ${vj} — máquina ${vm}`)
-      if (vj >= vm) { setPtsJ(p => p + pts); addLog(`✅ +${pts}`) }
-      else { setPtsM(p => p + pts); addLog(`❌ +${pts} máquina`) }
+      addLog(`[F] Flor: vos ${vj} — máquina ${vm}`)
+      if (vj >= vm) { setPtsJ(p => p + pts); addLog(`[+] Flor: +${pts} pts para vos`) }
+      else { setPtsM(p => p + pts); addLog(`[-] Flor: +${pts} pts para la máquina`) }
       setFlorResuelta(true); setFlorPendiente(false); setEnvidoResuelto(true); setEsperando(false)
     }, 1000)
   }
@@ -178,15 +184,15 @@ export default function Truco() {
   const responderFlorQuiero = () => {
     const vj = calcularFlor(manoJ, muestra), vm = calcularFlor(manoM, muestra)
     const pts = florCantada === 'flor' ? 3 : florCantada === 'conFlor' ? 6 : limite - Math.min(ptsJ, ptsM)
-    addLog(`⚘ Flor: vos ${vj} — máquina ${vm}`)
-    if (vj >= vm) { setPtsJ(p => p + pts); addLog(`✅ +${pts}`) }
-    else { setPtsM(p => p + pts); addLog(`❌ +${pts} máquina`) }
+    addLog(`[F] Flor: vos ${vj} — máquina ${vm}`)
+    if (vj >= vm) { setPtsJ(p => p + pts); addLog(`[+] Flor: +${pts} pts para vos`) }
+    else { setPtsM(p => p + pts); addLog(`[-] Flor: +${pts} pts para la máquina`) }
     setFlorResuelta(true); setFlorPendiente(false); setEnvidoResuelto(true)
   }
 
   const responderFlorNoQuiero = () => {
     const pts = florCantada === 'flor' ? 3 : florCantada === 'conFlor' ? 3 : 5
-    addLog(`❌ No querés — +${pts} máquina`); setPtsM(p => p + pts)
+    addLog(`[-] No quisiste la flor — +${pts} pts para la máquina`); setPtsM(p => p + pts)
     setFlorResuelta(true); setFlorPendiente(false); setEnvidoResuelto(true)
   }
 
@@ -196,20 +202,21 @@ export default function Truco() {
     setEsperando(true); setEnvidoNivel(nivel)
     const pts = nivel === 'falta' ? limite - Math.min(ptsJ, ptsM) : nivel === 'real' ? 3 : 2
     setEnvidoPtsApostados(pts)
-    addLog(`Cantaste: ${nivel === 'real' ? 'Real Envido' : nivel === 'falta' ? 'Falta Envido' : 'Envido'} (vale ${pts})`)
+    const nEnv = nivel === 'real' ? 'Real Envido' : nivel === 'falta' ? 'Falta Envido' : 'Envido'
+    addLog(`[E] Cantaste ${nEnv} (vale ${pts} pts)`)
     setTimeout(() => {
-      if (Math.random() < 0.25) { addLog('🤖 No quiere — +1'); setPtsJ(p => p + 1); setEnvidoResuelto(true); setEsperando(false); return }
+      if (Math.random() < 0.25) { addLog('[+] Máquina no quiere el envido — +1 pt para vos'); setPtsJ(p => p + 1); setEnvidoResuelto(true); setEsperando(false); return }
       if (nivel === 'envido' && Math.random() < 0.5) {
         const subida = Math.random() < 0.5 ? 'real' : 'falta'
         const ptsSub = subida === 'falta' ? limite - Math.min(ptsJ, ptsM) : 3
-        addLog(`🤖 ${subida === 'real' ? 'Real Envido' : 'Falta Envido'} (vale ${ptsSub})`)
+        addLog(`[E] Máquina sube a ${subida === 'real' ? 'Real Envido' : 'Falta Envido'} (vale ${ptsSub} pts)`)
         setEnvidoNivel(subida); setEnvidoPtsApostados(ptsSub); setEnvidoPendiente(true); setEsperando(false); return
       }
-      addLog('🤖 Quiere')
+      addLog('[E] Máquina quiere el envido')
       const ej = calcularEnvido(manoJ, muestra), em = calcularEnvido(manoM, muestra)
-      addLog(`Tanto: vos ${ej} — máquina ${em}`)
-      if (ej >= em) { setPtsJ(p => p + pts); addLog(`✅ +${pts}`) }
-      else { setPtsM(p => p + pts); addLog(`❌ +${pts} máquina`) }
+      addLog(`[E] Tanto: vos ${ej} — máquina ${em}`)
+      if (ej >= em) { setPtsJ(p => p + pts); addLog(`[+] Envido: +${pts} pts para vos`) }
+      else { setPtsM(p => p + pts); addLog(`[-] Envido: +${pts} pts para la máquina`) }
       setEnvidoResuelto(true); setEsperando(false)
     }, 1000)
   }
@@ -217,14 +224,14 @@ export default function Truco() {
   const responderEnvidoQuiero = () => {
     const ej = calcularEnvido(manoJ, muestra), em = calcularEnvido(manoM, muestra)
     const pts = envidoNivel === 'falta' ? limite - Math.min(ptsJ, ptsM) : envidoPtsApostados
-    addLog(`Tanto: vos ${ej} — máquina ${em}`)
-    if (ej >= em) { setPtsJ(p => p + pts); addLog(`✅ +${pts}`) }
-    else { setPtsM(p => p + pts); addLog(`❌ +${pts} máquina`) }
+    addLog(`[E] Tanto: vos ${ej} — máquina ${em}`)
+    if (ej >= em) { setPtsJ(p => p + pts); addLog(`[+] Envido: +${pts} pts para vos`) }
+    else { setPtsM(p => p + pts); addLog(`[-] Envido: +${pts} pts para la máquina`) }
     setEnvidoResuelto(true); setEnvidoPendiente(false)
   }
 
   const responderEnvidoNoQuiero = () => {
-    addLog('No querés — +1 máquina'); setPtsM(p => p + 1)
+    addLog('[-] No quisiste el envido — +1 pt para la máquina'); setPtsM(p => p + 1)
     setEnvidoResuelto(true); setEnvidoPendiente(false)
   }
 
@@ -232,42 +239,64 @@ export default function Truco() {
   const cantarTruco = (nivel) => {
     if (esperando || mostrandoMano) return
     setTrucoCantado(nivel); setUltimoEnCantar('jugador'); setEsperando(true)
-    addLog(`🗣 Cantaste ${nivel}`)
+    const nTru = nivel === 'truco' ? 'Truco' : nivel === 'retruco' ? 'Retruco' : 'Vale Cuatro'
+    addLog(`[T] Cantaste ${nTru}`)
     setTimeout(() => {
       if (Math.random() < 0.35) {
-        const pts = { truco: 1, retruco: 2, vale4: 3 }[nivel]; addLog(`🤖 No quiere — +${pts}`); setPtsJ(p => p + pts)
+        const pts = { truco: 1, retruco: 2, vale4: 3 }[nivel]; addLog(`[+] Máquina no quiere el truco — +${pts} pts para vos`); setPtsJ(p => p + pts)
         setTrucoResuelto(true); setEsperando(false)
         if (revisarGanador(ptsJ + pts, ptsM)) return
         setTimeout(() => { const { nuevoEsMano } = repartir(true, esMano); if (!nuevoEsMano) setTimeout(() => maquinaJugarFn([], [], [], 0), 500) }, 800)
-      } else if (Math.random() < 0.65 || nivel === 'vale4') { addLog(`🤖 Quiere ${nivel}`); setEsperando(false); setTrucoPendiente(false) }
+      } else if (Math.random() < 0.65 || nivel === 'vale4') { addLog(`[T] Máquina quiere el ${nTru}`); setEsperando(false); setTrucoPendiente(false) }
       else {
         const subida = nivel === 'truco' ? 'retruco' : nivel === 'retruco' ? 'vale4' : null
-        if (subida) { addLog(`🤖 ${subida}`); setTrucoCantado(subida); setUltimoEnCantar('maquina') }
-        else addLog(`🤖 Quiere ${nivel}`)
+        if (subida) { addLog(`[T] Máquina sube a ${subida === 'retruco' ? 'Retruco' : 'Vale Cuatro'}`); setTrucoCantado(subida); setUltimoEnCantar('maquina') }
+        else addLog(`[T] Máquina quiere el ${nTru}`)
         setEsperando(false)
       }
     }, 1000)
   }
 
-  const responderTrucoQuiero = () => { addLog(`✅ Querés ${trucoCantado}`); setUltimoEnCantar('jugador'); setTrucoPendiente(false) }
+  const responderTrucoQuiero = () => { addLog(`[T] Aceptaste el truco`); setUltimoEnCantar('jugador'); setTrucoPendiente(false) }
   const responderTrucoNoQuiero = () => {
     const pts = { truco: 1, retruco: 2, vale4: 3 }[trucoCantado] || 1
-    addLog(`❌ No querés — +${pts} máquina`); setPtsM(p => p + pts); setTrucoResuelto(true); setTrucoPendiente(false)
+    addLog(`[-] No quisiste el truco — +${pts} pts para la máquina`); setPtsM(p => p + pts); setTrucoResuelto(true); setTrucoPendiente(false)
     if (rivalTieneFlor) setMostrarCartasRival(true)
     setTimeout(() => terminarRonda('maquina', ptsJ, ptsM + pts, esMano), 800)
   }
 
   const subirTruco = (nivel) => {
     setTrucoCantado(nivel); setUltimoEnCantar('jugador'); setEsperando(true); setTrucoPendiente(false)
-    addLog(`🗣 Subís a ${nivel}`)
+    const nSub = nivel === 'retruco' ? 'Retruco' : 'Vale Cuatro'
+    addLog(`[T] Subís a ${nSub}`)
     setTimeout(() => {
       if (Math.random() < 0.35) {
-        const pts = { retruco: 2, vale4: 3 }[nivel] || 1; addLog(`🤖 No quiere — +${pts}`); setPtsJ(p => p + pts)
+        const pts = { retruco: 2, vale4: 3 }[nivel] || 1; addLog(`[+] Máquina no quiere — +${pts} pts para vos`); setPtsJ(p => p + pts)
         setTrucoResuelto(true); setEsperando(false)
         setTimeout(() => terminarRonda('jugador', ptsJ + pts, ptsM, esMano), 800)
-      } else { addLog(`🤖 Quiere ${nivel}`); setUltimoEnCantar('maquina'); setEsperando(false) }
+      } else { addLog(`[T] Máquina quiere el ${nSub}`); setUltimoEnCantar('maquina'); setEsperando(false) }
     }, 1000)
   }
+
+  useEffect(() => {
+    clearInterval(timerRef.current)
+    const activo = turno === 'jugador' && florResuelta && !mostrandoMano &&
+      !esperando && !trucoPendiente && !envidoPendiente && !florPendiente
+    if (!activo) { setTimerSeg(45); return }
+    setTimerSeg(45)
+    timerRef.current = setInterval(() => {
+      setTimerSeg(prev => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current)
+          const carta = manoJRef.current.find(c => !cjJ.includes(c))
+          if (carta) jugarCarta(carta)
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+    return () => clearInterval(timerRef.current)
+  }, [turno, florResuelta, mostrandoMano, esperando, trucoPendiente, envidoPendiente, florPendiente])
 
   const resultadoUltimaMano = resultados[resultados.length - 1]
   const bloqueado = mostrandoMano || esperando || trucoPendiente || envidoPendiente
@@ -429,7 +458,7 @@ export default function Truco() {
 
   // JUEGO
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex flex-col">
+    <div className="min-h-screen bg-[#07090d] text-white flex flex-col">
       <Navbar />
       <MesaTruco
         manoJ={manoJ} manoM={manoM} cjJ={cjJ} cjM={cjM}
@@ -451,7 +480,8 @@ export default function Truco() {
         puedeIniciarTruco={puedeIniciarTruco} puedeRetruco={puedeRetruco} puedeVale4={puedeVale4}
         puedeIniciarRetruco={puedeIniciarRetruco} puedeIniciarVale4={puedeIniciarVale4}
         puedeSubirEnvido={puedeSubirEnvido} puedeSubirRealEnvido={puedeSubirRealEnvido} puedeSubirFaltaEnvido={puedeSubirFaltaEnvido}
-        nombreRival="Máquina" inicialesRival="🤖"
+        nombreRival="Máquina"
+        timerSeg={timerSeg}
         miNombre={usuario?.displayName || usuario?.email?.split('@')[0] || 'Jugador'}
         miPhotoURL={usuario?.photoURL || ''}
         florJ={florJ} florM={florM} florCantada={florCantada}

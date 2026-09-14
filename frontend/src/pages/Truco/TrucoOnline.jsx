@@ -105,7 +105,7 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
   const [copied, setCopied]           = useState(false)
   const [copiedLink, setCopiedLink]   = useState(false)
   const [rondaTerminada, setRondaTerminada] = useState(false)
-  const [timerSeg, setTimerSeg]       = useState(30)
+  const [timerSeg, setTimerSeg]       = useState(45)
   const [globoYo, setGloboYo]               = useState(null)
   const [globoRival, setGloboRival]         = useState(null)
   const [globoPartner2v2, setGloboPartner2v2] = useState(null)
@@ -398,7 +398,7 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
       setPtsJ(0); setPtsM(0); setGanador(null); setLog([])
       prevResultadosLen.current = 0
       setPantalla('juego')
-      addLog(['🎮 ¡Partida iniciada!'])
+      addLog(['─── Partida iniciada ───'])
     })
 
     socket.on('truco_estado', estado => {
@@ -433,11 +433,11 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
       setPtsJ(0); setPtsM(0); setGanador(null); setLog([])
       prevResultadosLen.current = 0
       setPantalla('juego')
-      addLog(['🎮 ¡Partida 2vs2 iniciada!'])
+      addLog(['─── Partida 2vs2 iniciada ───'])
     })
 
     socket.on('chat_recibido', ({ nombre, texto }) => {
-      addLog([`💬 ${nombre}: ${texto}`])
+      addLog([`[C] ${nombre}: ${texto}`])
       const partner = partner2v2Ref.current
       const rivals  = rivals2v2Ref.current
       if (partner?.nombre === nombre) {
@@ -495,14 +495,14 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
     }
   }, [conectado, miNombre, usuario])
 
-  // ── Turn timer: 30s countdown when it's your turn to play ──
+  // ── Turn timer: 45s countdown when it's your turn to play ──
   useEffect(() => {
     clearInterval(timerRef.current)
     const puedeJugarAhora = turno === 'yo' && florResuelta && !rondaTerminada &&
       !mostrandoMano && !esperandoRespuesta && !trucoPendiente && !envidoPendiente && !florPendiente
-    if (!puedeJugarAhora) { setTimerSeg(30); return }
+    if (!puedeJugarAhora) { setTimerSeg(45); return }
 
-    setTimerSeg(30)
+    setTimerSeg(45)
     timerRef.current = setInterval(() => {
       setTimerSeg(prev => {
         if (prev <= 1) {
@@ -518,7 +518,7 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
   }, [turno, florResuelta, rondaTerminada, mostrandoMano, esperandoRespuesta, trucoPendiente, envidoPendiente, florPendiente])
 
   // ── Action handlers — just forward to server ──
-  const jugarCarta        = carta => { clearInterval(timerRef.current); setTimerSeg(30); setCartaSel(null); emit('carta', { carta }) }
+  const jugarCarta        = carta => { clearInterval(timerRef.current); setTimerSeg(45); setCartaSel(null); emit('carta', { carta }) }
   const cantarTruco       = nivel => emit(nivel)
   const subirTruco        = nivel => emit(nivel)
   const responderTrucoQuiero   = () => emit('quiero_truco')
@@ -538,7 +538,7 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
   }
 
   const enviarMensaje = texto => {
-    addLog([`💬 Vos: ${texto}`])
+    addLog([`[C] Vos: ${texto}`])
     setGloboYo(texto)
     setTimeout(() => setGloboYo(null), 5000)
     sockRef.current?.emit('chat_mensaje', { texto })
@@ -561,16 +561,16 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
 
   // ── ESPERANDO (1vs1) ──
   if (pantalla === 'esperando') return (
-    <div className="min-h-screen bg-[#07070f] text-white flex flex-col">
+    <div className="min-h-screen bg-[#07090d] text-white flex flex-col">
       <Navbar />
       <div className="relative flex-1 flex items-center justify-center px-4 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_0%,rgba(109,40,217,0.2),transparent)]" />
-        <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(rgba(139,92,246,0.05) 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_0%,rgba(201,168,60,0.10),transparent)]" />
+        <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(rgba(201,168,60,0.035) 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
 
         <div className="relative z-10 bg-white/[0.03] border border-white/[0.07] rounded-3xl p-10 max-w-md w-full text-center flex flex-col gap-7 backdrop-blur-sm">
 
           <div className="flex flex-col items-center gap-2">
-            <span className="inline-flex items-center gap-2 bg-purple-950/50 border border-purple-600/30 text-purple-300 text-[10px] font-semibold px-3 py-1 rounded-full uppercase tracking-widest">
+            <span className="inline-flex items-center gap-2 bg-yellow-950/40 border border-yellow-700/30 text-yellow-400 text-[10px] font-semibold px-3 py-1 rounded-full uppercase tracking-widest">
               Modalidad {modalidadFijada || '1vs1'}
             </span>
             <h2 className="text-2xl font-extrabold mt-1">Sala creada</h2>
@@ -579,10 +579,10 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
 
           <div className="flex flex-col items-center gap-3 py-4">
             <p className="text-[10px] text-gray-500 uppercase tracking-widest font-semibold">Código de sala</p>
-            <p className="text-6xl font-mono font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-violet-300 tracking-widest">{codigoSala}</p>
+            <p className="text-6xl font-mono font-extrabold tracking-widest" style={{ color: '#c9a83c' }}>{codigoSala}</p>
             <button
               onClick={() => { navigator.clipboard.writeText(codigoSala); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
-              className="flex items-center gap-2 mt-2 px-5 py-2.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-purple-500/30 transition-all text-sm font-semibold"
+              className="flex items-center gap-2 mt-2 px-5 py-2.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-yellow-600/30 transition-all text-sm font-semibold"
             >
               {copied ? (
                 <><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4 text-green-400"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg><span className="text-green-400">¡Copiado!</span></>
@@ -592,7 +592,7 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
             </button>
             <button
               onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/unirse/${codigoSala}`); setCopiedLink(true); setTimeout(() => setCopiedLink(false), 2000) }}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.06] hover:border-purple-500/20 transition-all text-sm text-gray-400 hover:text-white"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.06] hover:border-yellow-600/20 transition-all text-sm text-gray-400 hover:text-white"
             >
               {copiedLink ? (
                 <><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4 text-green-400"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg><span className="text-green-400">¡Link copiado!</span></>
@@ -615,8 +615,8 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
 
           <div className="flex items-center justify-center gap-2 text-gray-500 text-sm py-2">
             <span className="relative flex w-2 h-2">
-              <span className="animate-ping absolute inset-0 rounded-full bg-purple-500 opacity-60" />
-              <span className="relative rounded-full w-2 h-2 bg-purple-400" />
+              <span className="animate-ping absolute inset-0 rounded-full bg-yellow-500 opacity-60" />
+              <span className="relative rounded-full w-2 h-2 bg-yellow-400" />
             </span>
             Esperando rival...
           </div>
@@ -637,11 +637,11 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
   if (pantalla === 'resultado') {
     const gano = ganador === 'yo'
     return (
-      <div className="min-h-screen bg-[#07070f] text-white flex flex-col">
+      <div className="min-h-screen bg-[#07090d] text-white flex flex-col">
         <Navbar />
         <div className="relative flex-1 flex items-center justify-center px-4 overflow-hidden">
-          <div className={`absolute inset-0 ${gano ? 'bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(109,40,217,0.25),transparent)]' : 'bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(220,38,38,0.15),transparent)]'}`} />
-          <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(rgba(139,92,246,0.04) 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
+          <div className={`absolute inset-0 ${gano ? 'bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(201,168,60,0.12),transparent)]' : 'bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(220,38,38,0.15),transparent)]'}`} />
+          <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(rgba(201,168,60,0.03) 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
 
           <div className="relative z-10 bg-white/[0.03] border border-white/[0.07] rounded-3xl p-10 max-w-sm w-full text-center flex flex-col gap-6 backdrop-blur-sm">
             <div className="flex justify-center">
@@ -670,7 +670,7 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
             <div className="grid grid-cols-2 gap-3">
               <div className="bg-white/[0.04] border border-white/[0.07] rounded-2xl p-4">
                 <p className="text-gray-500 text-xs uppercase tracking-wider mb-1">Vos</p>
-                <p className="text-3xl font-extrabold text-purple-400">{ptsJ}</p>
+                <p className="text-3xl font-extrabold" style={{ color: '#c9a83c' }}>{ptsJ}</p>
               </div>
               <div className="bg-white/[0.04] border border-white/[0.07] rounded-2xl p-4">
                 <p className="text-gray-500 text-xs uppercase tracking-wider mb-1">Rival</p>
@@ -690,7 +690,7 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
 
             <button
               onClick={() => setPantalla('lobby')}
-              className="bg-white/[0.05] hover:bg-white/[0.09] border border-white/[0.08] hover:border-purple-500/30 text-white py-3 rounded-2xl font-semibold transition text-sm"
+              className="bg-white/[0.05] hover:bg-white/[0.09] border border-white/[0.08] hover:border-yellow-600/30 text-white py-3 rounded-2xl font-semibold transition text-sm"
             >
               ← Volver al lobby
             </button>
@@ -715,7 +715,7 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
           empty
             ? 'border border-dashed border-gray-700 text-gray-700'
             : color === 'A'
-              ? 'bg-purple-900/60 border border-purple-600/40 text-purple-200'
+              ? 'bg-yellow-950/50 border border-yellow-700/40 text-yellow-300'
               : 'bg-red-900/60 border border-red-600/40 text-red-200'
         }`}>
           {empty ? '?' : (jugador?.nombre || '?').slice(0, 2).toUpperCase()}
@@ -724,7 +724,7 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
           {empty ? 'Esperando...' : jugador?.nombre}
         </span>
         {!empty && (
-          <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold flex-shrink-0 ${color === 'A' ? 'bg-purple-900/50 text-purple-300' : 'bg-red-900/50 text-red-300'}`}>
+          <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold flex-shrink-0 ${color === 'A' ? 'bg-yellow-950/40 text-yellow-400' : 'bg-red-900/50 text-red-300'}`}>
             Listo
           </span>
         )}
@@ -734,10 +734,10 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
     const TeamCard = ({ jugadores, label, color, equipo }) => {
       const lleno = jugadores.length >= 2
       return (
-        <div className={`flex-1 flex flex-col gap-3 bg-white/[0.03] border rounded-2xl p-4 transition-all ${lleno ? (color === 'A' ? 'border-purple-500/30' : 'border-red-500/30') : 'border-white/[0.07]'}`}>
+        <div className={`flex-1 flex flex-col gap-3 bg-white/[0.03] border rounded-2xl p-4 transition-all ${lleno ? (color === 'A' ? 'border-yellow-600/30' : 'border-red-500/30') : 'border-white/[0.07]'}`}>
           <div className="flex items-center justify-between">
-            <span className={`text-xs font-bold uppercase tracking-widest ${color === 'A' ? 'text-purple-400' : 'text-red-400'}`}>{label}</span>
-            <span className={`text-[10px] font-bold tabular-nums ${lleno ? (color === 'A' ? 'text-purple-400' : 'text-red-400') : 'text-gray-600'}`}>{jugadores.length}/2</span>
+            <span className={`text-xs font-bold uppercase tracking-widest ${color === 'A' ? 'text-yellow-500' : 'text-red-400'}`}>{label}</span>
+            <span className={`text-[10px] font-bold tabular-nums ${lleno ? (color === 'A' ? 'text-yellow-500' : 'text-red-400') : 'text-gray-600'}`}>{jugadores.length}/2</span>
           </div>
           {/* Slots de altura fija — siempre 2 filas, sin crecer */}
           <div className="flex flex-col gap-1" style={{ height: '104px' }}>
@@ -748,7 +748,7 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
           <button
             onClick={() => sockRef.current?.emit('elegir_equipo', { salaId, equipo })}
             disabled={lleno || ambosCompletos}
-            className={`w-full py-2.5 rounded-xl text-sm font-bold transition-all disabled:opacity-30 disabled:cursor-not-allowed ${color === 'A' ? 'bg-purple-600 hover:bg-purple-500 hover:shadow-[0_0_20px_rgba(139,92,246,0.3)]' : 'bg-red-700 hover:bg-red-600 hover:shadow-[0_0_20px_rgba(239,68,68,0.2)]'} text-white`}
+            className={`w-full py-2.5 rounded-xl text-sm font-bold transition-all disabled:opacity-30 disabled:cursor-not-allowed ${color === 'A' ? 'bg-[#c9a83c] hover:bg-[#e8c96a] hover:shadow-[0_0_20px_rgba(201,168,60,0.3)]' : 'bg-red-700 hover:bg-red-600 hover:shadow-[0_0_20px_rgba(239,68,68,0.2)]'} text-white`}
           >
             {ambosCompletos ? '¡Iniciando!' : lleno ? 'Equipo lleno' : `Unirse a ${label}`}
           </button>
@@ -757,23 +757,23 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
     }
 
     return (
-      <div className="min-h-screen bg-[#07070f] text-white flex flex-col">
+      <div className="min-h-screen bg-[#07090d] text-white flex flex-col">
         <Navbar />
         <div className="relative flex-1 flex items-center justify-center px-4 py-12 overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_0%,rgba(109,40,217,0.18),transparent)]" />
-          <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(rgba(139,92,246,0.05) 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_0%,rgba(201,168,60,0.09),transparent)]" />
+          <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(rgba(201,168,60,0.035) 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
 
           <div className="relative z-10 w-full max-w-lg flex flex-col gap-6">
 
             {/* Header */}
             <div className="text-center flex flex-col gap-2">
-              <span className="inline-flex items-center gap-2 bg-purple-950/50 border border-purple-600/30 text-purple-300 text-[10px] font-semibold px-3 py-1 rounded-full uppercase tracking-widest self-center">
+              <span className="inline-flex items-center gap-2 bg-yellow-950/40 border border-yellow-700/30 text-yellow-400 text-[10px] font-semibold px-3 py-1 rounded-full uppercase tracking-widest self-center">
                 Truco · 2 vs 2
               </span>
               <h1 className="text-3xl font-extrabold">Sala de espera</h1>
               <div className="flex items-center justify-center gap-3 mt-1">
                 <p className="text-gray-400 text-sm font-mono tracking-widest">
-                  Código: <span className="text-purple-400 font-bold">{salaId}</span>
+                  Código: <span className="text-[#c9a83c] font-bold">{salaId}</span>
                 </p>
                 <button
                   onClick={() => { navigator.clipboard.writeText(salaId); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
@@ -788,7 +788,7 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
                 </button>
                 <button
                   onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/unirse/${salaId}`); setCopiedLink(true); setTimeout(() => setCopiedLink(false), 2000) }}
-                  className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-purple-400 transition"
+                  className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-yellow-500 transition"
                 >
                   {copiedLink ? (
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3.5 h-3.5 text-green-400"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
@@ -803,7 +803,7 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
             {/* Progress */}
             <div className="flex items-center gap-3 bg-white/[0.03] border border-white/[0.06] rounded-2xl px-5 py-3">
               <div className="flex-1 bg-white/[0.05] rounded-full h-1.5 overflow-hidden">
-                <div className="h-full bg-purple-500 rounded-full transition-all duration-500" style={{ width: `${(total / 4) * 100}%` }} />
+                <div className="h-full bg-[#c9a83c] rounded-full transition-all duration-500" style={{ width: `${(total / 4) * 100}%` }} />
               </div>
               <span className="text-sm font-bold text-white tabular-nums">{total}<span className="text-gray-500">/4</span></span>
               {ambosCompletos ? (
@@ -839,11 +839,11 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
 
   // ── SALA ERROR (link expirado / sala llena) ──
   if (pantalla === 'sala-error') return (
-    <div className="min-h-screen bg-[#07070f] text-white flex flex-col">
+    <div className="min-h-screen bg-[#07090d] text-white flex flex-col">
       <Navbar />
       <div className="relative flex-1 flex items-center justify-center px-4 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(220,38,38,0.12),transparent)]" />
-        <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(rgba(139,92,246,0.04) 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
+        <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(rgba(201,168,60,0.03) 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
 
         <div className="relative z-10 bg-white/[0.03] border border-white/[0.07] rounded-3xl p-10 max-w-sm w-full text-center flex flex-col gap-6 backdrop-blur-sm">
           <div className="flex justify-center">
@@ -870,7 +870,7 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
             <button
               onClick={() => { setSalaError(''); autoJoinedRef.current = false; setPantalla('lobby'); setModalCrearAbierto(true) }}
               disabled={!conectado}
-              className="bg-purple-600 hover:bg-purple-500 disabled:opacity-40 text-white py-3 rounded-2xl font-bold transition-all hover:shadow-[0_0_24px_rgba(139,92,246,0.3)] text-sm"
+              className="bg-[#c9a83c] hover:bg-[#e8c96a] disabled:opacity-40 text-[#07090d] py-3 rounded-2xl font-bold transition-all hover:shadow-[0_0_24px_rgba(201,168,60,0.3)] text-sm"
             >
               Crear mi propia sala →
             </button>
@@ -892,18 +892,18 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
     const modoLabel = modalidadFijada === '2vs2' ? '2 vs 2' : '1 vs 1'
     const modoDesc  = modalidadFijada === '2vs2' ? 'En equipo de dos — 4 jugadores' : 'Duelo mano a mano'
     return (
-    <div className="min-h-screen bg-[#07070f] text-white flex flex-col">
+    <div className="min-h-screen bg-[#07090d] text-white flex flex-col">
       <Navbar />
       <div className="relative flex-1 flex items-center justify-center px-4 py-16 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_-5%,rgba(109,40,217,0.2),transparent)]" />
-        <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(rgba(139,92,246,0.05) 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_-5%,rgba(201,168,60,0.10),transparent)]" />
+        <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(rgba(201,168,60,0.035) 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
 
         <div className="relative z-10 w-full max-w-md flex flex-col gap-4">
 
           {/* Header */}
           <div className="text-center mb-2">
-            <span className="inline-flex items-center gap-2 bg-purple-950/50 border border-purple-600/30 text-purple-300 text-[10px] font-semibold px-3 py-1 rounded-full uppercase tracking-widest">
-              <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
+            <span className="inline-flex items-center gap-2 bg-yellow-950/40 border border-yellow-700/30 text-yellow-400 text-[10px] font-semibold px-3 py-1 rounded-full uppercase tracking-widest">
+              <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse" />
               {modoLabel} · {modoDesc}
             </span>
             <h1 className="text-3xl font-extrabold mt-3">Truco Online</h1>
@@ -935,8 +935,8 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
             <div className="bg-white/[0.03] border border-white/[0.07] rounded-3xl overflow-hidden">
               <div className="px-7 pt-7 pb-5 border-b border-white/[0.06]">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-purple-900/40 border border-purple-700/25 flex items-center justify-center">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5 text-purple-400">
+                  <div className="w-10 h-10 rounded-xl bg-yellow-950/40 border border-yellow-700/25 flex items-center justify-center">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5 text-yellow-500">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
                     </svg>
                   </div>
@@ -953,7 +953,7 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
                   <div className="grid grid-cols-4 gap-2">
                     {[10, 20, 30, 40].map(l => (
                       <button key={l} onClick={() => setLimite(l)}
-                        className={`py-3 rounded-xl border font-bold text-base transition-all ${limite === l ? 'border-purple-500 bg-purple-950/60 text-white shadow-[0_0_16px_rgba(139,92,246,0.2)]' : 'border-white/[0.07] bg-white/[0.03] text-gray-400 hover:border-purple-500/30 hover:text-white'}`}>
+                        className={`py-3 rounded-xl border font-bold text-base transition-all ${limite === l ? 'border-yellow-500 bg-yellow-950/60 text-white shadow-[0_0_16px_rgba(201,168,60,0.2)]' : 'border-white/[0.07] bg-white/[0.03] text-gray-400 hover:border-yellow-600/30 hover:text-white'}`}>
                         {l}
                       </button>
                     ))}
@@ -962,7 +962,7 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
 
                 <div className="flex items-center justify-between bg-white/[0.03] border border-white/[0.06] rounded-2xl px-4 py-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-purple-900/50 border border-purple-700/30 flex items-center justify-center text-xs font-bold text-purple-200">
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: 'rgba(201,168,60,0.15)', border: '1px solid rgba(201,168,60,0.35)', color: '#c9a83c' }}>
                       {miNombre.slice(0, 2).toUpperCase()}
                     </div>
                     <div>
@@ -971,7 +971,7 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-purple-400 text-sm font-bold">{modoLabel}</p>
+                    <p className="text-yellow-500 text-sm font-bold">{modoLabel}</p>
                     <p className="text-gray-500 text-xs">hasta {limite} pts</p>
                   </div>
                 </div>
@@ -979,7 +979,7 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
                 <button
                   onClick={() => { setError(''); setModalCrearAbierto(false); sockRef.current?.emit('crear_sala', { limite, modalidad: modalidadFijada || modalidadCrear }) }}
                   disabled={!conectado}
-                  className="bg-purple-600 hover:bg-purple-500 disabled:opacity-40 disabled:cursor-not-allowed text-white py-3.5 rounded-2xl font-bold transition-all hover:shadow-[0_0_32px_rgba(139,92,246,0.35)]"
+                  className="bg-[#c9a83c] hover:bg-[#e8c96a] disabled:opacity-40 disabled:cursor-not-allowed text-[#07090d] py-3.5 rounded-2xl font-bold transition-all hover:shadow-[0_0_32px_rgba(201,168,60,0.35)]"
                 >
                   Crear partida →
                 </button>
@@ -993,10 +993,10 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
             /* ── Vista principal lobby ── */
             <div className="flex flex-col gap-3">
               {/* Crear sala */}
-              <div className="bg-white/[0.03] border border-white/[0.07] hover:border-purple-500/25 rounded-2xl p-5 flex flex-col gap-4 transition-colors">
+              <div className="bg-white/[0.03] border border-white/[0.07] hover:border-yellow-600/25 rounded-2xl p-5 flex flex-col gap-4 transition-colors">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-purple-900/40 border border-purple-700/25 flex items-center justify-center">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5 text-purple-400">
+                  <div className="w-10 h-10 rounded-xl bg-yellow-950/40 border border-yellow-700/25 flex items-center justify-center">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5 text-yellow-500">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                   </div>
@@ -1008,7 +1008,7 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
                 <button
                   onClick={() => setModalCrearAbierto(true)}
                   disabled={!conectado}
-                  className="bg-purple-600 hover:bg-purple-500 disabled:opacity-40 disabled:cursor-not-allowed text-white py-3 rounded-xl font-bold transition-all hover:shadow-[0_0_24px_rgba(139,92,246,0.3)] text-sm"
+                  className="bg-[#c9a83c] hover:bg-[#e8c96a] disabled:opacity-40 disabled:cursor-not-allowed text-[#07090d] py-3 rounded-xl font-bold transition-all hover:shadow-[0_0_24px_rgba(201,168,60,0.3)] text-sm"
                 >
                   Crear sala →
                 </button>
@@ -1045,7 +1045,7 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
                           </div>
                           <p className="text-gray-600 text-[10px] mt-0.5">{sala.jugadores.length}/{maxJ} jugador{sala.jugadores.length !== 1 ? 'es' : ''}</p>
                         </div>
-                        <span className="text-purple-400 text-xs font-bold flex-shrink-0">Unirse →</span>
+                        <span className="text-yellow-500 text-xs font-bold flex-shrink-0">Unirse →</span>
                       </button>
                     ))}
                   </div>
@@ -1071,12 +1071,12 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
                   onKeyDown={e => e.key === 'Enter' && inputCodigo.length === 4 && conectado && sockRef.current?.emit('unirse_sala', { salaId: normalizarCodigoTruco(inputCodigo) })}
                   placeholder="ABCD"
                   maxLength={4}
-                  className="bg-white/[0.04] border border-white/[0.08] focus:border-purple-500/50 rounded-xl px-4 py-3 text-white text-center text-2xl font-mono tracking-[0.3em] focus:outline-none transition placeholder-gray-700"
+                  className="bg-white/[0.04] border border-white/[0.08] focus:border-yellow-500/50 rounded-xl px-4 py-3 text-white text-center text-2xl font-mono tracking-[0.3em] focus:outline-none transition placeholder-gray-700"
                 />
                 <button
                   onClick={() => { setError(''); sockRef.current?.emit('unirse_sala', { salaId: normalizarCodigoTruco(inputCodigo) }) }}
                   disabled={inputCodigo.length < 4 || !conectado}
-                  className="bg-white/[0.06] hover:bg-white/[0.10] disabled:opacity-30 disabled:cursor-not-allowed border border-white/[0.08] hover:border-purple-500/30 text-white py-3 rounded-xl font-bold transition text-sm"
+                  className="bg-white/[0.06] hover:bg-white/[0.10] disabled:opacity-30 disabled:cursor-not-allowed border border-white/[0.08] hover:border-yellow-600/30 text-white py-3 rounded-xl font-bold transition text-sm"
                 >
                   Unirse →
                 </button>

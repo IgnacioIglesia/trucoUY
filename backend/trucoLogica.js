@@ -190,25 +190,25 @@ function procesarFlorInicial(p) {
   const logA = [], logB = []
   logA.push('─── Nueva ronda ───')
   logB.push('─── Nueva ronda ───')
-  logA.push(`📋 Muestra: ${p.muestra.numero} de ${p.muestra.palo}`)
-  logB.push(`📋 Muestra: ${p.muestra.numero} de ${p.muestra.palo}`)
+  logA.push(`Muestra: ${p.muestra.numero} de ${p.muestra.palo}`)
+  logB.push(`Muestra: ${p.muestra.numero} de ${p.muestra.palo}`)
 
   if (p.florA && p.florB) {
-    logA.push('⚘ ¡Ambos tienen Flor!')
-    logB.push('⚘ ¡Ambos tienen Flor!')
+    logA.push('[F] Ambos tienen Flor')
+    logB.push('[F] Ambos tienen Flor')
   } else if (p.florA && !p.florB) {
     _addPts(p, 'A', 3)
     p.florResuelta = true
     p.envidoResuelto = true
-    logA.push('🌸 Flor automática — +3')
-    logB.push(`🌸 ${p.nombreA} tiene Flor — +3`)
+    logA.push('[+] Flor automática — +3 pts para vos')
+    logB.push(`[-] ${p.nombreA} tiene Flor — +3 pts para el rival`)
     if (p.ptsA >= p.limite) p.ganador = 'A'
   } else if (!p.florA && p.florB) {
     _addPts(p, 'B', 3)
     p.florResuelta = true
     p.envidoResuelto = true
-    logA.push(`🌸 ${p.nombreB} tiene Flor — +3`)
-    logB.push('🌸 Flor automática — +3')
+    logA.push(`[-] ${p.nombreB} tiene Flor — +3 pts para el rival`)
+    logB.push('[+] Flor automática — +3 pts para vos')
     if (p.ptsB >= p.limite) p.ganador = 'B'
   }
 
@@ -310,10 +310,10 @@ function _terminarRonda(p, ganRonda, logA, logB) {
     const ganadorFlor = valorA >= valorB ? 'A' : 'B'
     const pts = p.ptsFlorDiferida
     _addPts(p, ganadorFlor, pts)
-    logA.push(`⚘ Flor: vos ${valorA} vs rival ${valorB}`)
-    logB.push(`⚘ Flor: vos ${valorB} vs rival ${valorA}`)
-    logA.push(ganadorFlor === 'A' ? `✅ Flor +${pts}` : `❌ Flor +${pts} para ${p.nombreB}`)
-    logB.push(ganadorFlor === 'B' ? `✅ Flor +${pts}` : `❌ Flor +${pts} para ${p.nombreA}`)
+    logA.push(`[F] Flor: vos ${valorA} — rival ${valorB}`)
+    logB.push(`[F] Flor: vos ${valorB} — rival ${valorA}`)
+    logA.push(ganadorFlor === 'A' ? `[+] Flor: +${pts} pts para vos` : `[-] Flor: +${pts} pts para ${p.nombreB}`)
+    logB.push(ganadorFlor === 'B' ? `[+] Flor: +${pts} pts para vos` : `[-] Flor: +${pts} pts para ${p.nombreA}`)
     p.florDeferida = false
   }
 
@@ -321,8 +321,8 @@ function _terminarRonda(p, ganRonda, logA, logB) {
     const val = { truco: 2, retruco: 3, vale4: 4 }[p.trucoCantado] || 1
     let ganadorPts = ganRonda
     if (ganRonda === 'empate') ganadorPts = p.esManoA ? 'A' : 'B'
-    if (ganadorPts === 'A') { _addPts(p, 'A', val); logA.push(`✅ Ganaste la ronda +${val}`); logB.push(`❌ Perdiste la ronda −${val}`) }
-    else { _addPts(p, 'B', val); logB.push(`✅ Ganaste la ronda +${val}`); logA.push(`❌ Perdiste la ronda −${val}`) }
+    if (ganadorPts === 'A') { _addPts(p, 'A', val); logA.push(`[+] Ronda: +${val} pts para vos`); logB.push(`[-] Ronda: +${val} pts para el rival`) }
+    else { _addPts(p, 'B', val); logB.push(`[+] Ronda: +${val} pts para vos`); logA.push(`[-] Ronda: +${val} pts para el rival`) }
   }
 
   if (p.florA || p.florB) p.mostrarCartasRival = true
@@ -362,8 +362,8 @@ function procesarAccion(p, socketId, tipo, datos) {
       if (esA) p.primeraJugadaA = true; else p.primeraJugadaB = true
 
       const desc = `${carta.numero} de ${carta.palo}`
-      logA.push(esA ? `🃏 Jugaste ${desc}` : `🃏 ${nRivA} jugó ${desc}`)
-      logB.push(esA ? `🃏 ${nRivB} jugó ${desc}` : `🃏 Jugaste ${desc}`)
+      logA.push(esA ? `Vos: ${desc}` : `${nRivA}: ${desc}`)
+      logB.push(esA ? `${nRivB}: ${desc}` : `Vos: ${desc}`)
 
       const cA = p.cartasJugadasA[p.manoActual]
       const cB = p.cartasJugadasB[p.manoActual]
@@ -371,8 +371,8 @@ function procesarAccion(p, socketId, tipo, datos) {
       if (cA && cB) {
         const res = ganadorMano(cA, cB, p.muestra)
         p.resultadosManos.push(res)
-        logA.push(res === 'empate' ? '🤝 Empate en la mano' : res === 'A' ? '✅ Ganaste la mano' : '❌ Perdiste la mano')
-        logB.push(res === 'empate' ? '🤝 Empate en la mano' : res === 'B' ? '✅ Ganaste la mano' : '❌ Perdiste la mano')
+        logA.push(res === 'empate' ? '[=] Mano empatada' : res === 'A' ? '[+] Ganaste la mano' : '[-] Perdiste la mano')
+        logB.push(res === 'empate' ? '[=] Mano empatada' : res === 'B' ? '[+] Ganaste la mano' : '[-] Perdiste la mano')
 
         const ganRonda = ganadorRonda(p.resultadosManos, p.esManoA ? 'A' : 'B')
         if (ganRonda || p.resultadosManos.length === 3) {
@@ -408,8 +408,8 @@ function procesarAccion(p, socketId, tipo, datos) {
       // Si había pendiente para mí, acepto implícitamente antes de subir
       if (pendingParaMi1v1) {
         const nAnt = p.trucoCantado === 'truco' ? 'Truco' : 'Retruco'
-        logA.push(esA ? `✅ Aceptaste el ${nAnt} (implícito)` : `✅ ${nRivA} aceptó el ${nAnt} (implícito)`)
-        logB.push(esA ? `✅ ${nRivB} aceptó el ${nAnt} (implícito)` : `✅ Aceptaste el ${nAnt} (implícito)`)
+        logA.push(esA ? `[T] Aceptaste el ${nAnt} (implícito)` : `[T] ${nRivA} aceptó el ${nAnt}`)
+        logB.push(esA ? `[T] ${nRivB} aceptó el ${nAnt}` : `[T] Aceptaste el ${nAnt} (implícito)`)
         p.trucoPendientePara = null
       }
       if (tipo === 'truco') p.cantanteOriginalTruco = yo
@@ -417,8 +417,8 @@ function procesarAccion(p, socketId, tipo, datos) {
       p.ultimoEnCantar = yo
       p.trucoPendientePara = rival
       const n = tipo === 'truco' ? 'Truco' : tipo === 'retruco' ? 'Retruco' : 'Vale Cuatro'
-      logA.push(esA ? `🗣 Cantaste ${n}` : `🗣 ${nRivA} cantó ${n}`)
-      logB.push(esA ? `🗣 ${nRivB} cantó ${n}` : `🗣 Cantaste ${n}`)
+      logA.push(esA ? `[T] Cantaste ${n}` : `[T] ${nRivA} cantó ${n}`)
+      logB.push(esA ? `[T] ${nRivB} cantó ${n}` : `[T] Cantaste ${n}`)
       return { ok: true, logA, logB, terminoRonda: false }
     }
 
@@ -427,8 +427,8 @@ function procesarAccion(p, socketId, tipo, datos) {
       p.trucoPendientePara = null
       p.ultimoEnCantar = yo
       const n = p.trucoCantado === 'truco' ? 'Truco' : p.trucoCantado === 'retruco' ? 'Retruco' : 'Vale Cuatro'
-      logA.push(esA ? `✅ Aceptaste el ${n}` : `✅ ${nRivA} quiere el ${n}`)
-      logB.push(esA ? `✅ ${nRivB} quiere el ${n}` : `✅ Aceptaste el ${n}`)
+      logA.push(esA ? `[T] Aceptaste el ${n}` : `[T] ${nRivA} quiere el ${n}`)
+      logB.push(esA ? `[T] ${nRivB} quiere el ${n}` : `[T] Aceptaste el ${n}`)
       return { ok: true, logA, logB, terminoRonda: false }
     }
 
@@ -438,8 +438,8 @@ function procesarAccion(p, socketId, tipo, datos) {
       _addPts(p, rival, pts)
       p.trucoResuelto = true
       p.trucoPendientePara = null
-      logA.push(esA ? `❌ No quisiste — +${pts} para ${nRivA}` : `✅ ${nRivA} no quiso — +${pts} para vos`)
-      logB.push(esA ? `✅ ${nRivB} no quiso — +${pts} para vos` : `❌ No quisiste — +${pts} para ${nRivB}`)
+      logA.push(esA ? `[-] No quisiste el truco — +${pts} pts para ${nRivA}` : `[+] ${nRivA} no quiso — +${pts} pts para vos`)
+      logB.push(esA ? `[+] ${nRivB} no quiso — +${pts} pts para vos` : `[-] No quisiste el truco — +${pts} pts para ${nRivB}`)
       const terminoPartida = _terminarRonda(p, rival, logA, logB)
       return { ok: true, logA, logB, terminoRonda: true, terminoPartida }
     }
@@ -465,8 +465,8 @@ function procesarAccion(p, socketId, tipo, datos) {
       p.envidoAcumulado = pts
       p.envidoPendientePara = rival
       const n = tipo === 'real' ? 'Real Envido' : tipo === 'falta' ? 'Falta Envido' : 'Envido'
-      logA.push(esA ? `Cantaste: ${n} (vale ${pts})` : `🎴 ${nRivA} cantó ${n} (vale ${pts})`)
-      logB.push(esA ? `🎴 ${nRivB} cantó ${n} (vale ${pts})` : `Cantaste: ${n} (vale ${pts})`)
+      logA.push(esA ? `[E] Cantaste ${n} (vale ${pts} pts)` : `[E] ${nRivA} cantó ${n} (vale ${pts} pts)`)
+      logB.push(esA ? `[E] ${nRivB} cantó ${n} (vale ${pts} pts)` : `[E] Cantaste ${n} (vale ${pts} pts)`)
       return { ok: true, logA, logB, terminoRonda: false }
     }
 
@@ -479,10 +479,10 @@ function procesarAccion(p, socketId, tipo, datos) {
       _addPts(p, ganadorEnv, pts)
       p.envidoResuelto = true
       p.envidoPendientePara = null
-      logA.push(`🎴 Envido — vos ${tantoA} vs rival ${tantoB}`)
-      logB.push(`🎴 Envido — vos ${tantoB} vs rival ${tantoA}`)
-      logA.push(ganadorEnv === 'A' ? `✅ +${pts} para vos` : `❌ +${pts} para rival`)
-      logB.push(ganadorEnv === 'B' ? `✅ +${pts} para vos` : `❌ +${pts} para rival`)
+      logA.push(`[E] Envido — vos ${tantoA} — rival ${tantoB}`)
+      logB.push(`[E] Envido — vos ${tantoB} — rival ${tantoA}`)
+      logA.push(ganadorEnv === 'A' ? `[+] Envido: +${pts} pts para vos` : `[-] Envido: +${pts} pts para el rival`)
+      logB.push(ganadorEnv === 'B' ? `[+] Envido: +${pts} pts para vos` : `[-] Envido: +${pts} pts para el rival`)
       if (p.ptsA >= p.limite) { p.ganador = 'A'; return { ok: true, logA, logB, terminoRonda: true, terminoPartida: true } }
       if (p.ptsB >= p.limite) { p.ganador = 'B'; return { ok: true, logA, logB, terminoRonda: true, terminoPartida: true } }
       return { ok: true, logA, logB, terminoRonda: false }
@@ -493,8 +493,8 @@ function procesarAccion(p, socketId, tipo, datos) {
       _addPts(p, rival, 1)
       p.envidoResuelto = true
       p.envidoPendientePara = null
-      logA.push(esA ? `❌ No quisiste el envido — +1 para ${nRivA}` : `✅ ${nRivA} no quiso — +1 para vos`)
-      logB.push(esA ? `✅ ${nRivB} no quiso — +1 para vos` : `❌ No quisiste el envido — +1 para ${nRivB}`)
+      logA.push(esA ? `[-] No quisiste el envido — +1 pt para ${nRivA}` : `[+] ${nRivA} no quiso — +1 pt para vos`)
+      logB.push(esA ? `[+] ${nRivB} no quiso — +1 pt para vos` : `[-] No quisiste el envido — +1 pt para ${nRivB}`)
       if (p.ptsA >= p.limite) { p.ganador = 'A'; return { ok: true, logA, logB, terminoRonda: true, terminoPartida: true } }
       if (p.ptsB >= p.limite) { p.ganador = 'B'; return { ok: true, logA, logB, terminoRonda: true, terminoPartida: true } }
       return { ok: true, logA, logB, terminoRonda: false }
@@ -521,8 +521,8 @@ function procesarAccion(p, socketId, tipo, datos) {
         p.florDeferida = true; p.ptsFlorDiferida = 3
         p.florResuelta = true; p.florActiva = false; p.florEnJuego = false
         p.florPendientePara = null; p.envidoResuelto = true
-        logA.push('🌸 Ambos con Flor — se compara al final de la mano (+3)')
-        logB.push('🌸 Ambos con Flor — se compara al final de la mano (+3)')
+        logA.push('[F] Ambos con Flor — se compara al final (+3 pts)')
+        logB.push('[F] Ambos con Flor — se compara al final (+3 pts)')
         return { ok: true, logA, logB, terminoRonda: false }
       }
 
@@ -531,8 +531,8 @@ function procesarAccion(p, socketId, tipo, datos) {
       p.florCantadaPor = yo
       p.florPendientePara = rival
       const n = tipo === 'flor' ? 'La mía es Flor' : tipo === 'conFlor' ? 'Con Flor Envido' : 'Contra Flor al Resto'
-      logA.push(esA ? `🌸 Cantaste: ${n}` : `🌸 ${nRivA} cantó: ${n}`)
-      logB.push(esA ? `🌸 ${nRivB} cantó: ${n}` : `🌸 Cantaste: ${n}`)
+      logA.push(esA ? `[F] Cantaste: ${n}` : `[F] ${nRivA} cantó: ${n}`)
+      logB.push(esA ? `[F] ${nRivB} cantó: ${n}` : `[F] Cantaste: ${n}`)
       return { ok: true, logA, logB, terminoRonda: false }
     }
 
@@ -543,8 +543,8 @@ function procesarAccion(p, socketId, tipo, datos) {
       p.florResuelta = true; p.florActiva = false; p.florEnJuego = false
       p.florPendientePara = null; p.envidoResuelto = true
       const nQ = p.nivelFlor === 'conFlor' ? 'Con Flor Envido' : 'Contra Flor al Resto'
-      logA.push(esA ? `✅ Querés el ${nQ} — se juega la mano (+${pts} en juego)` : `✅ ${nRivA} quiere el ${nQ}`)
-      logB.push(esA ? `✅ ${nRivB} quiere el ${nQ}` : `✅ Querés el ${nQ} — se juega la mano (+${pts} en juego)`)
+      logA.push(esA ? `[F] Aceptaste el ${nQ} (+${pts} pts en juego)` : `[F] ${nRivA} aceptó el ${nQ}`)
+      logB.push(esA ? `[F] ${nRivB} aceptó el ${nQ}` : `[F] Aceptaste el ${nQ} (+${pts} pts en juego)`)
       return { ok: true, logA, logB, terminoRonda: false }
     }
 
@@ -557,26 +557,26 @@ function procesarAccion(p, socketId, tipo, datos) {
       p.florPendientePara = null; p.envidoResuelto = true
       const nNQ = p.nivelFlor === 'conFlor' ? 'Con Flor Envido' : 'Contra Flor al Resto'
       logA.push(cantante === 'A'
-        ? (esA ? `✅ No quisieron tu ${nNQ} — +${pts} para vos` : `❌ No quisiste el ${nNQ} — +${pts} para ${nRivA}`)
-        : (esA ? `❌ No quisiste el ${nNQ} — +${pts} para ${nRivA}` : `✅ No quisieron tu ${nNQ} — +${pts} para vos`))
+        ? (esA ? `[+] No quisieron tu ${nNQ} — +${pts} pts para vos` : `[-] No quisiste el ${nNQ} — +${pts} pts para ${nRivA}`)
+        : (esA ? `[-] No quisiste el ${nNQ} — +${pts} pts para ${nRivA}` : `[+] No quisieron tu ${nNQ} — +${pts} pts para vos`))
       logB.push(cantante === 'B'
-        ? (esA ? `❌ No quisiste el ${nNQ} — +${pts} para ${nRivA}` : `✅ No quisieron tu ${nNQ} — +${pts} para vos`)
-        : (esA ? `✅ No quisieron tu ${nNQ} — +${pts} para vos` : `❌ No quisiste el ${nNQ} — +${pts} para ${nRivA}`))
+        ? (esA ? `[-] No quisiste el ${nNQ} — +${pts} pts para ${nRivA}` : `[+] No quisieron tu ${nNQ} — +${pts} pts para vos`)
+        : (esA ? `[+] No quisieron tu ${nNQ} — +${pts} pts para vos` : `[-] No quisiste el ${nNQ} — +${pts} pts para ${nRivA}`))
       if (p.ptsA >= p.limite) { p.ganador = 'A'; return { ok: true, logA, logB, terminoRonda: true, terminoPartida: true } }
       if (p.ptsB >= p.limite) { p.ganador = 'B'; return { ok: true, logA, logB, terminoRonda: true, terminoPartida: true } }
       return { ok: true, logA, logB, terminoRonda: false }
     }
 
     case 'irse_al_mazo': {
-      logA.push(esA ? '🃏 Te fuiste al mazo' : `🃏 ${nRivA} se fue al mazo`)
-      logB.push(esA ? `🃏 ${nRivB} se fue al mazo` : '🃏 Te fuiste al mazo')
+      logA.push(esA ? 'Te fuiste al mazo' : `${nRivA} se fue al mazo`)
+      logB.push(esA ? `${nRivB} se fue al mazo` : 'Te fuiste al mazo')
       // Pending envido: rival wins 1 (implicit no quiero)
       if (!p.envidoResuelto && p.envidoPendientePara != null) {
         _addPts(p, rival, 1)
         p.envidoResuelto = true
         p.envidoPendientePara = null
-        logA.push(esA ? `❌ Envido perdido — +1 para ${nRivA}` : `✅ +1 por el envido`)
-        logB.push(esA ? `✅ +1 por el envido` : `❌ Envido perdido — +1 para ${nRivB}`)
+        logA.push(esA ? `[-] Envido pendiente — +1 pt para ${nRivA}` : `[+] Envido pendiente — +1 pt para vos`)
+        logB.push(esA ? `[+] Envido pendiente — +1 pt para vos` : `[-] Envido pendiente — +1 pt para ${nRivB}`)
       }
       // Pending truco: implicit no quiero (1/2/3 pts)
       if (!p.trucoResuelto && p.trucoPendientePara != null) {
@@ -584,8 +584,8 @@ function procesarAccion(p, socketId, tipo, datos) {
         _addPts(p, rival, nqPts)
         p.trucoResuelto = true
         p.trucoPendientePara = null
-        logA.push(esA ? `❌ Truco perdido — +${nqPts} para ${nRivA}` : `✅ +${nqPts} por el truco`)
-        logB.push(esA ? `✅ +${nqPts} por el truco` : `❌ Truco perdido — +${nqPts} para ${nRivB}`)
+        logA.push(esA ? `[-] Truco pendiente — +${nqPts} pts para ${nRivA}` : `[+] Truco pendiente — +${nqPts} pts para vos`)
+        logB.push(esA ? `[+] Truco pendiente — +${nqPts} pts para vos` : `[-] Truco pendiente — +${nqPts} pts para ${nRivB}`)
         if (p.florA || p.florB) p.mostrarCartasRival = true
         p.rondaTerminada = true
         if (p.ptsA >= p.limite) { p.ganador = 'A'; return { ok: true, logA, logB, terminoRonda: true, terminoPartida: true } }
