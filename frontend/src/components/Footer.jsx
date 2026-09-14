@@ -1,19 +1,23 @@
 import { useNavigate } from 'react-router-dom'
 
+const GOLD = '#c9a83c'
 const VERSION = 'v1.5'
 
 export default function Footer() {
   const navigate = useNavigate()
 
   return (
-    <footer className="border-t border-white/[0.05] bg-[#07070f]">
+    <footer className="border-t bg-[#07090d]" style={{ borderColor: 'rgba(201,168,60,0.1)' }}>
       <div className="max-w-5xl mx-auto px-6 py-10 flex flex-col md:flex-row gap-8 md:gap-0 justify-between items-start">
 
         {/* Marca */}
         <div className="flex flex-col gap-3">
           <button onClick={() => navigate('/')} className="flex items-center gap-2.5 group">
-            <img src="/favicon.svg" alt="TrucoUY" className="w-8 h-8 group-hover:opacity-80 transition" />
-            <span className="text-base font-black text-white">Truco<span className="text-emerald-400">UY</span></span>
+            {/* Card icon */}
+            <div style={{ width: 28, height: 36, background: '#0a150c', border: `1.5px solid ${GOLD}`, borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <span style={{ color: GOLD, fontSize: 15, lineHeight: 1, fontFamily: 'Georgia, serif' }}>♠</span>
+            </div>
+            <span className="text-base font-black text-white">Truco<span style={{ color: GOLD }}>UY</span></span>
           </button>
           <p className="text-gray-600 text-xs max-w-[200px] leading-relaxed">
             Truco rioplatense online. Gratis, sin publicidad.
@@ -66,9 +70,8 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Bottom */}
-      <div className="border-t border-white/[0.04] px-6 py-4 max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-        <p className="text-gray-700 text-xs">TrucoUY © 2026. Todos los derechos reservados.</p>
+      <div className="border-t px-6 py-4 max-w-5xl mx-auto" style={{ borderColor: 'rgba(255,255,255,0.04)' }}>
+        <p className="text-gray-700 text-xs text-center sm:text-left">TrucoUY © 2026. Todos los derechos reservados.</p>
       </div>
     </footer>
   )

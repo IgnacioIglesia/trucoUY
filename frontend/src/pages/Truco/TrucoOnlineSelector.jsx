@@ -3,80 +3,120 @@ import Navbar from '../../components/Navbar'
 import { usePageTitle } from '../../hooks/usePageTitle'
 import Footer from '../../components/Footer'
 
+const GOLD = '#c9a83c'
+const GOLD_LIGHT = '#e8c96a'
+
 export default function TrucoOnlineSelector() {
   usePageTitle('Truco Online')
   const navigate = useNavigate()
 
   return (
-    <div className="min-h-screen bg-[#07070f] text-white flex flex-col">
+    <div className="min-h-screen bg-[#07090d] text-white flex flex-col">
       <Navbar />
 
-      <div className="relative flex-1 flex items-center justify-center px-4 py-16 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_0%,rgba(109,40,217,0.18),transparent)]" />
-        <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(rgba(139,92,246,0.05) 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
+      <div className="flex-1 flex flex-col relative overflow-hidden" style={{ minHeight: 'calc(100vh - 64px)' }}>
 
-        <div className="relative z-10 w-full max-w-2xl flex flex-col gap-10">
+        {/* Header */}
+        <div className="relative z-10 flex flex-col items-center justify-center gap-3 pt-12 pb-8 px-6 text-center">
+          <span className="inline-flex items-center gap-2 text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest border"
+                style={{ background: 'rgba(201,168,60,0.07)', borderColor: 'rgba(201,168,60,0.22)', color: GOLD }}>
+            <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+            Truco Online · Multijugador
+          </span>
+          <h1 className="text-3xl sm:text-4xl font-extrabold">Elegí la modalidad</h1>
+          <p className="text-gray-600 text-sm">¿Duelo individual o en equipo?</p>
+        </div>
 
-          <div className="text-center">
-            <div className="inline-flex w-16 h-16 rounded-2xl bg-purple-600/20 border border-purple-500/30 items-center justify-center mb-5">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-8 h-8 text-purple-400">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3h10.5a.75.75 0 01.75.75v16.5a.75.75 0 01-.75.75H6.75a.75.75 0 01-.75-.75V3.75A.75.75 0 016.75 3zM8.25 8.25h7.5M8.25 12h7.5m-7.5 3.75h4.5"/>
-              </svg>
-            </div>
-            <h1 className="text-4xl font-extrabold">Truco Online</h1>
-            <p className="text-gray-500 mt-2 text-sm">Elegí la modalidad de juego</p>
-          </div>
+        {/* Split */}
+        <div className="flex-1 flex flex-col sm:flex-row relative">
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
-            {/* 1vs1 */}
-            <button
-              onClick={() => navigate('/juegos/truco-online/1vs1')}
-              className="group bg-white/[0.03] border border-white/[0.06] hover:border-purple-500/40 hover:bg-white/[0.05] rounded-3xl p-8 flex flex-col items-center gap-5 transition-all text-center"
-            >
-              <div className="w-16 h-16 bg-purple-600/20 border border-purple-500/30 rounded-2xl flex items-center justify-center text-3xl group-hover:bg-purple-600/30 transition">
-                ⚔️
-              </div>
-              <div>
-                <p className="text-2xl font-extrabold">1 vs 1</p>
-                <p className="text-gray-500 text-sm mt-1.5">Duelo mano a mano contra un rival</p>
-              </div>
-              <div className="flex gap-2 flex-wrap justify-center">
-                <span className="bg-white/[0.05] border border-white/[0.08] text-gray-400 text-xs px-3 py-1 rounded-full">2 jugadores</span>
-                <span className="bg-green-950/60 border border-green-700/30 text-green-400 text-xs px-3 py-1 rounded-full">Disponible</span>
-              </div>
-            </button>
-
-            {/* 2vs2 */}
-            <button
-              onClick={() => navigate('/juegos/truco-online/2vs2')}
-              className="group bg-white/[0.03] border border-white/[0.06] hover:border-purple-500/40 hover:bg-white/[0.05] rounded-3xl p-8 flex flex-col items-center gap-5 transition-all text-center"
-            >
-              <div className="w-16 h-16 bg-purple-600/20 border border-purple-500/30 rounded-2xl flex items-center justify-center group-hover:bg-purple-600/30 transition">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-8 h-8 text-purple-400">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"/>
-                </svg>
-              </div>
-              <div>
-                <p className="text-2xl font-extrabold">2 vs 2</p>
-                <p className="text-gray-500 text-sm mt-1.5">Jugá en equipo con un compañero</p>
-              </div>
-              <div className="flex gap-2 flex-wrap justify-center">
-                <span className="bg-white/[0.05] border border-white/[0.08] text-gray-400 text-xs px-3 py-1 rounded-full">4 jugadores</span>
-                <span className="bg-yellow-950/60 border border-yellow-700/30 text-yellow-400 text-xs px-3 py-1 rounded-full">Beta</span>
-              </div>
-            </button>
-
-          </div>
-
+          {/* ── 1 vs 1 ── */}
           <button
-            onClick={() => navigate('/juegos')}
-            className="text-gray-600 text-sm hover:text-gray-400 transition text-center"
+            onClick={() => navigate('/juegos/truco-online/1vs1')}
+            className="group flex-1 relative flex flex-col items-center justify-center gap-8 p-10 sm:p-14 text-center overflow-hidden transition-all duration-500"
+            style={{ minHeight: '42vh', background: 'linear-gradient(160deg, #0d0f08 0%, #07090d 100%)' }}
+            onMouseEnter={e => e.currentTarget.style.background = 'linear-gradient(160deg, #111408 0%, #0a0c07 100%)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'linear-gradient(160deg, #0d0f08 0%, #07090d 100%)'}
           >
-            ← Volver a los juegos
+            <div className="absolute inset-0 pointer-events-none transition-opacity duration-500 opacity-50 group-hover:opacity-100"
+                 style={{ background: 'radial-gradient(ellipse 80% 80% at 50% 70%, rgba(201,168,60,0.09), transparent)' }} />
+            <span className="absolute font-serif select-none pointer-events-none leading-none"
+                  style={{ fontSize: 320, color: 'rgba(201,168,60,0.03)', bottom: '-40px', right: '0', fontFamily: 'Georgia, serif' }} aria-hidden>1</span>
+            <div className="hidden sm:block absolute right-0 inset-y-0 w-px pointer-events-none"
+                 style={{ background: 'linear-gradient(to bottom, transparent, rgba(201,168,60,0.12), transparent)' }} />
+
+            <div className="relative z-10 flex flex-col items-center gap-5">
+              <div className="text-7xl sm:text-8xl font-black leading-none" style={{ color: GOLD, fontVariantNumeric: 'tabular-nums' }}>
+                1<span className="text-4xl sm:text-5xl text-gray-700 mx-1">vs</span>1
+              </div>
+              <div className="flex flex-col items-center gap-1.5">
+                <p className="text-lg font-bold text-white">Duelo individual</p>
+                <p className="text-gray-500 text-sm max-w-[200px] leading-relaxed">Vos contra un rival. El mejor truco gana.</p>
+              </div>
+              <span className="inline-flex items-center gap-2 text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest bg-green-950/70 text-green-400 border border-green-700/30">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                Disponible
+              </span>
+              <div className="mt-1 px-7 py-3 rounded-2xl font-bold text-sm transition-all"
+                   style={{ background: GOLD, color: '#07090d' }}
+                   onMouseEnter={e => e.currentTarget.style.background = GOLD_LIGHT}
+                   onMouseLeave={e => e.currentTarget.style.background = GOLD}>
+                Jugar 1vs1 →
+              </div>
+            </div>
           </button>
 
+          {/* ── Divisor ── */}
+          <div className="hidden sm:block absolute inset-y-0 left-1/2 -translate-x-1/2 w-px z-20 pointer-events-none"
+               style={{ background: 'linear-gradient(to bottom, transparent 5%, rgba(201,168,60,0.1) 30%, rgba(201,168,60,0.1) 70%, transparent 95%)' }}>
+            <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-gray-600"
+                 style={{ background: '#07090d', border: '1px solid rgba(255,255,255,0.06)' }}>
+              vs
+            </div>
+          </div>
+          <div className="sm:hidden h-px w-full"
+               style={{ background: 'linear-gradient(to right, transparent, rgba(201,168,60,0.1), transparent)' }} />
+
+          {/* ── 2 vs 2 ── */}
+          <button
+            onClick={() => navigate('/juegos/truco-online/2vs2')}
+            className="group flex-1 relative flex flex-col items-center justify-center gap-8 p-10 sm:p-14 text-center overflow-hidden transition-all duration-500"
+            style={{ minHeight: '42vh', background: 'linear-gradient(160deg, #0a0a0d 0%, #07090d 100%)' }}
+            onMouseEnter={e => e.currentTarget.style.background = 'linear-gradient(160deg, #0d0d11 0%, #090b0e 100%)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'linear-gradient(160deg, #0a0a0d 0%, #07090d 100%)'}
+          >
+            <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                 style={{ background: 'radial-gradient(ellipse 80% 80% at 50% 70%, rgba(100,110,140,0.05), transparent)' }} />
+            <span className="absolute font-serif select-none pointer-events-none leading-none"
+                  style={{ fontSize: 320, color: 'rgba(255,255,255,0.015)', bottom: '-40px', left: '0', fontFamily: 'Georgia, serif' }} aria-hidden>2</span>
+
+            <div className="relative z-10 flex flex-col items-center gap-5">
+              <div className="text-7xl sm:text-8xl font-black leading-none text-white">
+                2<span className="text-4xl sm:text-5xl text-gray-700 mx-1">vs</span>2
+              </div>
+              <div className="flex flex-col items-center gap-1.5">
+                <p className="text-lg font-bold text-white">En equipo</p>
+                <p className="text-gray-500 text-sm max-w-[200px] leading-relaxed">Con un compañero. El truco como se juega de verdad.</p>
+              </div>
+              <span className="inline-flex text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest border"
+                    style={{ background: 'rgba(201,168,60,0.06)', borderColor: 'rgba(201,168,60,0.2)', color: GOLD }}>
+                Beta
+              </span>
+              <div className="mt-1 px-7 py-3 rounded-2xl font-bold text-sm border border-white/[0.1] bg-white/[0.04] text-gray-300 transition-all group-hover:border-white/[0.2] group-hover:text-white">
+                Jugar 2vs2 →
+              </div>
+            </div>
+          </button>
         </div>
+
+        {/* Back */}
+        <div className="relative z-10 flex justify-center py-6">
+          <button onClick={() => navigate('/juegos')}
+            className="text-gray-700 text-xs hover:text-gray-400 transition">
+            ← Volver
+          </button>
+        </div>
+
       </div>
 
       <Footer />

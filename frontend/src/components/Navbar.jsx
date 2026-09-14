@@ -6,6 +6,24 @@ import { auth } from '../firebase'
 import { signOut } from 'firebase/auth'
 import Avatar from './Avatar'
 
+const GOLD = '#c9a83c'
+const GOLD_LIGHT = '#e8c96a'
+
+const CardLogo = () => (
+  <div style={{
+    width: 26, height: 34,
+    background: '#0a150c',
+    border: `1.5px solid ${GOLD}`,
+    borderRadius: 4,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  }}>
+    <span style={{ color: GOLD, fontSize: 15, lineHeight: 1, fontFamily: 'Georgia, serif' }}>♠</span>
+  </div>
+)
+
 const IconUser = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4">
     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
@@ -79,15 +97,18 @@ function Navbar() {
   return (
     <>
     <div className="sticky top-0 z-50">
-      <nav className="h-14 flex items-center px-4 md:px-8 border-b border-white/[0.06] bg-[#07070f]/90 backdrop-blur-md">
+      <nav className="h-14 flex items-center px-4 md:px-8 border-b bg-[#07090d]/92 backdrop-blur-md"
+           style={{ borderColor: 'rgba(201,168,60,0.12)' }}>
 
         {/* Logo */}
         <button
           onClick={() => handleNavigate('/')}
-          className="flex items-center gap-2 bg-transparent border-none flex-shrink-0 group"
+          className="flex items-center gap-2.5 bg-transparent border-none flex-shrink-0"
         >
-          <img src="/favicon.svg" alt="TrucoUY" className="w-7 h-7 group-hover:opacity-80 transition" />
-          <span className="text-base font-bold text-white">Truco<span className="text-emerald-400">UY</span></span>
+          <CardLogo />
+          <span className="text-base font-bold text-white">
+            Truco<span style={{ color: GOLD }}>UY</span>
+          </span>
         </button>
 
         {/* Nav links — desktop */}
@@ -96,15 +117,14 @@ function Navbar() {
             <button
               key={ruta}
               onClick={() => handleNavigate(ruta)}
-              className={`relative text-sm px-3 py-1.5 rounded-lg transition-colors ${
-                isActive(ruta)
-                  ? 'text-white'
-                  : 'text-gray-500 hover:text-gray-200'
-              }`}
+              className="relative text-sm px-3 py-1.5 rounded-lg transition-colors"
+              style={{ color: isActive(ruta) ? '#e8c96a' : '#6b7280' }}
+              onMouseEnter={e => { if (!isActive(ruta)) e.currentTarget.style.color = '#d4d4d4' }}
+              onMouseLeave={e => { if (!isActive(ruta)) e.currentTarget.style.color = '#6b7280' }}
             >
               {label}
               {isActive(ruta) && (
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-emerald-400" />
+                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full" style={{ background: GOLD }} />
               )}
             </button>
           ))}
@@ -119,7 +139,8 @@ function Navbar() {
               <div className="relative" ref={menuRef}>
                 <button
                   onClick={() => setMenuAbierto(v => !v)}
-                  className="flex items-center gap-2 pl-1.5 pr-2.5 py-1 rounded-xl hover:bg-white/[0.06] transition border border-transparent hover:border-white/[0.08]"
+                  className="flex items-center gap-2 pl-1.5 pr-2.5 py-1 rounded-xl hover:bg-white/[0.05] transition border border-transparent"
+                  style={{ ':hover': { borderColor: 'rgba(201,168,60,0.2)' } }}
                 >
                   <Avatar usuario={usuario} size="sm" />
                   <span className="text-sm text-gray-300 max-w-[120px] truncate">
@@ -134,8 +155,9 @@ function Navbar() {
                 </button>
 
                 {menuAbierto && (
-                  <div className="absolute right-0 mt-2 w-52 rounded-2xl border border-white/[0.08] bg-[#0f0f1a]/95 backdrop-blur-md shadow-2xl shadow-black/60 overflow-hidden">
-                    <div className="flex items-center gap-3 px-4 py-3 border-b border-white/[0.06]">
+                  <div className="absolute right-0 mt-2 w-52 rounded-2xl border bg-[#0f0f1a]/95 backdrop-blur-md shadow-2xl shadow-black/60 overflow-hidden"
+                       style={{ borderColor: 'rgba(201,168,60,0.15)' }}>
+                    <div className="flex items-center gap-3 px-4 py-3 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
                       <Avatar usuario={usuario} size="md" />
                       <div className="min-w-0">
                         <p className="text-white text-sm font-semibold truncate">
@@ -176,7 +198,10 @@ function Navbar() {
                 </button>
                 <button
                   onClick={() => handleNavigate('/registro')}
-                  className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-1.5 rounded-xl text-sm font-semibold transition hover:shadow-[0_0_20px_rgba(139,92,246,0.35)]"
+                  className="text-sm font-bold px-4 py-1.5 rounded-xl transition"
+                  style={{ background: GOLD, color: '#07090d' }}
+                  onMouseEnter={e => e.currentTarget.style.background = GOLD_LIGHT}
+                  onMouseLeave={e => e.currentTarget.style.background = GOLD}
                 >
                   Registrarse
                 </button>
@@ -203,30 +228,28 @@ function Navbar() {
         </div>
       </nav>
 
-      {/* Mobile menu panel */}
+      {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden bg-[#07070f]/97 backdrop-blur-md border-b border-white/[0.06]">
+        <div className="md:hidden bg-[#07090d]/97 backdrop-blur-md border-b" style={{ borderColor: 'rgba(201,168,60,0.1)' }}>
           <div className="px-4 py-3 flex flex-col gap-1">
-
-            {/* Navigation links */}
             {links.map(({ label, ruta }) => (
               <button
                 key={ruta}
                 onClick={() => handleNavigate(ruta)}
-                className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-semibold transition-all text-left ${
-                  isActive(ruta)
-                    ? 'bg-emerald-950/50 border border-emerald-700/30 text-white'
-                    : 'text-gray-400 hover:text-white hover:bg-white/[0.05]'
-                }`}
+                className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-semibold transition-all text-left"
+                style={{
+                  background: isActive(ruta) ? 'rgba(201,168,60,0.08)' : 'transparent',
+                  border: isActive(ruta) ? '1px solid rgba(201,168,60,0.25)' : '1px solid transparent',
+                  color: isActive(ruta) ? '#e8c96a' : '#9ca3af',
+                }}
               >
-                {isActive(ruta) && <span className="w-1 h-1 rounded-full bg-emerald-400 flex-shrink-0" />}
+                {isActive(ruta) && <span className="w-1 h-1 rounded-full flex-shrink-0" style={{ background: GOLD }} />}
                 {label}
               </button>
             ))}
 
             <div className="h-px bg-white/[0.06] my-1" />
 
-            {/* User section */}
             {usuario ? (
               <>
                 <div className="flex items-center gap-3 px-3 py-2.5">
@@ -261,19 +284,19 @@ function Navbar() {
                 </button>
                 <button
                   onClick={() => handleNavigate('/registro')}
-                  className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold transition"
+                  className="w-full py-2.5 rounded-xl text-sm font-bold transition"
+                  style={{ background: GOLD, color: '#07090d' }}
                 >
                   Registrarse
                 </button>
               </div>
             )}
-
           </div>
         </div>
       )}
     </div>
 
-    {/* Modal confirmación salir de partida */}
+    {/* Modal confirmación salir */}
     {pendingRoute && (
       <div className="fixed inset-0 z-[200] flex items-center justify-center px-4">
         <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={cancelNavigation} />
@@ -292,16 +315,10 @@ function Navbar() {
             </div>
           </div>
           <div className="flex gap-3">
-            <button
-              onClick={cancelNavigation}
-              className="flex-1 py-2.5 rounded-xl border border-white/[0.08] bg-white/[0.04] hover:bg-white/[0.07] text-white text-sm font-semibold transition"
-            >
+            <button onClick={cancelNavigation} className="flex-1 py-2.5 rounded-xl border border-white/[0.08] bg-white/[0.04] hover:bg-white/[0.07] text-white text-sm font-semibold transition">
               Quedarme
             </button>
-            <button
-              onClick={confirmNavigation}
-              className="flex-1 py-2.5 rounded-xl bg-red-700 hover:bg-red-600 text-white text-sm font-bold transition"
-            >
+            <button onClick={confirmNavigation} className="flex-1 py-2.5 rounded-xl bg-red-700 hover:bg-red-600 text-white text-sm font-bold transition">
               Salir igual
             </button>
           </div>

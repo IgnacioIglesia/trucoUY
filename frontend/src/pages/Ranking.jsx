@@ -6,27 +6,8 @@ import { usePageTitle } from '../hooks/usePageTitle'
 import Footer from '../components/Footer'
 import EmptyState from '../components/EmptyState'
 
-const DIFF_COLOR = {
-  facil: 'text-green-400', medio: 'text-blue-400', dificil: 'text-yellow-400',
-  experto: 'text-orange-400', maestro: 'text-red-400', extremo: 'text-purple-400',
-}
-const DIFF_LABEL = {
-  facil: 'Fácil', medio: 'Medio', dificil: 'Difícil',
-  experto: 'Experto', maestro: 'Maestro', extremo: 'Extremo',
-}
-
-const JUEGOS = [
-  { id: 'truco',      nombre: 'Truco',      icono: 'TR', coleccion: 'ranking_truco',      tipo: 'victorias'  },
-  { id: 'sudoku',     nombre: 'Sudoku',     icono: 'SU', coleccion: 'ranking_sudoku',     tipo: 'puntuacion' },
-  { id: 'buscaminas', nombre: 'Buscaminas', icono: 'BU', coleccion: 'ranking_buscaminas', tipo: 'puntuacion' },
-  { id: 'palabras',   nombre: 'Palabras',   icono: 'AB', coleccion: 'ranking_palabras',   tipo: 'racha' },
-]
-
-function formatTiempo(s) {
-  const m = Math.floor(s / 60)
-  const sec = s % 60
-  return `${m.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`
-}
+const GOLD = '#c9a83c'
+const GOLD_BORDER = 'rgba(201,168,60,0.22)'
 
 function MedalBadge({ pos }) {
   if (pos === 0) return <div className="w-7 h-7 rounded-full bg-yellow-500/20 border border-yellow-500/40 flex items-center justify-center text-yellow-400 text-xs font-black flex-shrink-0">1</div>
@@ -35,20 +16,17 @@ function MedalBadge({ pos }) {
   return <span className="text-gray-600 text-sm font-bold tabular-nums w-7 text-center flex-shrink-0">{pos + 1}</span>
 }
 
-function RankingAvatar({ jugador }) {
-  const iniciales = (jugador.nombre || 'Jugador').slice(0, 2).toUpperCase()
+function Avatar({ jugador }) {
+  const iniciales = (jugador.nombre || 'J').slice(0, 2).toUpperCase()
   return (
-    <div className="w-9 h-9 rounded-full bg-purple-900/60 border border-purple-600/40 flex items-center justify-center flex-shrink-0 overflow-hidden">
+    <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden"
+         style={{ background: 'rgba(201,168,60,0.1)', border: `1px solid ${GOLD_BORDER}` }}>
       {jugador.photoURL ? (
-        <img
-          src={jugador.photoURL}
-          alt=""
-          className="w-full h-full object-cover"
-          referrerPolicy="no-referrer"
-          onError={(e) => { e.currentTarget.style.display = 'none' }}
-        />
+        <img src={jugador.photoURL} alt="" className="w-full h-full object-cover"
+             referrerPolicy="no-referrer"
+             onError={e => { e.currentTarget.style.display = 'none' }} />
       ) : (
-        <span className="text-white font-extrabold text-xs">{iniciales}</span>
+        <span className="font-extrabold text-xs" style={{ color: GOLD }}>{iniciales}</span>
       )}
     </div>
   )
@@ -56,251 +34,131 @@ function RankingAvatar({ jugador }) {
 
 export default function Ranking() {
   usePageTitle('Ranking')
-  const [juegoActivo, setJuegoActivo] = useState('truco')
-  const [ranking, setRanking]         = useState([])
-  const [cargando, setCargando]       = useState(true)
-
-  const juego = JUEGOS.find(j => j.id === juegoActivo)
+  const [ranking, setRanking] = useState([])
+  const [cargando, setCargando] = useState(true)
 
   useEffect(() => {
     const cargar = async () => {
       setCargando(true)
       try {
         const [snap, usersSnap] = await Promise.all([
-          getDocs(collection(db, juego.coleccion)),
+          getDocs(collection(db, 'ranking_truco')),
           getDocs(collection(db, 'users')).catch(() => null),
         ])
         const perfiles = {}
         usersSnap?.forEach(doc => {
           const d = doc.data()
-          perfiles[doc.id] = {
-            nombre: d.displayName || d.nombre || '',
-            photoURL: d.photoURL || '',
-          }
+          perfiles[doc.id] = { nombre: d.displayName || d.nombre || '', photoURL: d.photoURL || '' }
         })
-        const aplicarPerfil = (uid, base) => ({
-          ...base,
-          nombre: perfiles[uid]?.nombre || base.nombre || 'Jugador',
-          photoURL: perfiles[uid]?.photoURL || base.photoURL || '',
-        })
-
-        if (juego.tipo === 'victorias') {
-          const porUsuario = {}
-          snap.forEach(doc => {
-            const d = doc.data()
-            if (!porUsuario[d.uid]) porUsuario[d.uid] = aplicarPerfil(d.uid, { uid: d.uid, nombre: d.nombre, victorias: 0, derrotas: 0 })
-            if (d.resultado === 'victoria') porUsuario[d.uid].victorias++
-            else porUsuario[d.uid].derrotas++
-          })
-          const lista = Object.values(porUsuario)
-            .map(u => ({ ...u, partidas: u.victorias + u.derrotas, winrate: u.victorias + u.derrotas > 0 ? Math.round((u.victorias / (u.victorias + u.derrotas)) * 100) : 0 }))
-            .sort((a, b) => b.victorias - a.victorias || b.winrate - a.winrate)
-            .slice(0, 10)
-          setRanking(lista)
-        } else if (juego.tipo === 'racha') {
-          const lista = []
-          snap.forEach(doc => {
-            const d = doc.data()
-            lista.push(aplicarPerfil(d.uid || doc.id, {
-              uid: d.uid || doc.id,
-              nombre: d.nombre || 'Jugador',
-              racha: d.racha || 0,
-              mejorRacha: d.mejorRacha || d.racha || 0,
-              totalAciertos: d.totalAciertos || 0,
-              lastSolvedDate: d.lastSolvedDate,
-            }))
-          })
-          lista.sort((a, b) => b.racha - a.racha || b.mejorRacha - a.mejorRacha || b.totalAciertos - a.totalAciertos)
-          setRanking(lista.slice(0, 10))
-        } else {
-          const porUsuario = {}
-          snap.forEach(doc => {
-            const d = doc.data()
-            if (!porUsuario[d.uid] || (d.puntuacion || 0) > (porUsuario[d.uid].puntuacion || 0)) {
-              porUsuario[d.uid] = aplicarPerfil(d.uid, { uid: d.uid, nombre: d.nombre, puntuacion: d.puntuacion || 0, dificultad: d.dificultad, tiempo: d.tiempo, errores: d.errores })
+        const porUsuario = {}
+        snap.forEach(doc => {
+          const d = doc.data()
+          if (!porUsuario[d.uid]) {
+            porUsuario[d.uid] = {
+              uid: d.uid,
+              nombre: perfiles[d.uid]?.nombre || d.nombre || 'Jugador',
+              photoURL: perfiles[d.uid]?.photoURL || d.photoURL || '',
+              victorias: 0, derrotas: 0,
             }
-          })
-          const lista = Object.values(porUsuario)
-            .sort((a, b) => b.puntuacion - a.puntuacion)
-            .slice(0, 10)
-          setRanking(lista)
-        }
+          }
+          if (d.resultado === 'victoria') porUsuario[d.uid].victorias++
+          else porUsuario[d.uid].derrotas++
+        })
+        const lista = Object.values(porUsuario)
+          .map(u => ({
+            ...u,
+            partidas: u.victorias + u.derrotas,
+            winrate: u.victorias + u.derrotas > 0
+              ? Math.round((u.victorias / (u.victorias + u.derrotas)) * 100) : 0,
+          }))
+          .sort((a, b) => b.victorias - a.victorias || b.winrate - a.winrate)
+          .slice(0, 50)
+        setRanking(lista)
       } catch { setRanking([]) }
       setCargando(false)
     }
     cargar()
-  }, [juegoActivo])
+  }, [])
 
   return (
-    <div className="min-h-screen bg-[#07070f] text-white flex flex-col">
+    <div className="min-h-screen bg-[#07090d] text-white flex flex-col">
       <Navbar />
 
       <div className="relative flex-1">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_40%_at_50%_0%,rgba(109,40,217,0.15),transparent)]" />
-        <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(rgba(139,92,246,0.04) 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
+        <div className="absolute inset-0 pointer-events-none"
+             style={{ background: 'radial-gradient(ellipse 65% 40% at 50% 0%, rgba(201,168,60,0.1), transparent)' }} />
+        <div className="absolute inset-0 pointer-events-none"
+             style={{ backgroundImage: 'radial-gradient(rgba(201,168,60,0.04) 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
 
-        <div className="relative z-10 max-w-3xl mx-auto w-full px-4 py-12">
+        <div className="relative z-10 max-w-2xl mx-auto w-full px-4 py-12">
 
           {/* Header */}
           <div className="text-center mb-10">
-            <div className="inline-flex items-center gap-2 bg-purple-950/50 border border-purple-600/30 text-purple-300 text-[10px] font-semibold px-3 py-1 rounded-full uppercase tracking-widest mb-4">
-              <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold px-3 py-1.5 rounded-full uppercase tracking-widest mb-4"
+                  style={{ background: 'rgba(201,168,60,0.07)', border: `1px solid ${GOLD_BORDER}`, color: GOLD }}>
+              <span className="font-serif">♠</span>
               Tabla global
-            </div>
+            </span>
             <h1 className="text-4xl font-extrabold">Ranking</h1>
             <p className="text-gray-500 mt-2 text-sm">Los mejores jugadores de TrucoUY</p>
           </div>
 
-          {/* Tabs */}
-          <div className="flex gap-2 mb-8 bg-white/[0.03] border border-white/[0.06] rounded-2xl p-1.5">
-            {JUEGOS.map(j => (
-              <button
-                key={j.id}
-                onClick={() => setJuegoActivo(j.id)}
-                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all ${
-                  juegoActivo === j.id
-                    ? 'bg-purple-600 text-white shadow-[0_0_16px_rgba(139,92,246,0.25)]'
-                    : 'text-gray-400 hover:text-white hover:bg-white/[0.05]'
-                }`}
-              >
-                <span className="text-[10px] font-extrabold opacity-70">{j.icono}</span>
-                <span>{j.nombre}</span>
-              </button>
-            ))}
-          </div>
-
-          {/* Content */}
+          {/* Contenido */}
           {cargando ? (
             <div className="flex flex-col gap-2">
-              {[0,1,2,3,4,5,6,7].map(i => (
+              {Array.from({ length: 8 }).map((_, i) => (
                 <div key={i} className="flex items-center gap-3 bg-white/[0.02] rounded-2xl px-4 py-3">
                   <div className="w-5 h-4 bg-white/[0.06] rounded animate-pulse flex-shrink-0" />
                   <div className="w-8 h-8 rounded-full bg-white/[0.06] animate-pulse flex-shrink-0" />
                   <div className="flex-1 h-4 bg-white/[0.06] rounded-lg animate-pulse" />
-                  <div className="w-16 h-4 bg-white/[0.06] rounded-lg animate-pulse" />
+                  <div className="w-20 h-4 bg-white/[0.06] rounded-lg animate-pulse" />
                 </div>
               ))}
             </div>
           ) : ranking.length === 0 ? (
             <EmptyState
-              icon={juego.tipo === 'victorias' ? 'cards' : juego.id === 'sudoku' || juego.id === 'palabras' ? 'chart' : 'gamepad'}
+              icon="cards"
               title="Nadie en el ranking todavía"
-              description={`Sé el primero en aparecer. Jugá ${juego.nombre} para sumar puntos.`}
-              action={{ label: `Jugar ${juego.nombre}`, to: juego.id === 'truco' ? '/juegos/truco-online' : `/juegos/${juego.id}` }}
+              description="Sé el primero en aparecer. Jugá Truco Online para sumar victorias."
+              action={{ label: 'Jugar Truco Online', to: '/juegos/truco-online' }}
             />
-          ) : juego.tipo === 'victorias' ? (
-
-            /* ── Truco ── */
-            <div className="flex flex-col gap-3">
-              {ranking.map((jugador, i) => {
-                return (
-                  <div key={i} className={`flex items-center gap-4 bg-white/[0.03] border rounded-2xl px-5 py-4 transition-all ${
-                    i === 0 ? 'border-yellow-500/30 bg-yellow-500/[0.02]'
-                    : i === 1 ? 'border-gray-400/20'
-                    : i === 2 ? 'border-orange-500/20'
-                    : 'border-white/[0.06]'
-                  }`}>
-                    <MedalBadge pos={i} />
-                    <RankingAvatar jugador={jugador} />
-                    <div className="flex-1 min-w-0">
-                      <p className="font-bold text-white text-sm truncate">{jugador.nombre}</p>
-                      <p className="text-gray-600 text-xs">{jugador.partidas} partidas</p>
-                    </div>
-                    <div className="flex gap-5 text-center flex-shrink-0">
-                      <div>
-                        <p className="text-green-400 font-extrabold text-lg leading-none tabular-nums">{jugador.victorias}</p>
-                        <p className="text-gray-600 text-[10px] mt-0.5">victorias</p>
-                      </div>
-                      <div>
-                        <p className="text-red-400 font-extrabold text-lg leading-none tabular-nums">{jugador.derrotas}</p>
-                        <p className="text-gray-600 text-[10px] mt-0.5">derrotas</p>
-                      </div>
-                      <div>
-                        <p className="text-purple-400 font-extrabold text-lg leading-none tabular-nums">{jugador.winrate}%</p>
-                        <p className="text-gray-600 text-[10px] mt-0.5">winrate</p>
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-
-          ) : juego.tipo === 'racha' ? (
-
-            /* ── Adivina la Palabra ── */
-            <div className="flex flex-col gap-3">
-              {ranking.map((jugador, i) => {
-                return (
-                  <div key={i} className={`flex items-center gap-4 bg-white/[0.03] border rounded-2xl px-5 py-4 transition-all ${
-                    i === 0 ? 'border-yellow-500/30 bg-yellow-500/[0.02]'
-                    : i === 1 ? 'border-gray-400/20'
-                    : i === 2 ? 'border-orange-500/20'
-                    : 'border-white/[0.06]'
-                  }`}>
-                    <MedalBadge pos={i} />
-                    <RankingAvatar jugador={jugador} />
-                    <div className="flex-1 min-w-0">
-                      <p className="font-bold text-white text-sm truncate">{jugador.nombre}</p>
-                      <p className="text-gray-600 text-xs">Adivina la Palabra</p>
-                    </div>
-                    <div className="flex gap-5 text-center flex-shrink-0">
-                      <div>
-                        <p className="text-green-400 font-extrabold text-lg leading-none tabular-nums">{jugador.racha}</p>
-                        <p className="text-gray-600 text-[10px] mt-0.5">racha</p>
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-
           ) : (
-
-            /* ── Sudoku / Buscaminas ── */
-            <div className="flex flex-col gap-3">
-              {ranking.map((jugador, i) => {
-                return (
-                  <div key={i} className={`flex items-center gap-4 bg-white/[0.03] border rounded-2xl px-5 py-4 transition-all ${
-                    i === 0 ? 'border-yellow-500/30 bg-yellow-500/[0.02]'
-                    : i === 1 ? 'border-gray-400/20'
-                    : i === 2 ? 'border-orange-500/20'
-                    : 'border-white/[0.06]'
-                  }`}>
-                    <MedalBadge pos={i} />
-                    <RankingAvatar jugador={jugador} />
-                    <div className="flex-1 min-w-0">
-                      <p className="font-bold text-white text-sm truncate">{jugador.nombre}</p>
-                      <span className={`text-xs font-semibold ${DIFF_COLOR[jugador.dificultad] || 'text-gray-400'}`}>
-                        {DIFF_LABEL[jugador.dificultad] || jugador.dificultad}
-                      </span>
+            <div className="flex flex-col gap-2.5">
+              {ranking.map((jugador, i) => (
+                <div key={i}
+                  className="flex items-center gap-4 rounded-2xl px-5 py-4 transition-colors"
+                  style={{
+                    background: i === 0 ? 'rgba(201,168,60,0.05)' : 'rgba(255,255,255,0.02)',
+                    border: i === 0 ? '1px solid rgba(201,168,60,0.2)'
+                           : i === 1 ? '1px solid rgba(192,192,192,0.12)'
+                           : i === 2 ? '1px solid rgba(200,120,50,0.12)'
+                           : '1px solid rgba(255,255,255,0.05)',
+                  }}>
+                  <MedalBadge pos={i} />
+                  <Avatar jugador={jugador} />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-white text-sm truncate">{jugador.nombre}</p>
+                    <p className="text-gray-600 text-xs">{jugador.partidas} {jugador.partidas === 1 ? 'partida' : 'partidas'}</p>
+                  </div>
+                  <div className="flex gap-5 text-center flex-shrink-0">
+                    <div>
+                      <p className="text-green-400 font-extrabold text-lg leading-none tabular-nums">{jugador.victorias}</p>
+                      <p className="text-gray-600 text-[10px] mt-0.5">victorias</p>
                     </div>
-                    <div className="flex gap-5 text-center flex-shrink-0">
-                      <div>
-                        <p className="text-purple-400 font-extrabold text-lg leading-none tabular-nums">
-                          {(jugador.puntuacion || 0).toLocaleString()}
-                        </p>
-                        <p className="text-gray-600 text-[10px] mt-0.5">puntos</p>
-                      </div>
-                      {jugador.tiempo != null && (
-                        <div>
-                          <p className="text-gray-300 font-bold text-base leading-none tabular-nums">{formatTiempo(jugador.tiempo)}</p>
-                          <p className="text-gray-600 text-[10px] mt-0.5">tiempo</p>
-                        </div>
-                      )}
-                      {jugador.errores != null && (
-                        <div>
-                          <p className={`font-bold text-base leading-none tabular-nums ${jugador.errores > 0 ? 'text-red-400' : 'text-green-400'}`}>
-                            {jugador.errores}
-                          </p>
-                          <p className="text-gray-600 text-[10px] mt-0.5">errores</p>
-                        </div>
-                      )}
+                    <div>
+                      <p className="text-red-400 font-extrabold text-lg leading-none tabular-nums">{jugador.derrotas}</p>
+                      <p className="text-gray-600 text-[10px] mt-0.5">derrotas</p>
+                    </div>
+                    <div>
+                      <p className="font-extrabold text-lg leading-none tabular-nums" style={{ color: GOLD }}>{jugador.winrate}%</p>
+                      <p className="text-gray-600 text-[10px] mt-0.5">winrate</p>
                     </div>
                   </div>
-                )
-              })}
+                </div>
+              ))}
             </div>
           )}
+
         </div>
       </div>
 

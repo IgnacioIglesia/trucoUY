@@ -4,6 +4,10 @@ import { auth, googleProvider } from '../firebase'
 import { createUserWithEmailAndPassword, signInWithPopup, updateProfile } from 'firebase/auth'
 import { usePageTitle } from '../hooks/usePageTitle'
 
+const GOLD = '#c9a83c'
+const GOLD_LIGHT = '#e8c96a'
+const GOLD_BORDER = 'rgba(201,168,60,0.28)'
+
 const GoogleIcon = () => (
   <svg viewBox="0 0 24 24" className="w-4 h-4 flex-shrink-0" xmlns="http://www.w3.org/2000/svg">
     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -13,7 +17,14 @@ const GoogleIcon = () => (
   </svg>
 )
 
+const CardLogo = () => (
+  <div style={{ width: 36, height: 46, background: '#0a150c', border: `1.5px solid ${GOLD}`, borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+    <span style={{ color: GOLD, fontSize: 20, lineHeight: 1, fontFamily: 'Georgia, serif' }}>♠</span>
+  </div>
+)
+
 export default function Registro() {
+  usePageTitle('Crear cuenta')
   const navigate  = useNavigate()
   const [nombre,   setNombre]   = useState('')
   const [email,    setEmail]    = useState('')
@@ -55,36 +66,48 @@ export default function Registro() {
   const noCoinciden = confirmar.length > 0 && password !== confirmar
   const coinciden   = confirmar.length > 0 && password === confirmar
 
+  const inputBase = 'w-full bg-white/[0.04] border border-white/[0.08] outline-none text-white px-4 py-3 rounded-xl text-sm placeholder-gray-700'
+
   return (
-    <div className="min-h-screen bg-[#07070f] text-white flex">
+    <div className="min-h-screen text-white flex" style={{ background: '#07090d' }}>
 
       {/* ── Panel izquierdo ── */}
-      <div className="hidden lg:flex w-[480px] flex-shrink-0 flex-col items-center justify-center p-14 relative overflow-hidden"
-        style={{ background: 'linear-gradient(155deg, #0d0620 0%, #080413 100%)' }}>
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_40%_50%,rgba(109,40,217,0.22),transparent)]" />
-        <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(rgba(139,92,246,0.07) 1px, transparent 1px)', backgroundSize: '22px 22px' }} />
-        <div className="absolute right-0 inset-y-0 w-px bg-gradient-to-b from-transparent via-purple-500/20 to-transparent" />
+      <div className="hidden lg:flex w-[460px] flex-shrink-0 flex-col justify-center p-14 relative overflow-hidden"
+           style={{ background: 'linear-gradient(155deg, #0a0d07 0%, #060809 100%)' }}>
 
-        <div className="relative z-10 flex flex-col items-start gap-10 w-full max-w-xs">
-          <button onClick={() => navigate('/')} className="flex items-center gap-3 group">
-            <div className="w-11 h-11 bg-purple-600 rounded-2xl flex items-center justify-center text-white font-black text-xl group-hover:bg-purple-500 transition shadow-[0_0_28px_rgba(139,92,246,0.5)]">P</div>
-            <span className="text-2xl font-black">Play<span className="text-purple-400">Room</span></span>
+        <div className="absolute inset-0 pointer-events-none"
+             style={{ background: 'radial-gradient(ellipse 80% 70% at 30% 40%, rgba(201,168,60,0.09), transparent)' }} />
+        <div className="absolute inset-0 pointer-events-none"
+             style={{ backgroundImage: 'radial-gradient(rgba(201,168,60,0.07) 1px, transparent 1px)', backgroundSize: '22px 22px' }} />
+        <div className="absolute right-0 inset-y-0 w-px pointer-events-none"
+             style={{ background: 'linear-gradient(to bottom, transparent, rgba(201,168,60,0.2), transparent)' }} />
+        <span className="absolute -bottom-8 -right-4 font-serif select-none pointer-events-none leading-none"
+              style={{ fontSize: 200, color: 'rgba(201,168,60,0.04)' }} aria-hidden>♣</span>
+
+        <div className="relative z-10 flex flex-col gap-10 max-w-xs">
+
+          <button onClick={() => navigate('/')} className="flex items-center gap-3">
+            <CardLogo />
+            <span className="text-2xl font-black text-white">Truco<span style={{ color: GOLD }}>UY</span></span>
           </button>
 
           <div>
-            <h2 className="text-2xl font-extrabold text-white leading-snug">Empezá a jugar hoy.</h2>
-            <p className="text-gray-500 text-sm mt-2 leading-relaxed">Creá tu cuenta gratis y uníte a miles de jugadores.</p>
+            <h2 className="text-2xl font-extrabold leading-snug">Empezá a jugar hoy.</h2>
+            <p className="text-gray-500 text-sm mt-2 leading-relaxed">
+              Creá tu cuenta gratis y uníte a miles de jugadores.
+            </p>
           </div>
 
-          <div className="flex flex-col gap-2.5 w-full">
-            {([
-              { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 text-purple-400 flex-shrink-0"><path strokeLinecap="round" strokeLinejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0H3"/></svg>, texto: 'Acceso a todos los juegos' },
-              { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 text-purple-400 flex-shrink-0"><path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"/></svg>, texto: 'Jugá con amigos online' },
-              { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 text-purple-400 flex-shrink-0"><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 002.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 012.916.52 6.003 6.003 0 01-5.395 4.972m0 0a6.726 6.726 0 01-2.749 1.35m0 0a6.772 6.772 0 01-3.044 0"/></svg>, texto: 'Guardá tu historial y ranking' },
-              { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 text-purple-400 flex-shrink-0"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>, texto: 'Completamente gratis' },
-            ]).map((item, i) => (
-              <div key={i} className="flex items-center gap-3 bg-white/[0.04] border border-white/[0.07] rounded-2xl px-4 py-3 hover:bg-white/[0.06] transition-colors">
-                {item.icon}
+          <div className="flex flex-col gap-2.5">
+            {[
+              { suit: '♠', texto: 'Truco Online 1vs1 y 2vs2' },
+              { suit: '♥', texto: 'Jugá contra amigos en tiempo real' },
+              { suit: '♦', texto: 'Ranking y estadísticas' },
+              { suit: '♣', texto: 'Completamente gratis' },
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-3 rounded-2xl px-4 py-3"
+                   style={{ background: 'rgba(201,168,60,0.05)', border: `1px solid ${GOLD_BORDER}` }}>
+                <span className="font-serif flex-shrink-0 text-base" style={{ color: GOLD }}>{item.suit}</span>
                 <span className="text-gray-300 text-sm">{item.texto}</span>
               </div>
             ))}
@@ -94,7 +117,8 @@ export default function Registro() {
 
       {/* ── Panel derecho — formulario ── */}
       <div className="flex-1 flex items-center justify-center px-6 py-12 relative">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_50%_35%_at_50%_0%,rgba(109,40,217,0.07),transparent)]" />
+        <div className="absolute inset-0 pointer-events-none"
+             style={{ background: 'radial-gradient(ellipse 50% 35% at 50% 0%, rgba(201,168,60,0.05), transparent)' }} />
 
         <div className="relative z-10 w-full max-w-sm flex flex-col gap-5">
 
@@ -106,10 +130,9 @@ export default function Registro() {
             Volver al inicio
           </button>
 
-          {/* Logo solo en mobile */}
           <div className="lg:hidden flex items-center gap-2.5 mb-1">
-            <div className="w-9 h-9 bg-purple-600 rounded-xl flex items-center justify-center text-white font-black shadow-[0_0_16px_rgba(139,92,246,0.4)]">P</div>
-            <span className="text-xl font-black">Play<span className="text-purple-400">Room</span></span>
+            <CardLogo />
+            <span className="text-xl font-black">Truco<span style={{ color: GOLD }}>UY</span></span>
           </div>
 
           <div>
@@ -136,32 +159,37 @@ export default function Registro() {
           </div>
 
           <form onSubmit={handleRegistro} className="flex flex-col gap-4">
+
             <Field label="Nombre">
               <input type="text" value={nombre} onChange={e => setNombre(e.target.value)}
                 placeholder="Tu nombre" required maxLength={30}
-                className="w-full bg-white/[0.04] border border-white/[0.08] focus:border-purple-500/60 focus:bg-white/[0.06] outline-none text-white px-4 py-3 rounded-xl text-sm transition placeholder-gray-700" />
+                className={inputBase}
+                onFocus={e => e.target.style.borderColor = GOLD_BORDER}
+                onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.08)'} />
             </Field>
 
             <Field label="Email">
               <input type="email" value={email} onChange={e => setEmail(e.target.value)}
                 placeholder="tu@email.com" required
-                className="w-full bg-white/[0.04] border border-white/[0.08] focus:border-purple-500/60 focus:bg-white/[0.06] outline-none text-white px-4 py-3 rounded-xl text-sm transition placeholder-gray-700" />
+                className={inputBase}
+                onFocus={e => e.target.style.borderColor = GOLD_BORDER}
+                onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.08)'} />
             </Field>
 
             <div className="grid grid-cols-2 gap-3">
               <Field label="Contraseña">
                 <input type="password" value={password} onChange={e => setPassword(e.target.value)}
                   placeholder="Mín. 6 caracteres" required
-                  className="w-full bg-white/[0.04] border border-white/[0.08] focus:border-purple-500/60 focus:bg-white/[0.06] outline-none text-white px-4 py-3 rounded-xl text-sm transition placeholder-gray-700" />
+                  className={inputBase}
+                  onFocus={e => e.target.style.borderColor = GOLD_BORDER}
+                  onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.08)'} />
               </Field>
               <Field label="Confirmar">
                 <input type="password" value={confirmar} onChange={e => setConfirmar(e.target.value)}
                   placeholder="Repetí" required
-                  className={`w-full bg-white/[0.04] outline-none text-white px-4 py-3 rounded-xl text-sm transition placeholder-gray-700 border ${
-                    noCoinciden ? 'border-red-500/70 focus:border-red-500'
-                    : coinciden  ? 'border-green-500/60 focus:border-green-500'
-                    : 'border-white/[0.08] focus:border-purple-500/60 focus:bg-white/[0.06]'
-                  }`} />
+                  className={`${inputBase} ${noCoinciden ? 'border-red-500/70' : coinciden ? 'border-green-500/60' : ''}`}
+                  onFocus={e => { if (!noCoinciden && !coinciden) e.target.style.borderColor = GOLD_BORDER }}
+                  onBlur={e => { if (!noCoinciden && !coinciden) e.target.style.borderColor = 'rgba(255,255,255,0.08)' }} />
               </Field>
             </div>
 
@@ -179,29 +207,51 @@ export default function Registro() {
             )}
 
             <label className="flex items-start gap-3 cursor-pointer group mt-1">
-              <div className={`w-4 h-4 mt-0.5 rounded flex-shrink-0 border-2 flex items-center justify-center transition-all ${
-                aceptaTerminos ? 'bg-purple-600 border-purple-600' : 'bg-transparent border-white/20 group-hover:border-purple-500/50'
-              }`} onClick={() => setAceptaTerminos(v => !v)}>
-                {aceptaTerminos && <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" className="w-2.5 h-2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>}
+              <div className="w-4 h-4 mt-0.5 rounded flex-shrink-0 border-2 flex items-center justify-center transition-all"
+                   style={{
+                     background: aceptaTerminos ? GOLD : 'transparent',
+                     borderColor: aceptaTerminos ? GOLD : 'rgba(255,255,255,0.2)',
+                   }}
+                   onClick={() => setAceptaTerminos(v => !v)}>
+                {aceptaTerminos && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#07090d" strokeWidth="3" className="w-2.5 h-2.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                  </svg>
+                )}
               </div>
               <input type="checkbox" checked={aceptaTerminos} onChange={e => setAceptaTerminos(e.target.checked)} className="sr-only" />
               <span className="text-gray-500 text-xs leading-relaxed">
                 Acepto los{' '}
-                <Link to="/terminos" target="_blank" className="text-purple-400 hover:text-purple-300 underline underline-offset-2">Términos y Condiciones</Link>
+                <Link to="/terminos" target="_blank" className="underline underline-offset-2 transition"
+                      style={{ color: GOLD }}
+                      onMouseEnter={e => e.target.style.color = GOLD_LIGHT}
+                      onMouseLeave={e => e.target.style.color = GOLD}>
+                  Términos y Condiciones
+                </Link>
                 {' '}y la{' '}
-                <Link to="/privacidad" target="_blank" className="text-purple-400 hover:text-purple-300 underline underline-offset-2">Política de Privacidad</Link>
+                <Link to="/privacidad" target="_blank" className="underline underline-offset-2 transition"
+                      style={{ color: GOLD }}
+                      onMouseEnter={e => e.target.style.color = GOLD_LIGHT}
+                      onMouseLeave={e => e.target.style.color = GOLD}>
+                  Política de Privacidad
+                </Link>
               </span>
             </label>
 
             <button type="submit" disabled={cargando || noCoinciden || !aceptaTerminos}
-              className="w-full bg-purple-600 hover:bg-purple-500 disabled:opacity-40 disabled:cursor-not-allowed text-white py-3.5 rounded-2xl font-bold transition-all text-sm hover:shadow-[0_0_28px_rgba(139,92,246,0.35)]">
+              className="w-full py-3.5 rounded-2xl font-bold transition-all text-sm mt-1 disabled:opacity-40 disabled:cursor-not-allowed hover:scale-[1.02]"
+              style={{ background: GOLD, color: '#07090d' }}
+              onMouseEnter={e => { if (!cargando) e.currentTarget.style.background = GOLD_LIGHT }}
+              onMouseLeave={e => e.currentTarget.style.background = GOLD}>
               {cargando ? 'Creando cuenta...' : 'Crear cuenta →'}
             </button>
           </form>
 
           <p className="text-center text-gray-600 text-sm">
             ¿Ya tenés cuenta?{' '}
-            <button onClick={() => navigate('/login')} className="text-purple-400 hover:text-purple-300 font-semibold transition">
+            <button onClick={() => navigate('/login')} className="font-semibold transition" style={{ color: GOLD }}
+              onMouseEnter={e => e.target.style.color = GOLD_LIGHT}
+              onMouseLeave={e => e.target.style.color = GOLD}>
               Iniciá sesión
             </button>
           </p>
