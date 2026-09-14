@@ -148,7 +148,7 @@ export default function Ranking() {
               Tabla global
             </div>
             <h1 className="text-4xl font-extrabold">Ranking</h1>
-            <p className="text-gray-500 mt-2 text-sm">Los mejores jugadores de PlayRoom</p>
+            <p className="text-gray-500 mt-2 text-sm">Los mejores jugadores de TrucoUY</p>
           </div>
 
           {/* Tabs */}

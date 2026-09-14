@@ -55,10 +55,14 @@ export default function MesaTruco({
   onEnviarMensaje,
   onSubirEnvidoConNivel,
   onIrseMazo,
+  onSalirPartida,
   rivalReconectando,
+  rivalAlMazo,
 }) {
   const [chatInput, setChatInput]         = useState('')
   const [popupRival, setPopupRival]       = useState(false)
+  const [confirmSalir, setConfirmSalir]   = useState(false)
+  const [confirmMazo, setConfirmMazo]     = useState(false)
 
   const enviar = () => {
     const txt = chatInput.trim()
@@ -68,7 +72,59 @@ export default function MesaTruco({
   }
 
   return (
-    <div className="flex-1 flex flex-col lg:flex-row max-w-[1400px] mx-auto w-full px-2 lg:px-4 py-2 lg:py-4 gap-3 lg:gap-4">
+    <div className="flex-1 flex flex-col lg:flex-row max-w-[1400px] mx-auto w-full px-2 lg:px-4 py-2 lg:py-4 gap-3 lg:gap-4 relative">
+
+      {/* ── MODAL CONFIRMAR SALIR ── */}
+      {confirmSalir && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
+          <div className="bg-[#0d0b1a] border border-white/10 rounded-2xl p-6 max-w-sm w-full flex flex-col gap-5 shadow-2xl">
+            <div className="flex flex-col gap-1.5">
+              <h3 className="text-white font-extrabold text-lg">¿Abandonar la partida?</h3>
+              <p className="text-gray-400 text-sm">Tu rival ganará automáticamente y perderás ELO.</p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConfirmSalir(false)}
+                className="flex-1 py-2.5 rounded-xl border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-white text-sm font-semibold transition"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => { setConfirmSalir(false); onSalirPartida?.() }}
+                className="flex-1 py-2.5 rounded-xl bg-red-700 hover:bg-red-600 text-white text-sm font-bold transition"
+              >
+                Sí, salir
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── MODAL CONFIRMAR IRSE AL MAZO ── */}
+      {confirmMazo && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
+          <div className="bg-[#0d0b1a] border border-white/10 rounded-2xl p-6 max-w-sm w-full flex flex-col gap-5 shadow-2xl">
+            <div className="flex flex-col gap-1.5">
+              <h3 className="text-white font-extrabold text-lg">¿Irse al mazo?</h3>
+              <p className="text-gray-400 text-sm">Perdés la ronda y el rival gana los puntos de truco cantado.</p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConfirmMazo(false)}
+                className="flex-1 py-2.5 rounded-xl border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-white text-sm font-semibold transition"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => { setConfirmMazo(false); onIrseMazo?.() }}
+                className="flex-1 py-2.5 rounded-xl bg-red-700 hover:bg-red-600 text-white text-sm font-bold transition"
+              >
+                Sí, me voy
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── PANEL IZQUIERDO — solo desktop ── */}
       <div className="hidden lg:flex flex-col gap-3 w-52 flex-shrink-0">
@@ -173,6 +229,16 @@ export default function MesaTruco({
           <div className="w-full max-w-md mx-auto flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-950/60 border border-amber-700/40 text-amber-300 text-xs font-semibold">
             <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse flex-shrink-0" />
             {nombreRival} se desconectó — esperando reconexión (30s)...
+          </div>
+        )}
+
+        {/* Rival fue al mazo banner */}
+        {rivalAlMazo && (
+          <div className="w-full max-w-md mx-auto flex items-center gap-3 px-4 py-3 rounded-xl bg-green-950/70 border border-green-700/50 text-green-300 text-sm font-bold shadow-lg">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5 flex-shrink-0">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0H3"/>
+            </svg>
+            <span>{nombreRival} se fue al mazo — Ganaste la ronda</span>
           </div>
         )}
 
@@ -441,9 +507,15 @@ export default function MesaTruco({
         <div style={{ height: '90px' }} />
 
         {/* Barra de timer cuando es tu turno */}
-        {puedeJugar && timerSeg < 30 && (
+        {puedeJugar && (
           <div className="w-full max-w-xs mx-auto px-2">
-            <div className="w-full h-1.5 bg-gray-700 rounded-full overflow-hidden">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[10px] text-gray-500 uppercase tracking-widest font-semibold">Tu turno</span>
+              <span className={`text-sm font-extrabold tabular-nums transition-colors ${
+                timerSeg > 15 ? 'text-green-400' : timerSeg > 8 ? 'text-yellow-400' : 'text-red-400 animate-pulse'
+              }`}>{timerSeg}s</span>
+            </div>
+            <div className="w-full h-2 bg-gray-800 rounded-full overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all duration-1000 ease-linear ${
                   timerSeg > 15 ? 'bg-green-500' : timerSeg > 8 ? 'bg-yellow-500' : 'bg-red-500'
@@ -451,9 +523,6 @@ export default function MesaTruco({
                 style={{ width: `${(timerSeg / 30) * 100}%` }}
               />
             </div>
-            {timerSeg <= 10 && (
-              <p className="text-center text-red-400 text-xs font-bold mt-0.5 animate-pulse">{timerSeg}s</p>
-            )}
           </div>
         )}
 
@@ -470,18 +539,30 @@ export default function MesaTruco({
 
         {cartaSel && <p className="text-purple-400 text-xs animate-pulse">Clickeá de nuevo para jugar</p>}
 
-        {/* Irse al mazo */}
-        {onIrseMazo && !rondaTerminada && !bloqueado && (
+        {/* Irse al mazo + Salir */}
+        <div className="flex items-center gap-3">
+          {onIrseMazo && !rondaTerminada && !bloqueado && (
+            <button
+              onClick={() => setConfirmMazo(true)}
+              className="flex items-center gap-1.5 text-red-400/70 hover:text-red-300 text-xs font-semibold uppercase tracking-widest transition-all border border-red-900/30 hover:border-red-700/60 hover:bg-red-950/30 px-4 py-2 rounded-xl"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/>
+              </svg>
+              Irse al mazo
+            </button>
+          )}
           <button
-            onClick={onIrseMazo}
-            className="flex items-center gap-1.5 text-red-400/70 hover:text-red-300 text-xs font-semibold uppercase tracking-widest transition-all border border-red-900/30 hover:border-red-700/60 hover:bg-red-950/30 px-4 py-2 rounded-xl"
+            onClick={() => setConfirmSalir(true)}
+            className="flex items-center gap-1.5 text-gray-600 hover:text-red-400 text-xs font-semibold uppercase tracking-widest transition-all px-3 py-2 rounded-xl hover:bg-red-950/20"
+            title="Abandonar partida"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
             </svg>
-            Irse al mazo
+            Salir
           </button>
-        )}
+        </div>
 
         {/* Avatar jugador */}
         <div className="flex flex-col items-center gap-1 mt-1">

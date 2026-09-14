@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { auth, googleProvider } from '../firebase'
 import { createUserWithEmailAndPassword, signInWithPopup, updateProfile } from 'firebase/auth'
 import { usePageTitle } from '../hooks/usePageTitle'
@@ -18,9 +18,10 @@ export default function Registro() {
   const [nombre,   setNombre]   = useState('')
   const [email,    setEmail]    = useState('')
   const [password, setPassword] = useState('')
-  const [confirmar,setConfirmar]= useState('')
-  const [error,    setError]    = useState('')
-  const [cargando, setCargando] = useState(false)
+  const [confirmar,setConfirmar]  = useState('')
+  const [error,    setError]      = useState('')
+  const [cargando, setCargando]   = useState(false)
+  const [aceptaTerminos, setAceptaTerminos] = useState(false)
 
   const handleRegistro = async (e) => {
     e.preventDefault()
@@ -31,7 +32,7 @@ export default function Registro() {
     try {
       const result = await createUserWithEmailAndPassword(auth, email, password)
       await updateProfile(result.user, { displayName: nombre.trim() })
-      navigate('/')
+      navigate('/juegos', { state: { bienvenida: true } })
     } catch (err) {
       if (err.code === 'auth/email-already-in-use') setError('Este email ya está registrado.')
       else setError('Ocurrió un error. Intentá de nuevo.')
@@ -44,7 +45,7 @@ export default function Registro() {
     setError('')
     try {
       await signInWithPopup(auth, googleProvider)
-      navigate('/')
+      navigate('/juegos', { state: { bienvenida: true } })
     } catch {
       setError('No se pudo registrar con Google.')
     }
@@ -164,11 +165,36 @@ export default function Registro() {
               </Field>
             </div>
 
-            {noCoinciden && <p className="text-red-400 text-xs -mt-2 flex items-center gap-1"><span>✗</span> Las contraseñas no coinciden</p>}
-            {coinciden   && <p className="text-green-400 text-xs -mt-2 flex items-center gap-1"><span>✓</span> Las contraseñas coinciden</p>}
+            {noCoinciden && (
+              <p className="text-red-400 text-xs -mt-2 flex items-center gap-1.5">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-3 h-3 flex-shrink-0"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                Las contraseñas no coinciden
+              </p>
+            )}
+            {coinciden && (
+              <p className="text-green-400 text-xs -mt-2 flex items-center gap-1.5">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-3 h-3 flex-shrink-0"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                Las contraseñas coinciden
+              </p>
+            )}
 
-            <button type="submit" disabled={cargando || noCoinciden}
-              className="w-full bg-purple-600 hover:bg-purple-500 disabled:opacity-40 disabled:cursor-not-allowed text-white py-3.5 rounded-2xl font-bold transition-all text-sm hover:shadow-[0_0_28px_rgba(139,92,246,0.35)] mt-1">
+            <label className="flex items-start gap-3 cursor-pointer group mt-1">
+              <div className={`w-4 h-4 mt-0.5 rounded flex-shrink-0 border-2 flex items-center justify-center transition-all ${
+                aceptaTerminos ? 'bg-purple-600 border-purple-600' : 'bg-transparent border-white/20 group-hover:border-purple-500/50'
+              }`} onClick={() => setAceptaTerminos(v => !v)}>
+                {aceptaTerminos && <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" className="w-2.5 h-2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>}
+              </div>
+              <input type="checkbox" checked={aceptaTerminos} onChange={e => setAceptaTerminos(e.target.checked)} className="sr-only" />
+              <span className="text-gray-500 text-xs leading-relaxed">
+                Acepto los{' '}
+                <Link to="/terminos" target="_blank" className="text-purple-400 hover:text-purple-300 underline underline-offset-2">Términos y Condiciones</Link>
+                {' '}y la{' '}
+                <Link to="/privacidad" target="_blank" className="text-purple-400 hover:text-purple-300 underline underline-offset-2">Política de Privacidad</Link>
+              </span>
+            </label>
+
+            <button type="submit" disabled={cargando || noCoinciden || !aceptaTerminos}
+              className="w-full bg-purple-600 hover:bg-purple-500 disabled:opacity-40 disabled:cursor-not-allowed text-white py-3.5 rounded-2xl font-bold transition-all text-sm hover:shadow-[0_0_28px_rgba(139,92,246,0.35)]">
               {cargando ? 'Creando cuenta...' : 'Crear cuenta →'}
             </button>
           </form>

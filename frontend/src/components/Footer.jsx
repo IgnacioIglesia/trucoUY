@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 
-const VERSION = 'v0.5'
+const VERSION = 'v1.5'
 
 export default function Footer() {
   const navigate = useNavigate()
@@ -12,11 +12,11 @@ export default function Footer() {
         {/* Marca */}
         <div className="flex flex-col gap-3">
           <button onClick={() => navigate('/')} className="flex items-center gap-2.5 group">
-            <img src="/favicon.svg" alt="PlayRoom" className="w-8 h-8 group-hover:opacity-80 transition" />
-            <span className="text-base font-black text-white">Play<span className="text-purple-400">Room</span></span>
+            <img src="/favicon.svg" alt="TrucoUY" className="w-8 h-8 group-hover:opacity-80 transition" />
+            <span className="text-base font-black text-white">Truco<span className="text-emerald-400">UY</span></span>
           </button>
           <p className="text-gray-600 text-xs max-w-[200px] leading-relaxed">
-            Juegos clásicos en un solo lugar. Gratis, sin publicidad.
+            Truco rioplatense online. Gratis, sin publicidad.
           </p>
           <span className="text-gray-700 text-[10px] font-mono">{VERSION}</span>
         </div>
@@ -24,12 +24,11 @@ export default function Footer() {
         {/* Links */}
         <div className="flex gap-12 md:gap-16">
           <div className="flex flex-col gap-3">
-            <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-widest">Juegos</p>
+            <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-widest">Jugar</p>
             {[
               { label: 'Truco Online', to: '/juegos/truco-online' },
-              { label: 'Sudoku',       to: '/juegos/sudoku'       },
-              { label: 'Buscaminas',   to: '/juegos/buscaminas'   },
-              { label: 'Banderas',     to: '/juegos/banderas'     },
+              { label: 'Truco vs IA',  to: '/juegos/truco'        },
+              { label: 'Ranking',      to: '/ranking'             },
             ].map(l => (
               <button key={l.to} onClick={() => navigate(l.to)}
                 className="text-gray-500 hover:text-gray-300 text-xs transition text-left">
@@ -41,9 +40,22 @@ export default function Footer() {
           <div className="flex flex-col gap-3">
             <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-widest">Cuenta</p>
             {[
-              { label: 'Mi perfil', to: '/perfil'   },
-              { label: 'Ranking',   to: '/ranking'  },
-              { label: 'Juegos',    to: '/juegos'   },
+              { label: 'Mi perfil', to: '/perfil'  },
+              { label: 'Registro',  to: '/registro' },
+            ].map(l => (
+              <button key={l.to} onClick={() => navigate(l.to)}
+                className="text-gray-500 hover:text-gray-300 text-xs transition text-left">
+                {l.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-widest">Legal</p>
+            {[
+              { label: 'Términos',   to: '/terminos'   },
+              { label: 'Privacidad', to: '/privacidad' },
+              { label: 'Cookies',    to: '/cookies'    },
             ].map(l => (
               <button key={l.to} onClick={() => navigate(l.to)}
                 className="text-gray-500 hover:text-gray-300 text-xs transition text-left">
@@ -56,7 +68,7 @@ export default function Footer() {
 
       {/* Bottom */}
       <div className="border-t border-white/[0.04] px-6 py-4 max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-        <p className="text-gray-700 text-xs">PlayRoom © 2026. Todos los derechos reservados.</p>
+        <p className="text-gray-700 text-xs">TrucoUY © 2026. Todos los derechos reservados.</p>
       </div>
     </footer>
   )

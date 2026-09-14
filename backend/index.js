@@ -13,10 +13,7 @@ if (process.env.SENTRY_DSN) {
 
 const ALLOWED_ORIGIN = (process.env.FRONTEND_URL || 'http://localhost:5173').replace(/\/$/, '')
 
-const registerTruco    = require('./routes/truco')
-const registerPoker    = require('./routes/poker')
-const registerUno      = require('./routes/uno')
-const registerPictionary = require('./routes/pictionary')
+const registerTruco = require('./routes/truco')
 
 const { getEstadoParaSocket, getEstadoParaSocket2v2 } = require('./trucoLogica')
 
@@ -30,7 +27,6 @@ function cargarSalas() {
     const ahora = Date.now()
     const restored = {}
     for (const [id, sala] of Object.entries(saved)) {
-      // Only restore lobbies (not mid-game) that are < 30 min old
       if (sala.estado === 'esperando' && ahora - sala.createdAt < 30 * 60 * 1000) {
         restored[id] = sala
       }
@@ -54,25 +50,14 @@ function guardarSalas(salas) {
 
 // ── Shared state ─────────────────────────────────────────────────────────────
 
-const salas        = cargarSalas()
-const trucoGames   = {}
-const pokerSalas   = {}
-const pokerGames   = {}
-const unoSalas     = {}
-const unoGames     = {}
-const pictionarySalas = {}
+const salas      = cargarSalas()
+const trucoGames = {}
 
-// userId → { timeout, salaId, oldSocketId, nombre }
 const pendingDisconnects = new Map()
-
-// userId → current socket.id (for duplicate-tab detection)
 const usuariosConectados = new Map()
 
 const state = {
   salas, trucoGames,
-  pokerSalas, pokerGames,
-  unoSalas, unoGames,
-  pictionarySalas,
   pendingDisconnects,
   guardarSalas: () => guardarSalas(salas),
 }
@@ -106,8 +91,8 @@ app.post('/verify-recaptcha', recaptchaLimiter, async (req, res) => {
 })
 
 app.get('/', (_req, res) => res.json({
-  servidor: 'PlayRoom',
-  version: '3.0.0',
+  servidor: 'TrucoUY',
+  version: '1.0.0',
   salasActivas: Object.keys(salas).length,
   timestamp: new Date().toISOString(),
 }))
@@ -125,7 +110,6 @@ app.get('/salas', (_req, res) => res.json(
 const server = http.createServer(app)
 const io = new Server(server, { cors: { origin: ALLOWED_ORIGIN, methods: ['GET', 'POST'] } })
 
-// Replace all occurrences of oldId with newId inside a Truco game object
 function actualizarSocketEnGame(game, oldId, newId) {
   if (!game) return
   if (game.socketA === oldId) game.socketA = newId
@@ -146,7 +130,6 @@ function actualizarSocketEnGame(game, oldId, newId) {
   }
 }
 
-// Send current game state to a (re)connected player
 function reenviarEstado(socket, salaId) {
   const partida = trucoGames[salaId]
   if (!partida) return
@@ -162,7 +145,6 @@ function reenviarEstado(socket, salaId) {
 io.on('connection', (socket) => {
   console.log(`Conectado: ${socket.id}`)
 
-  // ── Socket rate limiting (60 events/s max per socket) ────────────────────────
   let _rlWindow = Date.now(), _rlCount = 0
   socket.use((_, next) => {
     const now = Date.now()
@@ -171,13 +153,11 @@ io.on('connection', (socket) => {
     next()
   })
 
-  // ── Identity ────────────────────────────────────────────────────────────────
   socket.on('set_nombre', ({ nombre, userId: uid, photoURL }) => {
     socket.nombre   = nombre || 'Jugador'
     socket.photoURL = photoURL || ''
     const userId    = uid || socket.id
 
-    // Duplicate tab: kick previous socket for same user
     const prevSocketId = usuariosConectados.get(userId)
     if (prevSocketId && prevSocketId !== socket.id) {
       const prevSocket = io.sockets.sockets.get(prevSocketId)
@@ -186,7 +166,6 @@ io.on('connection', (socket) => {
     usuariosConectados.set(userId, socket.id)
     socket.userId = userId
 
-    // ── Reconnection: resume pending game ────────────────────────────────────
     const pending = pendingDisconnects.get(userId)
     if (pending) {
       clearTimeout(pending.timeout)
@@ -197,7 +176,6 @@ io.on('connection', (socket) => {
       const partida = trucoGames[salaId]
 
       if (sala) {
-        // Update socket.id references everywhere
         for (const j of sala.jugadores)      if (j.id === oldSocketId) j.id = socket.id
         if (sala.equipoA) for (const j of sala.equipoA) if (j.id === oldSocketId) j.id = socket.id
         if (sala.equipoB) for (const j of sala.equipoB) if (j.id === oldSocketId) j.id = socket.id
@@ -212,7 +190,6 @@ io.on('connection', (socket) => {
           socket.emit('reconectado_a_partida', { salaId, modalidad: sala.modalidad || '1vs1' })
           reenviarEstado(socket, salaId)
         } else {
-          // Waiting room reconnect: restore lobby screen
           if (sala.modalidad === '2vs2') {
             socket.emit('prelobby', { modalidad: sala.modalidad, limite: sala.limite, equipoA: sala.equipoA || [], equipoB: sala.equipoB || [], salaId })
           } else {
@@ -227,20 +204,12 @@ io.on('connection', (socket) => {
     console.log(`${socket.nombre} (${userId}) conectado`)
   })
 
-  // ── Register game handlers ──────────────────────────────────────────────────
-  const trucoCtrls      = registerTruco(io, socket, state)
-  const pokerCtrls      = registerPoker(io, socket, state)
-  const unoCtrls        = registerUno(io, socket, state)
-  const pictionaryCtrls = registerPictionary(io, socket, state)
+  const trucoCtrls = registerTruco(io, socket, state)
 
-  // ── Disconnect ─────────────────────────────────────────────────────────────
   socket.on('disconnect', (reason) => {
     console.log(`Desconectado: ${socket.nombre || socket.id} (${reason})`)
     if (socket.userId) usuariosConectados.delete(socket.userId)
     trucoCtrls.onDisconnect()
-    pokerCtrls.onDisconnect()
-    unoCtrls.onDisconnect()
-    pictionaryCtrls.onDisconnect()
   })
 })
 
@@ -259,7 +228,7 @@ setInterval(() => {
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 3001
-server.listen(PORT, () => console.log(`Servidor corriendo en http://localhost:${PORT}`))
+server.listen(PORT, () => console.log(`TrucoUY backend corriendo en http://localhost:${PORT}`))
 
 process.on('uncaughtException', err => {
   if (process.env.SENTRY_DSN) Sentry.captureException(err)

@@ -448,7 +448,9 @@ function procesarAccion(p, socketId, tipo, datos) {
     case 'real':
     case 'falta': {
       const esSubida = p.envidoPendientePara === yo
+      if (esSubida && p.nivelEnvido === 'falta') return { ok: false, error: 'El Falta Envido ya fue cantado — no se puede subir más' }
       if (!esSubida) {
+        if (p.turno !== yo) return { ok: false, error: 'No es tu turno para cantar envido' }
         if (p.envidoResuelto) return { ok: false, error: 'El envido ya fue resuelto' }
         if (p.envidoPendientePara != null) return { ok: false, error: 'Hay un envido pendiente de respuesta' }
         if (!p.florResuelta) return { ok: false, error: 'Resolvé la Flor primero' }

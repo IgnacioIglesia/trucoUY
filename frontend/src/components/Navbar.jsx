@@ -70,9 +70,10 @@ function Navbar() {
   }, [location.pathname])
 
   const links = [
-    { label: 'Inicio',  ruta: '/'        },
-    { label: 'Juegos',  ruta: '/juegos'  },
-    { label: 'Ranking', ruta: '/ranking' },
+    { label: 'Inicio',       ruta: '/'                    },
+    { label: 'Truco Online', ruta: '/juegos/truco-online' },
+    { label: 'vs IA',        ruta: '/juegos/truco'        },
+    { label: 'Ranking',      ruta: '/ranking'             },
   ]
 
   return (
@@ -85,8 +86,8 @@ function Navbar() {
           onClick={() => handleNavigate('/')}
           className="flex items-center gap-2 bg-transparent border-none flex-shrink-0 group"
         >
-          <img src="/favicon.svg" alt="PlayRoom" className="w-7 h-7 group-hover:opacity-80 transition" />
-          <span className="text-base font-bold text-white">Play<span className="text-purple-400">Room</span></span>
+          <img src="/favicon.svg" alt="TrucoUY" className="w-7 h-7 group-hover:opacity-80 transition" />
+          <span className="text-base font-bold text-white">Truco<span className="text-emerald-400">UY</span></span>
         </button>
 
         {/* Nav links — desktop */}
@@ -103,7 +104,7 @@ function Navbar() {
             >
               {label}
               {isActive(ruta) && (
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-purple-400" />
+                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-emerald-400" />
               )}
             </button>
           ))}
@@ -175,7 +176,7 @@ function Navbar() {
                 </button>
                 <button
                   onClick={() => handleNavigate('/registro')}
-                  className="bg-purple-600 hover:bg-purple-500 text-white px-4 py-1.5 rounded-xl text-sm font-semibold transition hover:shadow-[0_0_20px_rgba(139,92,246,0.35)]"
+                  className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-1.5 rounded-xl text-sm font-semibold transition hover:shadow-[0_0_20px_rgba(139,92,246,0.35)]"
                 >
                   Registrarse
                 </button>
@@ -214,11 +215,11 @@ function Navbar() {
                 onClick={() => handleNavigate(ruta)}
                 className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-semibold transition-all text-left ${
                   isActive(ruta)
-                    ? 'bg-purple-950/50 border border-purple-700/30 text-white'
+                    ? 'bg-emerald-950/50 border border-emerald-700/30 text-white'
                     : 'text-gray-400 hover:text-white hover:bg-white/[0.05]'
                 }`}
               >
-                {isActive(ruta) && <span className="w-1 h-1 rounded-full bg-purple-400 flex-shrink-0" />}
+                {isActive(ruta) && <span className="w-1 h-1 rounded-full bg-emerald-400 flex-shrink-0" />}
                 {label}
               </button>
             ))}
@@ -260,7 +261,7 @@ function Navbar() {
                 </button>
                 <button
                   onClick={() => handleNavigate('/registro')}
-                  className="w-full py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-sm font-bold transition"
+                  className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold transition"
                 >
                   Registrarse
                 </button>

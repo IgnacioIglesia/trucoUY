@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 
-const ORIGINAL_TITLE = 'PlayRoom — Juegos Virtuales'
-const BLINK_TITLE    = '⚡ Tu turno — PlayRoom'
+const ORIGINAL_TITLE = 'TrucoUY — Truco Rioplatense Online'
+const BLINK_TITLE    = '⚡ Tu turno — TrucoUY'
 const BLINK_INTERVAL = 1100
 
 export function useTurnNotification(esMiTurno) {
@@ -14,7 +14,7 @@ export function useTurnNotification(esMiTurno) {
     if (!('Notification' in window) || Notification.permission !== 'granted') return
     notifRef.current?.close()
     try {
-      notifRef.current = new Notification('Tu turno — PlayRoom', {
+      notifRef.current = new Notification('Tu turno — TrucoUY', {
         body: 'Es tu turno de jugar en Truco Online.',
         icon: '/favicon.svg',
         tag: 'playroom-turno',

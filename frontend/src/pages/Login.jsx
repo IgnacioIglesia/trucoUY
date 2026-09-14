@@ -107,7 +107,7 @@ export default function Login() {
 
           <div>
             <h1 className="text-2xl font-extrabold">Iniciar sesión</h1>
-            <p className="text-gray-500 text-sm mt-1">Bienvenido de vuelta a PlayRoom</p>
+            <p className="text-gray-500 text-sm mt-1">Bienvenido de vuelta a TrucoUY</p>
           </div>
 
           {desde && (
