@@ -29,7 +29,9 @@ export default function EmptyState({ icon = 'gamepad', title, description, actio
       {action && (
         <button
           onClick={() => navigate(action.to)}
-          className="mt-2 text-sm text-emerald-400 hover:text-emerald-300 font-semibold transition"
+          className="mt-2 text-sm font-semibold transition" style={{ color: '#c9a83c' }}
+          onMouseEnter={e => e.currentTarget.style.color = '#e8c96a'}
+          onMouseLeave={e => e.currentTarget.style.color = '#c9a83c'}
         >
           {action.label} →
         </button>

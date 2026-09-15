@@ -13,9 +13,12 @@ export default function Footer() {
         {/* Marca */}
         <div className="flex flex-col gap-3">
           <button onClick={() => navigate('/')} className="flex items-center gap-2.5 group">
-            {/* Card icon */}
-            <div style={{ width: 28, height: 36, background: '#0a150c', border: `1.5px solid ${GOLD}`, borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <span style={{ color: GOLD, fontSize: 15, lineHeight: 1, fontFamily: 'Georgia, serif' }}>♠</span>
+            <div style={{ width: 28, height: 36, background: '#07090d', border: `1.5px solid ${GOLD}`, borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <svg width="9" height="20" viewBox="0 0 30 68" fill={GOLD}>
+                <path d="M15 2 C16 8 18 22 18 34 L15 40 L12 34 C12 22 14 8 15 2 Z"/>
+                <path d="M3 32 C5 27 9 30 15 30 C21 30 25 27 27 32 C25 37 21 34 15 34 C9 34 5 37 3 32 Z"/>
+                <rect x="13" y="40" width="4" height="15" rx="2"/><circle cx="15" cy="59" r="7"/>
+              </svg>
             </div>
             <span className="text-base font-black text-white">Truco<span style={{ color: GOLD }}>UY</span></span>
           </button>
@@ -44,7 +47,7 @@ export default function Footer() {
           <div className="flex flex-col gap-3">
             <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-widest">Cuenta</p>
             {[
-              { label: 'Mi perfil', to: '/perfil'  },
+              { label: 'Mi perfil', to: '/perfil'   },
               { label: 'Registro',  to: '/registro' },
             ].map(l => (
               <button key={l.to} onClick={() => navigate(l.to)}

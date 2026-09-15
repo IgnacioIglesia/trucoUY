@@ -81,6 +81,10 @@ export default function MesaTruco({
 
   return (
     <div className="flex-1 flex flex-col lg:flex-row max-w-[1400px] mx-auto w-full px-2 lg:px-4 py-2 lg:py-4 gap-3 lg:gap-4 relative">
+      <style>{`
+        @keyframes cardSlide { from { opacity:0; transform:translateY(-8px) scale(0.94) } to { opacity:1; transform:translateY(0) scale(1) } }
+        @keyframes popIn { from { opacity:0; transform:scale(0.82) } to { opacity:1; transform:scale(1) } }
+      `}</style>
 
       {/* ── MODAL CONFIRMAR SALIR ── */}
       {confirmSalir && (
@@ -199,10 +203,10 @@ export default function MesaTruco({
           <div className="h-52 flex flex-col gap-1">
             <p className="text-[10px] font-semibold uppercase tracking-widest text-center" style={{ color: '#c9a83c' }}>Chat</p>
             <div className="rounded-xl p-2 flex-1 min-h-0 overflow-y-auto flex flex-col gap-0.5" style={{ background: 'rgba(201,168,60,0.05)', border: '1px solid rgba(201,168,60,0.12)' }}>
-              {log.filter(m => m.startsWith('💬')).slice(0, 4).length === 0
+              {log.filter(m => m.startsWith('[C]')).slice(0, 4).length === 0
                 ? <p className="text-xs text-center italic" style={{ color: 'rgba(201,168,60,0.3)' }}>Sin mensajes</p>
-                : log.filter(m => m.startsWith('💬')).slice(0, 4).map((msg, i) => (
-                    <p key={i} className={`text-xs ${i === 0 ? 'text-yellow-200 font-semibold' : 'text-yellow-400/50'}`}>{msg}</p>
+                : log.filter(m => m.startsWith('[C]')).slice(0, 4).map((msg, i) => (
+                    <p key={i} className={`text-xs ${i === 0 ? 'text-yellow-200 font-semibold' : 'text-yellow-400/50'}`}>{msg.replace(/^\[C\] /, '')}</p>
                   ))
               }
             </div>
@@ -346,7 +350,13 @@ export default function MesaTruco({
                       i === manoActual            ? 'bg-yellow-950/50 border-yellow-600/50 text-yellow-400' :
                                                     'bg-white/5 border-white/10 text-gray-600'
                     }`}>
-                      {resultados[i] === 'jugador' ? '✓' : resultados[i] === 'maquina' ? '✗' : resultados[i] === 'empate' ? '=' : i + 1}
+                      {resultados[i] === 'jugador'
+                        ? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-3 h-3"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                        : resultados[i] === 'maquina'
+                          ? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-3 h-3"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                          : resultados[i] === 'empate'
+                            ? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-3 h-3"><path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14"/></svg>
+                            : i + 1}
                     </span>
                   ))}
                 </div>
@@ -383,14 +393,48 @@ export default function MesaTruco({
               <div className="absolute inset-0 pointer-events-none overflow-hidden">
                 <div className="absolute inset-6 rounded-[50%]"
                      style={{ border: '1px solid rgba(201,168,60,0.09)' }} />
-                <span className="absolute top-3 left-3 font-serif select-none"
-                      style={{ fontSize: 14, color: 'rgba(201,168,60,0.12)', lineHeight: 1 }}>♠</span>
-                <span className="absolute top-3 right-3 font-serif select-none"
-                      style={{ fontSize: 14, color: 'rgba(201,168,60,0.12)', lineHeight: 1 }}>♣</span>
-                <span className="absolute bottom-3 left-3 font-serif select-none"
-                      style={{ fontSize: 14, color: 'rgba(201,168,60,0.12)', lineHeight: 1 }}>♦</span>
-                <span className="absolute bottom-3 right-3 font-serif select-none"
-                      style={{ fontSize: 14, color: 'rgba(201,168,60,0.12)', lineHeight: 1 }}>♥</span>
+                {/* Espada */}
+                <svg className="absolute top-2 left-2 select-none" aria-hidden width="9" height="18" viewBox="0 0 30 68" fill="none">
+                  <path d="M15 2 L16.6 32 L15 38 L13.4 32 Z"
+                        fill="rgba(201,168,60,0.18)" stroke="rgba(201,168,60,0.38)" strokeWidth="1" strokeLinejoin="round"/>
+                  <path d="M3 31 C6 25 10 27 15 27 C20 27 24 25 27 31 C24 36 20 34 15 34 C10 34 6 36 3 31 Z"
+                        fill="rgba(201,168,60,0.18)" stroke="rgba(201,168,60,0.38)" strokeWidth="1"/>
+                  <rect x="13.5" y="38" width="3" height="14" rx="1.5"
+                        fill="rgba(201,168,60,0.14)" stroke="rgba(201,168,60,0.3)" strokeWidth="1"/>
+                  <ellipse cx="15" cy="58" rx="7" ry="5"
+                           fill="rgba(201,168,60,0.14)" stroke="rgba(201,168,60,0.3)" strokeWidth="1"/>
+                </svg>
+                {/* Basto */}
+                <svg className="absolute top-2 right-2 select-none" aria-hidden width="9" height="18" viewBox="0 0 30 68" fill="none">
+                  <circle cx="15" cy="10" r="10"
+                          fill="rgba(201,168,60,0.14)" stroke="rgba(201,168,60,0.35)" strokeWidth="1"/>
+                  <circle cx="15" cy="27" r="8.5"
+                          fill="rgba(201,168,60,0.14)" stroke="rgba(201,168,60,0.35)" strokeWidth="1"/>
+                  <circle cx="15" cy="42" r="7"
+                          fill="rgba(201,168,60,0.14)" stroke="rgba(201,168,60,0.35)" strokeWidth="1"/>
+                  <path d="M12.5 48 C12 54 10 60 8 68 L22 68 C20 60 18 54 17.5 48 Z"
+                        fill="rgba(201,168,60,0.1)" stroke="rgba(201,168,60,0.28)" strokeWidth="1"/>
+                </svg>
+                {/* Oro */}
+                <svg className="absolute bottom-2 left-2 select-none" aria-hidden width="14" height="14" viewBox="0 0 46 46" fill="none">
+                  <circle cx="23" cy="23" r="20" stroke="rgba(201,168,60,0.35)" strokeWidth="3"/>
+                  <circle cx="23" cy="23" r="11.5" stroke="rgba(201,168,60,0.28)" strokeWidth="2.5"/>
+                  <circle cx="23" cy="4" r="2.2" fill="rgba(201,168,60,0.35)"/>
+                  <circle cx="23" cy="42" r="2.2" fill="rgba(201,168,60,0.35)"/>
+                  <circle cx="4" cy="23" r="2.2" fill="rgba(201,168,60,0.35)"/>
+                  <circle cx="42" cy="23" r="2.2" fill="rgba(201,168,60,0.35)"/>
+                </svg>
+                {/* Copa */}
+                <svg className="absolute bottom-2 right-2 select-none" aria-hidden width="9" height="14" viewBox="0 0 36 56" fill="none">
+                  <rect x="5" y="2" width="26" height="4" rx="2"
+                        fill="rgba(201,168,60,0.14)" stroke="rgba(201,168,60,0.35)" strokeWidth="1"/>
+                  <path d="M7 6 C7.5 17 11 24 16 27 L20 27 C25 24 28.5 17 29 6 Z"
+                        fill="rgba(201,168,60,0.14)" stroke="rgba(201,168,60,0.35)" strokeWidth="1"/>
+                  <rect x="15" y="27" width="6" height="13" rx="3"
+                        fill="rgba(201,168,60,0.1)" stroke="rgba(201,168,60,0.28)" strokeWidth="1"/>
+                  <path d="M9 40 Q18 38 27 40 L25.5 47 Q18 45 10.5 47 Z"
+                        fill="rgba(201,168,60,0.1)" stroke="rgba(201,168,60,0.28)" strokeWidth="1"/>
+                </svg>
               </div>
 
               <div className="absolute top-3 left-4 flex flex-col items-center gap-1">
@@ -406,7 +450,9 @@ export default function MesaTruco({
                 return (
                   <>
                     {cjM[displayIdx]
-                      ? <CartaComp carta={cjM[displayIdx]} muestra={muestra} jugada enMesa />
+                      ? <div key={cjM[displayIdx].id} style={{ animation: 'cardSlide 0.2s ease-out' }}>
+                          <CartaComp carta={cjM[displayIdx]} muestra={muestra} jugada enMesa />
+                        </div>
                       : <div className="w-[68px] md:w-20 h-24 md:h-28 rounded-xl flex-shrink-0"
                           style={{ background: 'rgba(0,0,0,0.35)', boxShadow: 'inset 0 2px 16px rgba(0,0,0,0.7)', border: '1px solid rgba(255,255,255,0.04)' }} />
                     }
@@ -418,7 +464,9 @@ export default function MesaTruco({
                     </div>
 
                     {cjJ[displayIdx]
-                      ? <CartaComp carta={cjJ[displayIdx]} muestra={muestra} jugada enMesa />
+                      ? <div key={cjJ[displayIdx].id} style={{ animation: 'cardSlide 0.2s ease-out' }}>
+                          <CartaComp carta={cjJ[displayIdx]} muestra={muestra} jugada enMesa />
+                        </div>
                       : <div className="w-[68px] md:w-20 h-24 md:h-28 rounded-xl flex-shrink-0"
                           style={{ background: 'rgba(0,0,0,0.35)', boxShadow: 'inset 0 2px 16px rgba(0,0,0,0.7)', border: '1px solid rgba(255,255,255,0.04)' }} />
                     }
@@ -479,7 +527,8 @@ export default function MesaTruco({
             {/* Truco cantado */}
             {trucoCantado && (
               <div className="px-4 pb-3 flex justify-center">
-                <span className="bg-red-950/80 border border-red-700/60 text-red-300 text-xs px-3 py-1.5 rounded-full font-bold">
+                <span key={trucoCantado} className="bg-red-950/80 border border-red-700/60 text-red-300 text-xs px-3 py-1.5 rounded-full font-bold"
+                      style={{ animation: 'popIn 0.18s ease-out' }}>
                   {trucoCantado === 'truco' ? 'Truco' : trucoCantado === 'retruco' ? 'Retruco' : 'Vale Cuatro'}
                   {' · '}{ultimoEnCantar === 'yo' || ultimoEnCantar === 'jugador' ? 'vos' : nombreRival}
                 </span>
@@ -684,10 +733,10 @@ export default function MesaTruco({
 
         {/* Chat — mobile: mensajes recientes + input */}
         <div className="lg:hidden w-full flex flex-col gap-1.5">
-          {log.filter(m => m.startsWith('💬')).slice(0, 3).length > 0 && (
+          {log.filter(m => m.startsWith('[C]')).slice(0, 3).length > 0 && (
             <div className="rounded-xl px-3 py-2 flex flex-col gap-0.5" style={{ background: 'rgba(201,168,60,0.05)', border: '1px solid rgba(201,168,60,0.12)' }}>
-              {log.filter(m => m.startsWith('💬')).slice(0, 3).map((msg, i) => (
-                <p key={i} className={`text-xs ${i === 0 ? 'text-yellow-200 font-semibold' : 'text-yellow-400/50'}`}>{msg}</p>
+              {log.filter(m => m.startsWith('[C]')).slice(0, 3).map((msg, i) => (
+                <p key={i} className={`text-xs ${i === 0 ? 'text-yellow-200 font-semibold' : 'text-yellow-400/50'}`}>{msg.replace(/^\[C\] /, '')}</p>
               ))}
             </div>
           )}
@@ -713,7 +762,7 @@ export default function MesaTruco({
           <div className="rounded-2xl p-3 max-h-24 overflow-y-auto" style={{ background: '#0c0b09', border: '1px solid rgba(255,255,255,0.06)' }}>
             {log.length === 0
               ? <p className="text-gray-500 text-xs text-center">El historial aparecerá acá</p>
-              : log.filter(m => !m.startsWith('💬')).slice(0, 8).map((msg, i) => <LogEntry key={i} msg={msg} reciente={i === 0} />)
+              : log.filter(m => !m.startsWith('[C]')).slice(0, 8).map((msg, i) => <LogEntry key={i} msg={msg} reciente={i === 0} />)
             }
           </div>
         </div>
@@ -732,9 +781,9 @@ export default function MesaTruco({
         <div className="h-[525px] flex flex-col gap-2">
           <p className="text-[10px] font-semibold uppercase tracking-widest mb-1 text-center flex-shrink-0" style={{ color: 'rgba(201,168,60,0.5)' }}>Historial</p>
           <div className="rounded-2xl p-3 overflow-y-auto flex-1 min-h-0" style={{ background: '#0c0b09', border: '1px solid rgba(255,255,255,0.06)' }}>
-            {log.filter(m => !m.startsWith('💬')).length === 0
+            {log.filter(m => !m.startsWith('[C]')).length === 0
               ? <p className="text-gray-500 text-xs text-center">El historial aparecerá acá</p>
-              : log.filter(m => !m.startsWith('💬')).map((msg, i) => <LogEntry key={i} msg={msg} reciente={i === 0} />)
+              : log.filter(m => !m.startsWith('[C]')).map((msg, i) => <LogEntry key={i} msg={msg} reciente={i === 0} />)
             }
           </div>
         </div>

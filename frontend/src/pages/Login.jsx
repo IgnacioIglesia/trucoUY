@@ -18,8 +18,12 @@ const GoogleIcon = () => (
 )
 
 const CardLogo = () => (
-  <div style={{ width: 36, height: 46, background: '#0a150c', border: `1.5px solid ${GOLD}`, borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-    <span style={{ color: GOLD, fontSize: 20, lineHeight: 1, fontFamily: 'Georgia, serif' }}>♠</span>
+  <div style={{ width: 36, height: 46, background: '#07090d', border: `1.5px solid ${GOLD}`, borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+    <svg width="12" height="26" viewBox="0 0 30 68" fill={GOLD}>
+      <path d="M15 2 C16 8 18 22 18 34 L15 40 L12 34 C12 22 14 8 15 2 Z"/>
+      <path d="M3 32 C5 27 9 30 15 30 C21 30 25 27 27 32 C25 37 21 34 15 34 C9 34 5 37 3 32 Z"/>
+      <rect x="13" y="40" width="4" height="15" rx="2"/><circle cx="15" cy="59" r="7"/>
+    </svg>
   </div>
 )
 
@@ -59,11 +63,11 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen text-white flex" style={{ background: '#07090d' }}>
+    <div className="min-h-screen text-white flex">
 
       {/* ── Panel izquierdo ── */}
       <div className="hidden lg:flex w-[460px] flex-shrink-0 flex-col justify-center p-14 relative overflow-hidden"
-           style={{ background: 'linear-gradient(155deg, #0a0d07 0%, #060809 100%)' }}>
+           style={{ background: '#07090d' }}>
 
         {/* Glow dorado */}
         <div className="absolute inset-0 pointer-events-none"
@@ -78,8 +82,12 @@ export default function Login() {
              style={{ background: 'linear-gradient(to bottom, transparent, rgba(201,168,60,0.2), transparent)' }} />
 
         {/* Palo decorativo */}
-        <span className="absolute -bottom-8 -right-4 font-serif select-none pointer-events-none leading-none"
-              style={{ fontSize: 200, color: 'rgba(201,168,60,0.04)' }} aria-hidden>♠</span>
+        <svg className="absolute -bottom-8 -right-4 select-none pointer-events-none" aria-hidden
+             width="90" height="200" viewBox="0 0 30 68" fill="rgba(201,168,60,0.04)">
+          <path d="M15 2 C16 8 18 22 18 34 L15 40 L12 34 C12 22 14 8 15 2 Z"/>
+          <path d="M3 32 C5 27 9 30 15 30 C21 30 25 27 27 32 C25 37 21 34 15 34 C9 34 5 37 3 32 Z"/>
+          <rect x="13" y="40" width="4" height="15" rx="2"/><circle cx="15" cy="59" r="7"/>
+        </svg>
 
         <div className="relative z-10 flex flex-col gap-10 max-w-xs">
 
@@ -97,14 +105,14 @@ export default function Login() {
 
           <div className="flex flex-col gap-2.5">
             {[
-              { suit: '♠', texto: 'Truco Online 1vs1 y 2vs2' },
-              { suit: '♥', texto: 'Jugá contra amigos en tiempo real' },
-              { suit: '♦', texto: 'Ranking y estadísticas' },
-              { suit: '♣', texto: 'Completamente gratis' },
+              { icon: <svg width="9" height="20" viewBox="0 0 30 68" fill={GOLD}><path d="M15 2 C16 8 18 22 18 34 L15 40 L12 34 C12 22 14 8 15 2 Z"/><path d="M3 32 C5 27 9 30 15 30 C21 30 25 27 27 32 C25 37 21 34 15 34 C9 34 5 37 3 32 Z"/><rect x="13" y="40" width="4" height="15" rx="2"/><circle cx="15" cy="59" r="7"/></svg>, texto: 'Truco Online 1vs1 y 2vs2' },
+              { icon: <svg width="8" height="16" viewBox="0 0 36 56" fill={GOLD}><rect x="4" y="2" width="28" height="4" rx="2"/><path d="M6 6 C7 18 11 26 18 28 C25 26 29 18 30 6 Z"/><rect x="15.5" y="28" width="5" height="14" rx="2.5"/><path d="M8 44 Q18 42 28 44 L26 52 Q18 50 10 52 Z"/></svg>, texto: 'Jugá contra amigos en tiempo real' },
+              { icon: <svg width="16" height="16" viewBox="0 0 46 46" fill="none"><circle cx="23" cy="23" r="20" stroke={GOLD} strokeWidth="3.5"/><circle cx="23" cy="23" r="11" stroke={GOLD} strokeWidth="3"/><circle cx="23" cy="5.5" r="2.5" fill={GOLD}/><circle cx="23" cy="40.5" r="2.5" fill={GOLD}/><circle cx="5.5" cy="23" r="2.5" fill={GOLD}/><circle cx="40.5" cy="23" r="2.5" fill={GOLD}/></svg>, texto: 'Ranking y estadísticas' },
+              { icon: <svg width="9" height="20" viewBox="0 0 30 68" fill={GOLD}><ellipse cx="15" cy="11" rx="11" ry="10"/><ellipse cx="15" cy="28" rx="8.5" ry="9.5"/><ellipse cx="15" cy="43" rx="6.5" ry="8"/><path d="M12 52 C11 57 9 62 7 68 L23 68 C21 62 19 57 18 52 Z"/></svg>, texto: 'Completamente gratis' },
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-3 rounded-2xl px-4 py-3 transition-colors"
                    style={{ background: 'rgba(201,168,60,0.05)', border: `1px solid ${GOLD_BORDER}` }}>
-                <span className="font-serif flex-shrink-0 text-base" style={{ color: GOLD }}>{item.suit}</span>
+                <span className="flex-shrink-0 flex items-center justify-center" style={{ width: 18 }}>{item.icon}</span>
                 <span className="text-gray-300 text-sm">{item.texto}</span>
               </div>
             ))}

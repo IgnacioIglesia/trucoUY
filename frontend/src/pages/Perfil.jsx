@@ -43,6 +43,57 @@ function IconCheck({ size = 13 }) {
     </svg>
   )
 }
+function IconTrophy({ size = 16 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', flexShrink: 0 }}>
+      <path d="M6 9H4a2 2 0 000 4h2" /><path d="M18 9h2a2 2 0 010 4h-2" />
+      <path d="M6 2h12v7a6 6 0 01-12 0V2z" /><path d="M12 15v4" /><path d="M8 19h8" />
+    </svg>
+  )
+}
+function IconSword({ size = 16 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', flexShrink: 0 }}>
+      <polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5" /><line x1="13" y1="19" x2="19" y2="13" />
+      <line x1="16" y1="16" x2="20" y2="20" /><line x1="19" y1="21" x2="21" y2="19" />
+    </svg>
+  )
+}
+function IconShield({ size = 16 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', flexShrink: 0 }}>
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    </svg>
+  )
+}
+function IconStar({ size = 16 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="1" style={{ display: 'inline', flexShrink: 0 }}>
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+    </svg>
+  )
+}
+function IconCrown({ size = 16 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', flexShrink: 0 }}>
+      <path d="M2 20h20" /><path d="M5 20l2-10 5 5 5-8 2 13" />
+    </svg>
+  )
+}
+function IconDiamond({ size = 16 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', flexShrink: 0 }}>
+      <path d="M2.7 10.3a2.41 2.41 0 000 3.41l7.59 7.58a2.41 2.41 0 003.41 0l7.58-7.58a2.41 2.41 0 000-3.41L13.69 2.71a2.41 2.41 0 00-3.41 0z" />
+    </svg>
+  )
+}
+function IconCards({ size = 16 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', flexShrink: 0 }}>
+      <rect x="2" y="7" width="16" height="13" rx="2" /><path d="M22 5c0-1.1-.9-2-2-2H7" /><path d="M6 2c-1.1 0-2 .9-2 2" />
+    </svg>
+  )
+}
 
 const AVATARES_PRESET = [
   'https://api.dicebear.com/7.x/pixel-art/svg?seed=Felix',
@@ -110,10 +161,12 @@ export default function Perfil() {
   const { usuario, refrescarUsuario } = useAuth()
   const navigate = useNavigate()
 
+  const [visible, setVisible]     = useState(false)
   const [tab, setTab]             = useState('resumen')
   const [cargando, setCargando]   = useState(true)
   const [truco, setTruco]         = useState(null)
   const [rivales, setRivales]     = useState([])
+  const [historial, setHistorial] = useState([])
   const [elo, setElo]             = useState(null)
 
   const [nombre, setNombre]       = useState('')
@@ -122,6 +175,11 @@ export default function Perfil() {
   const [guardando, setGuardando] = useState(false)
   const [exito, setExito]         = useState(false)
   const [error, setError]         = useState('')
+
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(true), 60)
+    return () => clearTimeout(t)
+  }, [])
 
   useEffect(() => {
     if (!usuario) { navigate('/login'); return }
@@ -137,7 +195,7 @@ export default function Perfil() {
       const [userDoc, trucoSnap, historialSnap] = await Promise.all([
         getDoc(doc(db, 'users', usuario.uid)).catch(() => null),
         getDocs(query(collection(db, 'ranking_truco'), where('uid', '==', usuario.uid))).catch(() => null),
-        getDocs(query(collection(db, 'users', usuario.uid, 'historial'), orderBy('fecha', 'desc'), limit(20))).catch(() => null),
+        getDocs(query(collection(db, 'users', usuario.uid, 'historial'), orderBy('fecha', 'desc'), limit(100))).catch(() => null),
       ])
 
       if (userDoc?.exists() && userDoc.data().elo != null) setElo(userDoc.data().elo)
@@ -157,12 +215,46 @@ export default function Perfil() {
         for (const e of entries) { if (e.resultado === tipo) racha++; else break }
         if (tipo !== 'victoria') racha = -racha
       }
+
+      let mejorRacha = 0, curRachaMax = 0
+      for (let i = entries.length - 1; i >= 0; i--) {
+        if (entries[i].resultado === 'victoria') { curRachaMax++; if (curRachaMax > mejorRacha) mejorRacha = curRachaMax }
+        else curRachaMax = 0
+      }
+
+      const ultDiez = entries.slice(0, 10)
+      const winrateUlt10 = ultDiez.length > 0
+        ? Math.round(ultDiez.filter(e => e.resultado === 'victoria').length / ultDiez.length * 100)
+        : 0
+
+      const now = new Date()
+      const partidasMes = entries.filter(e =>
+        e.fecha && e.fecha.getMonth() === now.getMonth() && e.fecha.getFullYear() === now.getFullYear()
+      ).length
+
       setTruco({
         partidas: entries.length,
-        victorias, derrotas, racha,
+        victorias, derrotas, racha, mejorRacha,
+        winrateUlt10, partidasMes,
         ultimaPartida: entries[0]?.fecha || null,
         recientes: entries.slice(0, 15).map(e => e.resultado),
       })
+
+      const rawHistorial = []
+      historialSnap?.forEach(d => {
+        const data = d.data()
+        rawHistorial.push({
+          id: d.id,
+          rival_nombre: data.rival_nombre || 'Rival',
+          rival_photo: data.rival_photo || '',
+          resultado: data.resultado,
+          pts_yo: data.pts_yo ?? null,
+          pts_rival: data.pts_rival ?? null,
+          juego: data.juego || 'truco',
+          fecha: data.fecha?.toDate?.() || null,
+        })
+      })
+      setHistorial(rawHistorial)
 
       const rivalMap = new Map()
       historialSnap?.forEach(d => {
@@ -208,74 +300,98 @@ export default function Perfil() {
   const usuarioPreview = { ...usuario, displayName: nombre || usuario?.displayName, photoURL: avatarPreview }
   const winrate        = truco && truco.partidas > 0 ? Math.round(truco.victorias / truco.partidas * 100) : 0
 
+  const logros = truco ? [
+    { id: 'primera',    label: 'Primera victoria',  desc: 'Ganá tu primera partida',          icon: <IconStar size={16} />,    earned: truco.victorias >= 1 },
+    { id: 'racha3',     label: 'Racha de 3',         desc: '3 victorias consecutivas',         icon: <IconFlame size={16} />,   earned: truco.mejorRacha >= 3 },
+    { id: 'llamas',     label: 'En llamas',           desc: '5 victorias consecutivas',         icon: <IconBolt size={16} />,    earned: truco.mejorRacha >= 5 },
+    { id: 'imparable',  label: 'Imparable',           desc: '10 victorias consecutivas',        icon: <IconBolt size={16} />,    earned: truco.mejorRacha >= 10 },
+    { id: 'jugador',    label: 'Jugador',             desc: '10 partidas jugadas',               icon: <IconCards size={16} />,   earned: truco.partidas >= 10 },
+    { id: 'veterano',   label: 'Veterano',            desc: '50 partidas jugadas',               icon: <IconSword size={16} />,   earned: truco.partidas >= 50 },
+    { id: 'centenario', label: 'Centenario',          desc: '100 partidas jugadas',              icon: <IconShield size={16} />,  earned: truco.partidas >= 100 },
+    { id: 'crack',      label: 'Crack',               desc: '+70% winrate (mín. 20 partidas)',   icon: <IconCrown size={16} />,   earned: truco.partidas >= 20 && winrate >= 70 },
+    { id: 'leyenda',    label: 'Leyenda',             desc: '+80% winrate (mín. 50 partidas)',   icon: <IconDiamond size={16} />, earned: truco.partidas >= 50 && winrate >= 80 },
+    { id: 'trofeo',     label: 'Trofeo',              desc: '100 victorias totales',             icon: <IconTrophy size={16} />,  earned: truco.victorias >= 100 },
+  ] : []
+
   if (!usuario) return null
 
   return (
-    <div className="min-h-screen bg-[#07090d] text-white flex flex-col">
+    <div className="min-h-screen text-white flex flex-col">
       <Navbar />
 
       <div className="relative flex-1">
         <div className="absolute inset-0 pointer-events-none"
-             style={{ background: 'radial-gradient(ellipse 80% 35% at 50% 0%, rgba(201,168,60,0.10), transparent)' }} />
-        <div className="absolute inset-0 pointer-events-none"
-             style={{ backgroundImage: 'radial-gradient(rgba(201,168,60,0.035) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
-
+             style={{ background: 'radial-gradient(ellipse 70% 25% at 50% 0%, rgba(201,168,60,0.06), transparent)' }} />
         <div className="relative z-10 max-w-4xl mx-auto w-full px-4 py-8 flex flex-col gap-6">
 
           {/* ══════════════ HERO ══════════════ */}
-          <div className="rounded-3xl overflow-hidden"
+          <div className="rounded-3xl overflow-hidden relative"
                style={{
-                 background: 'linear-gradient(135deg, rgba(201,168,60,0.08) 0%, rgba(255,255,255,0.02) 55%, rgba(201,168,60,0.05) 100%)',
+                 background: 'linear-gradient(135deg, rgba(201,168,60,0.08) 0%, rgba(201,168,60,0.02) 50%, rgba(255,255,255,0.01) 100%)',
                  border: `1px solid ${GOLD_BORDER}`,
+                 opacity: visible ? 1 : 0,
+                 transform: visible ? 'none' : 'translateY(14px)',
+                 transition: 'opacity 0.65s ease, transform 0.65s ease',
                }}>
 
-            <div className="relative px-6 pt-7 pb-6">
-              <span className="absolute right-5 top-3 select-none pointer-events-none font-serif"
-                    style={{ fontSize: 110, color: 'rgba(201,168,60,0.06)', lineHeight: 1 }}>♠</span>
+            {/* Patrón de puntos */}
+            <div className="absolute inset-0 pointer-events-none"
+                 style={{ backgroundImage: 'radial-gradient(rgba(201,168,60,0.05) 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
 
-              <div className="flex items-center gap-5 relative z-10">
+            {/* Glow esquina derecha */}
+            <div className="absolute top-0 right-0 w-48 h-48 pointer-events-none"
+                 style={{ background: 'radial-gradient(ellipse at top right, rgba(201,168,60,0.1), transparent 70%)' }} />
+
+            {/* Contenido */}
+            <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center gap-5 px-6 pt-6 pb-5">
+
+              {/* Avatar con borde dorado (no box-shadow — se clipea con overflow-hidden) */}
+              <div className="flex-shrink-0 p-[3px] rounded-[15px]"
+                   style={{ background: 'linear-gradient(135deg, rgba(201,168,60,0.55) 0%, rgba(201,168,60,0.15) 100%)' }}>
                 <HeroAvatar usuario={usuario} />
-                <div className="flex-1 min-w-0">
-                  <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight truncate leading-tight">
-                    {usuario.displayName || 'Sin nombre'}
-                  </h1>
-                  <p className="text-gray-500 text-sm mt-0.5 truncate">{usuario.email}</p>
+              </div>
 
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    {elo != null && (
-                      <span className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full"
-                            style={{ background: 'rgba(201,168,60,0.12)', border: `1px solid ${GOLD_BORDER}`, color: GOLD }}>
-                        <IconBolt size={12} /> ELO {elo}
-                      </span>
-                    )}
-                    {truco?.racha > 0 && (
-                      <span className="text-xs font-bold px-3 py-1.5 rounded-full bg-green-950/50 border border-green-700/30 text-green-400">
-                        <IconFlame size={12} /> Racha +{truco.racha}
-                      </span>
-                    )}
-                    {truco?.racha < 0 && (
-                      <span className="text-xs font-bold px-3 py-1.5 rounded-full bg-red-950/40 border border-red-800/30 text-red-400">
-                        Racha {truco.racha}
-                      </span>
-                    )}
-                    {truco?.ultimaPartida && (
-                      <span className="text-xs px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.07] text-gray-500">
-                        Activo {timeAgo(truco.ultimaPartida)}
-                      </span>
-                    )}
-                  </div>
+              {/* Info */}
+              <div className="flex-1 min-w-0">
+                <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight truncate leading-tight">
+                  {usuario.displayName || 'Sin nombre'}
+                </h1>
+                <p className="text-gray-500 text-sm mt-0.5 truncate">{usuario.email}</p>
+
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {elo != null && (
+                    <span className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full"
+                          style={{ background: 'rgba(201,168,60,0.12)', border: `1px solid ${GOLD_BORDER}`, color: GOLD }}>
+                      <IconBolt size={12} /> ELO {elo}
+                    </span>
+                  )}
+                  {truco?.racha > 0 && (
+                    <span className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full bg-green-950/50 border border-green-700/30 text-green-400">
+                      <IconFlame size={12} /> Racha +{truco.racha}
+                    </span>
+                  )}
+                  {truco?.racha < 0 && (
+                    <span className="text-xs font-bold px-3 py-1.5 rounded-full bg-red-950/40 border border-red-800/30 text-red-400">
+                      Racha {truco.racha}
+                    </span>
+                  )}
+                  {truco?.ultimaPartida && (
+                    <span className="text-xs px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.07] text-gray-500">
+                      Activo {timeAgo(truco.ultimaPartida)}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
 
             {/* Stats strip */}
             {!cargando && truco && truco.partidas > 0 && (
-              <div className="grid grid-cols-3"
+              <div className="relative z-10 grid grid-cols-3"
                    style={{ borderTop: `1px solid ${GOLD_BORDER}` }}>
                 {[
-                  { label: 'Partidas',  value: truco.partidas,    color: '#fff'      },
-                  { label: 'Victorias', value: truco.victorias,   color: '#4ade80'   },
-                  { label: 'Winrate',   value: `${winrate}%`,     color: GOLD        },
+                  { label: 'Partidas',  value: truco.partidas,  color: '#fff'    },
+                  { label: 'Victorias', value: truco.victorias, color: '#4ade80' },
+                  { label: 'Winrate',   value: `${winrate}%`,   color: GOLD      },
                 ].map((s, i) => (
                   <div key={i} className="flex flex-col items-center py-4 gap-0.5"
                        style={{ borderLeft: i > 0 ? `1px solid ${GOLD_BORDER}` : undefined }}>
@@ -289,11 +405,13 @@ export default function Perfil() {
 
           {/* ══════════════ TABS ══════════════ */}
           <div className="flex gap-1.5 rounded-2xl p-1.5"
-               style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+               style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(10px)', transition: 'opacity 0.65s ease 0.1s, transform 0.65s ease 0.1s' }}>
             {[
-              { id: 'resumen', label: 'Resumen'      },
-              { id: 'rivales', label: 'Rivales'       },
-              { id: 'editar',  label: 'Editar perfil' },
+              { id: 'resumen',   label: 'Resumen'       },
+              { id: 'historial', label: 'Historial'     },
+              { id: 'logros',    label: 'Logros'        },
+              { id: 'rivales',   label: 'Rivales'       },
+              { id: 'editar',    label: 'Editar perfil' },
             ].map(t => (
               <button key={t.id} onClick={() => setTab(t.id)}
                 className="flex-1 py-2.5 rounded-xl text-sm font-bold transition-all"
@@ -322,80 +440,226 @@ export default function Perfil() {
                   action={{ label: 'Ir a jugar', to: '/juegos' }}
                 />
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-                  {/* Winrate gauge */}
-                  <div className="rounded-2xl p-6 flex flex-col items-center justify-center gap-5"
-                       style={{ background: 'rgba(201,168,60,0.04)', border: `1px solid ${GOLD_BORDER}` }}>
-                    <WinrateRing pct={winrate} />
-                    <div className="flex w-full gap-3">
-                      <div className="flex-1 flex flex-col items-center py-3 rounded-xl"
-                           style={{ background: 'rgba(74,222,128,0.06)', border: '1px solid rgba(74,222,128,0.15)' }}>
-                        <span className="text-2xl font-black text-green-400 tabular-nums">{truco.victorias}</span>
-                        <span className="text-[10px] text-gray-600 mt-0.5">victorias</span>
-                      </div>
-                      <div className="flex-1 flex flex-col items-center py-3 rounded-xl"
-                           style={{ background: 'rgba(248,113,113,0.05)', border: '1px solid rgba(248,113,113,0.12)' }}>
-                        <span className="text-2xl font-black text-red-400 tabular-nums">{truco.derrotas}</span>
-                        <span className="text-[10px] text-gray-600 mt-0.5">derrotas</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Racha + historial de partidas */}
-                  <div className="rounded-2xl p-6 flex flex-col gap-5"
-                       style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)' }}>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-widest mb-1">Racha actual</p>
-                        <p className="text-4xl font-black tabular-nums"
-                           style={{ color: truco.racha > 0 ? '#4ade80' : truco.racha < 0 ? '#f87171' : '#6b7280' }}>
-                          {truco.racha === 0 ? '—' : truco.racha > 0 ? `+${truco.racha}` : truco.racha}
-                        </p>
-                      </div>
-                      {truco.racha !== 0 && (
-                        <span style={{ color: truco.racha > 0 ? '#f97316' : '#60a5fa' }}>
-                          {truco.racha > 0 ? <IconFlame size={44} /> : <IconCold size={44} />}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* History bars */}
-                    {truco.recientes.length > 0 && (
-                      <div>
-                        <p className="text-[10px] text-gray-600 mb-3">Últimas {truco.recientes.length} partidas</p>
-                        <div className="flex items-end gap-1.5" style={{ height: 44 }}>
-                          {truco.recientes.map((res, i) => (
-                            <div key={i} title={res === 'victoria' ? 'Victoria' : 'Derrota'}
-                                 style={{
-                                   flex: 1,
-                                   height: res === 'victoria' ? '100%' : '50%',
-                                   background: res === 'victoria' ? 'rgba(74,222,128,0.65)' : 'rgba(248,113,113,0.5)',
-                                   borderRadius: 4,
-                                   alignSelf: 'flex-end',
-                                 }} />
-                          ))}
+                    {/* Winrate gauge */}
+                    <div className="rounded-2xl p-6 flex flex-col items-center justify-center gap-5"
+                         style={{ background: 'rgba(201,168,60,0.04)', border: `1px solid ${GOLD_BORDER}` }}>
+                      <WinrateRing pct={winrate} />
+                      <div className="flex w-full gap-3">
+                        <div className="flex-1 flex flex-col items-center py-3 rounded-xl"
+                             style={{ background: 'rgba(74,222,128,0.06)', border: '1px solid rgba(74,222,128,0.15)' }}>
+                          <span className="text-2xl font-black text-green-400 tabular-nums">{truco.victorias}</span>
+                          <span className="text-[10px] text-gray-600 mt-0.5">victorias</span>
+                        </div>
+                        <div className="flex-1 flex flex-col items-center py-3 rounded-xl"
+                             style={{ background: 'rgba(248,113,113,0.05)', border: '1px solid rgba(248,113,113,0.12)' }}>
+                          <span className="text-2xl font-black text-red-400 tabular-nums">{truco.derrotas}</span>
+                          <span className="text-[10px] text-gray-600 mt-0.5">derrotas</span>
                         </div>
                       </div>
-                    )}
+                    </div>
 
-                    {/* V/D bar */}
-                    <div>
-                      <div className="flex justify-between text-[10px] text-gray-600 mb-1.5">
-                        <span className="text-green-500">{truco.victorias}V</span>
-                        <span className="text-red-500">{truco.derrotas}D</span>
+                    {/* Racha + historial de partidas */}
+                    <div className="rounded-2xl p-6 flex flex-col gap-5"
+                         style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-widest mb-1">Racha actual</p>
+                          <p className="text-4xl font-black tabular-nums"
+                             style={{ color: truco.racha > 0 ? '#4ade80' : truco.racha < 0 ? '#f87171' : '#6b7280' }}>
+                            {truco.racha === 0 ? '—' : truco.racha > 0 ? `+${truco.racha}` : truco.racha}
+                          </p>
+                        </div>
+                        {truco.racha !== 0 && (
+                          <span style={{ color: truco.racha > 0 ? '#f97316' : '#60a5fa' }}>
+                            {truco.racha > 0 ? <IconFlame size={44} /> : <IconCold size={44} />}
+                          </span>
+                        )}
                       </div>
-                      <div className="flex h-2.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.04)' }}>
-                        {truco.victorias > 0 && (
-                          <div className="rounded-l-full" style={{ width: `${winrate}%`, background: 'rgba(74,222,128,0.55)' }} />
-                        )}
-                        {truco.derrotas > 0 && (
-                          <div className="rounded-r-full flex-1" style={{ background: 'rgba(248,113,113,0.35)' }} />
-                        )}
+
+                      {/* History bars */}
+                      {truco.recientes.length > 0 && (
+                        <div>
+                          <p className="text-[10px] text-gray-600 mb-3">Últimas {truco.recientes.length} partidas</p>
+                          <div className="flex items-end gap-1.5" style={{ height: 44 }}>
+                            {truco.recientes.map((res, i) => (
+                              <div key={i} title={res === 'victoria' ? 'Victoria' : 'Derrota'}
+                                   style={{
+                                     flex: 1,
+                                     height: res === 'victoria' ? '100%' : '50%',
+                                     background: res === 'victoria' ? 'rgba(74,222,128,0.65)' : 'rgba(248,113,113,0.5)',
+                                     borderRadius: 4,
+                                     alignSelf: 'flex-end',
+                                   }} />
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* V/D bar */}
+                      <div>
+                        <div className="flex justify-between text-[10px] text-gray-600 mb-1.5">
+                          <span className="text-green-500">{truco.victorias}V</span>
+                          <span className="text-red-500">{truco.derrotas}D</span>
+                        </div>
+                        <div className="flex h-2.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.04)' }}>
+                          {truco.victorias > 0 && (
+                            <div className="rounded-l-full" style={{ width: `${winrate}%`, background: 'rgba(74,222,128,0.55)' }} />
+                          )}
+                          {truco.derrotas > 0 && (
+                            <div className="rounded-r-full flex-1" style={{ background: 'rgba(248,113,113,0.35)' }} />
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
+
+                  {/* Advanced stats strip */}
+                  <div className="rounded-2xl overflow-hidden"
+                       style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                    <div className="grid grid-cols-3 divide-x divide-white/[0.05]">
+                      {[
+                        { label: 'Mejor racha', value: truco.mejorRacha > 0 ? `+${truco.mejorRacha}` : '—', color: '#4ade80' },
+                        { label: 'Últimas 10',  value: `${truco.winrateUlt10}%`,                             color: GOLD    },
+                        { label: 'Este mes',    value: truco.partidasMes,                                    color: '#fff'  },
+                      ].map((s, i) => (
+                        <div key={i} className="flex flex-col items-center py-4 gap-1">
+                          <span className="text-xl font-black tabular-nums" style={{ color: s.color }}>{s.value}</span>
+                          <span className="text-[10px] text-gray-600">{s.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
+          {/* ══════════════ HISTORIAL ══════════════ */}
+          {tab === 'historial' && (
+            <div className="flex flex-col gap-3">
+              {cargando ? (
+                <div className="flex justify-center py-16">
+                  <div className="w-7 h-7 border-2 rounded-full animate-spin"
+                       style={{ borderColor: 'rgba(201,168,60,0.15)', borderTopColor: GOLD }} />
                 </div>
+              ) : historial.length === 0 ? (
+                <EmptyState
+                  icon="cards"
+                  title="Sin partidas registradas"
+                  description="Jugá al Truco Online para ver el historial de tus partidas acá."
+                  action={{ label: 'Jugar Online', to: '/juegos/truco-online' }}
+                />
+              ) : (
+                <>
+                  <p className="text-[11px] text-gray-600 uppercase tracking-widest px-1">
+                    {historial.length} partidas · más recientes primero
+                  </p>
+                  <div className="flex flex-col gap-2">
+                    {historial.map((p, i) => (
+                      <div key={p.id || i}
+                           className="rounded-2xl px-4 py-3 flex items-center gap-3"
+                           style={{
+                             background: p.resultado === 'victoria' ? 'rgba(74,222,128,0.04)' : 'rgba(248,113,113,0.03)',
+                             border: p.resultado === 'victoria' ? '1px solid rgba(74,222,128,0.12)' : '1px solid rgba(248,113,113,0.1)',
+                           }}>
+                        {/* Rival avatar */}
+                        <div className="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0"
+                             style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                          {p.rival_photo
+                            ? <img src={p.rival_photo} alt="" className="w-full h-full object-cover" />
+                            : <span className="text-[11px] font-bold text-gray-400">
+                                {(p.rival_nombre || 'R').slice(0, 2).toUpperCase()}
+                              </span>
+                          }
+                        </div>
+                        {/* Rival name */}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-white truncate">vs {p.rival_nombre}</p>
+                          {p.fecha && (
+                            <p className="text-[11px] text-gray-600">{timeAgo(p.fecha)}</p>
+                          )}
+                        </div>
+                        {/* Score */}
+                        {p.pts_yo != null && p.pts_rival != null && (
+                          <span className="text-sm font-black tabular-nums flex-shrink-0 text-gray-400">
+                            <span style={{ color: p.resultado === 'victoria' ? '#4ade80' : '#f87171' }}>{p.pts_yo}</span>
+                            <span className="text-gray-700 mx-1">—</span>
+                            <span>{p.pts_rival}</span>
+                          </span>
+                        )}
+                        {/* Badge */}
+                        <span className="text-[10px] font-bold px-2.5 py-1 rounded-full flex-shrink-0"
+                              style={p.resultado === 'victoria'
+                                ? { background: 'rgba(74,222,128,0.12)', border: '1px solid rgba(74,222,128,0.25)', color: '#4ade80' }
+                                : { background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.2)', color: '#f87171' }
+                              }>
+                          {p.resultado === 'victoria' ? 'Victoria' : 'Derrota'}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
+          {/* ══════════════ LOGROS ══════════════ */}
+          {tab === 'logros' && (
+            <div className="flex flex-col gap-4">
+              {cargando ? (
+                <div className="flex justify-center py-16">
+                  <div className="w-7 h-7 border-2 rounded-full animate-spin"
+                       style={{ borderColor: 'rgba(201,168,60,0.15)', borderTopColor: GOLD }} />
+                </div>
+              ) : !truco || truco.partidas === 0 ? (
+                <EmptyState
+                  icon="cards"
+                  title="Todavía no tenés logros"
+                  description="Jugá partidas para desbloquear tus primeros logros."
+                  action={{ label: 'Ir a jugar', to: '/juegos' }}
+                />
+              ) : (
+                <>
+                  <div className="flex items-center justify-between px-1">
+                    <p className="text-[11px] text-gray-600 uppercase tracking-widest">
+                      {logros.filter(l => l.earned).length} / {logros.length} obtenidos
+                    </p>
+                    <div className="flex h-1.5 rounded-full overflow-hidden w-32"
+                         style={{ background: 'rgba(255,255,255,0.06)' }}>
+                      <div style={{ width: `${Math.round(logros.filter(l => l.earned).length / logros.length * 100)}%`, background: GOLD, borderRadius: 4 }} />
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    {logros.map(logro => (
+                      <div key={logro.id}
+                           className="flex items-center gap-3 rounded-2xl px-4 py-3.5 transition-all"
+                           style={{
+                             background: logro.earned ? 'rgba(201,168,60,0.06)' : 'rgba(255,255,255,0.02)',
+                             border: logro.earned ? `1px solid rgba(201,168,60,0.2)` : '1px solid rgba(255,255,255,0.05)',
+                             opacity: logro.earned ? 1 : 0.45,
+                           }}>
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                             style={{ background: logro.earned ? 'rgba(201,168,60,0.12)' : 'rgba(255,255,255,0.04)',
+                                      color: logro.earned ? GOLD : '#4b5563' }}>
+                          {logro.icon}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold" style={{ color: logro.earned ? '#fff' : '#6b7280' }}>{logro.label}</p>
+                          <p className="text-[11px] text-gray-600 mt-0.5">{logro.desc}</p>
+                        </div>
+                        {logro.earned && (
+                          <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
+                               style={{ background: 'rgba(201,168,60,0.15)', color: GOLD }}>
+                            <IconCheck size={11} />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </>
               )}
             </div>
           )}

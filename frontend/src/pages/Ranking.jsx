@@ -36,6 +36,12 @@ export default function Ranking() {
   usePageTitle('Ranking')
   const [ranking, setRanking] = useState([])
   const [cargando, setCargando] = useState(true)
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(true), 60)
+    return () => clearTimeout(t)
+  }, [])
 
   useEffect(() => {
     const cargar = async () => {
@@ -81,26 +87,54 @@ export default function Ranking() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-[#07090d] text-white flex flex-col">
+    <div className="min-h-screen text-white flex flex-col">
       <Navbar />
 
-      <div className="relative flex-1">
-        <div className="absolute inset-0 pointer-events-none"
-             style={{ background: 'radial-gradient(ellipse 65% 40% at 50% 0%, rgba(201,168,60,0.1), transparent)' }} />
-        <div className="absolute inset-0 pointer-events-none"
-             style={{ backgroundImage: 'radial-gradient(rgba(201,168,60,0.04) 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
+      <div className="relative flex-1" style={{ minHeight: 'calc(100vh - 56px)' }}>
 
-        <div className="relative z-10 max-w-2xl mx-auto w-full px-4 py-12">
+        {/* Glow central */}
+        <div className="absolute inset-0 pointer-events-none"
+             style={{ background: 'radial-gradient(ellipse 60% 40% at 50% 30%, rgba(201,168,60,0.07), transparent)' }} />
+
+        {/* Oro — izquierda, centrada */}
+        <svg className="hidden sm:block absolute left-16 top-1/2 -translate-y-1/2 select-none pointer-events-none" aria-hidden
+             width="130" height="130" viewBox="0 0 46 46" fill="none">
+          <circle cx="23" cy="23" r="20" stroke="rgba(201,168,60,0.15)" strokeWidth="2.2"/>
+          <circle cx="23" cy="23" r="11.5" stroke="rgba(201,168,60,0.11)" strokeWidth="1.6"/>
+          <circle cx="23" cy="4"  r="2.2" fill="rgba(201,168,60,0.15)"/>
+          <circle cx="23" cy="42" r="2.2" fill="rgba(201,168,60,0.15)"/>
+          <circle cx="4"  cy="23" r="2.2" fill="rgba(201,168,60,0.15)"/>
+          <circle cx="42" cy="23" r="2.2" fill="rgba(201,168,60,0.15)"/>
+        </svg>
+
+        {/* Basto — derecha, centrada */}
+        <svg className="hidden sm:block absolute right-16 top-1/2 -translate-y-1/2 select-none pointer-events-none" aria-hidden
+             width="90" height="200" viewBox="0 0 30 68" fill="none">
+          <circle cx="15" cy="10" r="10" fill="rgba(201,168,60,0.06)" stroke="rgba(201,168,60,0.14)" strokeWidth="0.8"/>
+          <circle cx="15" cy="27" r="8.5" fill="rgba(201,168,60,0.06)" stroke="rgba(201,168,60,0.14)" strokeWidth="0.8"/>
+          <circle cx="15" cy="42" r="7"   fill="rgba(201,168,60,0.06)" stroke="rgba(201,168,60,0.14)" strokeWidth="0.8"/>
+          <path d="M12.5 48 C12 54 10 60 8 68 L22 68 C20 60 18 54 17.5 48 Z"
+                fill="rgba(201,168,60,0.05)" stroke="rgba(201,168,60,0.11)" strokeWidth="0.8"/>
+        </svg>
+
+        <div className="relative z-10 max-w-2xl mx-auto w-full px-4 pt-10 pb-12">
 
           {/* Header */}
-          <div className="text-center mb-10">
-            <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold px-3 py-1.5 rounded-full uppercase tracking-widest mb-4"
+          <div className="text-center mb-10 flex flex-col items-center gap-4"
+               style={{ opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(16px)', transition: 'opacity 0.7s ease, transform 0.7s ease' }}>
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold px-3 py-1.5 rounded-full uppercase tracking-widest"
                   style={{ background: 'rgba(201,168,60,0.07)', border: `1px solid ${GOLD_BORDER}`, color: GOLD }}>
-              <span className="font-serif">♠</span>
+              <svg width="7" height="15" viewBox="0 0 30 68" fill="currentColor" style={{ display: 'inline', flexShrink: 0 }}>
+                <path d="M15 2 L16.6 32 L15 38 L13.4 32 Z"/>
+                <path d="M3 31 C6 25 10 27 15 27 C20 27 24 25 27 31 C24 36 20 34 15 34 C10 34 6 36 3 31 Z"/>
+                <rect x="13.5" y="38" width="3" height="14" rx="1.5"/><ellipse cx="15" cy="58" rx="7" ry="5"/>
+              </svg>
               Tabla global
             </span>
-            <h1 className="text-4xl font-extrabold">Ranking</h1>
-            <p className="text-gray-500 mt-2 text-sm">Los mejores jugadores de TrucoUY</p>
+            <div>
+              <h1 className="text-6xl sm:text-7xl font-black leading-none tracking-tight">Ranking</h1>
+              <p className="text-gray-600 text-sm mt-3">Los mejores jugadores de TrucoUY</p>
+            </div>
           </div>
 
           {/* Contenido */}
@@ -133,6 +167,9 @@ export default function Ranking() {
                            : i === 1 ? '1px solid rgba(192,192,192,0.12)'
                            : i === 2 ? '1px solid rgba(200,120,50,0.12)'
                            : '1px solid rgba(255,255,255,0.05)',
+                    opacity: visible ? 1 : 0,
+                    transform: visible ? 'none' : 'translateY(12px)',
+                    transition: `opacity 0.5s ease ${0.1 + i * 0.05}s, transform 0.5s ease ${0.1 + i * 0.05}s`,
                   }}>
                   <MedalBadge pos={i} />
                   <Avatar jugador={jugador} />

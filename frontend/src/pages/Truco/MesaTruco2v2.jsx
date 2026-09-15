@@ -298,14 +298,48 @@ export default function MesaTruco2v2({
               <div className="absolute inset-0 pointer-events-none overflow-hidden">
                 <div className="absolute inset-5 rounded-[50%]"
                      style={{ border: '1px solid rgba(201,168,60,0.09)' }} />
-                <span className="absolute top-2 left-2 font-serif select-none"
-                      style={{ fontSize: 13, color: 'rgba(201,168,60,0.12)', lineHeight: 1 }}>♠</span>
-                <span className="absolute top-2 right-2 font-serif select-none"
-                      style={{ fontSize: 13, color: 'rgba(201,168,60,0.12)', lineHeight: 1 }}>♣</span>
-                <span className="absolute bottom-2 left-2 font-serif select-none"
-                      style={{ fontSize: 13, color: 'rgba(201,168,60,0.12)', lineHeight: 1 }}>♦</span>
-                <span className="absolute bottom-2 right-2 font-serif select-none"
-                      style={{ fontSize: 13, color: 'rgba(201,168,60,0.12)', lineHeight: 1 }}>♥</span>
+                {/* Espada */}
+                <svg className="absolute top-2 left-2 select-none" aria-hidden width="9" height="18" viewBox="0 0 30 68" fill="none">
+                  <path d="M15 2 L16.6 32 L15 38 L13.4 32 Z"
+                        fill="rgba(201,168,60,0.18)" stroke="rgba(201,168,60,0.38)" strokeWidth="1" strokeLinejoin="round"/>
+                  <path d="M3 31 C6 25 10 27 15 27 C20 27 24 25 27 31 C24 36 20 34 15 34 C10 34 6 36 3 31 Z"
+                        fill="rgba(201,168,60,0.18)" stroke="rgba(201,168,60,0.38)" strokeWidth="1"/>
+                  <rect x="13.5" y="38" width="3" height="14" rx="1.5"
+                        fill="rgba(201,168,60,0.14)" stroke="rgba(201,168,60,0.3)" strokeWidth="1"/>
+                  <ellipse cx="15" cy="58" rx="7" ry="5"
+                           fill="rgba(201,168,60,0.14)" stroke="rgba(201,168,60,0.3)" strokeWidth="1"/>
+                </svg>
+                {/* Basto */}
+                <svg className="absolute top-2 right-2 select-none" aria-hidden width="9" height="18" viewBox="0 0 30 68" fill="none">
+                  <circle cx="15" cy="10" r="10"
+                          fill="rgba(201,168,60,0.14)" stroke="rgba(201,168,60,0.35)" strokeWidth="1"/>
+                  <circle cx="15" cy="27" r="8.5"
+                          fill="rgba(201,168,60,0.14)" stroke="rgba(201,168,60,0.35)" strokeWidth="1"/>
+                  <circle cx="15" cy="42" r="7"
+                          fill="rgba(201,168,60,0.14)" stroke="rgba(201,168,60,0.35)" strokeWidth="1"/>
+                  <path d="M12.5 48 C12 54 10 60 8 68 L22 68 C20 60 18 54 17.5 48 Z"
+                        fill="rgba(201,168,60,0.1)" stroke="rgba(201,168,60,0.28)" strokeWidth="1"/>
+                </svg>
+                {/* Oro */}
+                <svg className="absolute bottom-2 left-2 select-none" aria-hidden width="14" height="14" viewBox="0 0 46 46" fill="none">
+                  <circle cx="23" cy="23" r="20" stroke="rgba(201,168,60,0.35)" strokeWidth="3"/>
+                  <circle cx="23" cy="23" r="11.5" stroke="rgba(201,168,60,0.28)" strokeWidth="2.5"/>
+                  <circle cx="23" cy="4" r="2.2" fill="rgba(201,168,60,0.35)"/>
+                  <circle cx="23" cy="42" r="2.2" fill="rgba(201,168,60,0.35)"/>
+                  <circle cx="4" cy="23" r="2.2" fill="rgba(201,168,60,0.35)"/>
+                  <circle cx="42" cy="23" r="2.2" fill="rgba(201,168,60,0.35)"/>
+                </svg>
+                {/* Copa */}
+                <svg className="absolute bottom-2 right-2 select-none" aria-hidden width="9" height="14" viewBox="0 0 36 56" fill="none">
+                  <rect x="5" y="2" width="26" height="4" rx="2"
+                        fill="rgba(201,168,60,0.14)" stroke="rgba(201,168,60,0.35)" strokeWidth="1"/>
+                  <path d="M7 6 C7.5 17 11 24 16 27 L20 27 C25 24 28.5 17 29 6 Z"
+                        fill="rgba(201,168,60,0.14)" stroke="rgba(201,168,60,0.35)" strokeWidth="1"/>
+                  <rect x="15" y="27" width="6" height="13" rx="3"
+                        fill="rgba(201,168,60,0.1)" stroke="rgba(201,168,60,0.28)" strokeWidth="1"/>
+                  <path d="M9 40 Q18 38 27 40 L25.5 47 Q18 45 10.5 47 Z"
+                        fill="rgba(201,168,60,0.1)" stroke="rgba(201,168,60,0.28)" strokeWidth="1"/>
+                </svg>
               </div>
 
               {/* Muestra — top left */}

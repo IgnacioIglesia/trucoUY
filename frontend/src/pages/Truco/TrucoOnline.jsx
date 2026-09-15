@@ -561,7 +561,7 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
 
   // ── ESPERANDO (1vs1) ──
   if (pantalla === 'esperando') return (
-    <div className="min-h-screen bg-[#07090d] text-white flex flex-col">
+    <div className="min-h-screen text-white flex flex-col">
       <Navbar />
       <div className="relative flex-1 flex items-center justify-center px-4 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_0%,rgba(201,168,60,0.10),transparent)]" />
@@ -637,7 +637,7 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
   if (pantalla === 'resultado') {
     const gano = ganador === 'yo'
     return (
-      <div className="min-h-screen bg-[#07090d] text-white flex flex-col">
+      <div className="min-h-screen text-white flex flex-col">
         <Navbar />
         <div className="relative flex-1 flex items-center justify-center px-4 overflow-hidden">
           <div className={`absolute inset-0 ${gano ? 'bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(201,168,60,0.12),transparent)]' : 'bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(220,38,38,0.15),transparent)]'}`} />
@@ -757,7 +757,7 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
     }
 
     return (
-      <div className="min-h-screen bg-[#07090d] text-white flex flex-col">
+      <div className="min-h-screen text-white flex flex-col">
         <Navbar />
         <div className="relative flex-1 flex items-center justify-center px-4 py-12 overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_0%,rgba(201,168,60,0.09),transparent)]" />
@@ -839,7 +839,7 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
 
   // ── SALA ERROR (link expirado / sala llena) ──
   if (pantalla === 'sala-error') return (
-    <div className="min-h-screen bg-[#07090d] text-white flex flex-col">
+    <div className="min-h-screen text-white flex flex-col">
       <Navbar />
       <div className="relative flex-1 flex items-center justify-center px-4 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(220,38,38,0.12),transparent)]" />
@@ -892,7 +892,7 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
     const modoLabel = modalidadFijada === '2vs2' ? '2 vs 2' : '1 vs 1'
     const modoDesc  = modalidadFijada === '2vs2' ? 'En equipo de dos — 4 jugadores' : 'Duelo mano a mano'
     return (
-    <div className="min-h-screen bg-[#07090d] text-white flex flex-col">
+    <div className="min-h-screen text-white flex flex-col">
       <Navbar />
       <div className="relative flex-1 flex items-center justify-center px-4 py-16 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_-5%,rgba(201,168,60,0.10),transparent)]" />

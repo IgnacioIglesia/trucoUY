@@ -39,29 +39,59 @@ export default function Home() {
   }, [])
 
   return (
-    <div className="min-h-screen text-white flex flex-col" style={{ background: '#07090d' }}>
+    <div className="min-h-screen text-white flex flex-col">
       <Navbar />
 
       {/* ── HERO ─────────────────────────────────────────────────────────────── */}
       <section className="relative min-h-screen flex items-center justify-center px-6 py-28 overflow-hidden">
 
-        {/* Glow dorado central */}
-        <div className="absolute inset-0 pointer-events-none"
-             style={{ background: 'radial-gradient(ellipse 75% 55% at 50% 0%, rgba(201,168,60,0.13) 0%, transparent 70%)' }} />
-
-        {/* Grid de puntos */}
-        <div className="absolute inset-0 pointer-events-none"
-             style={{ backgroundImage: 'radial-gradient(rgba(201,168,60,0.06) 1px, transparent 1px)', backgroundSize: '26px 26px' }} />
-
-        {/* Palos decorativos */}
-        <span className="absolute top-20 left-[5%]  select-none pointer-events-none font-serif leading-none"
-              style={{ fontSize: 140, color: 'rgba(201,168,60,0.06)' }} aria-hidden>♠</span>
-        <span className="absolute top-12 right-[4%] select-none pointer-events-none font-serif leading-none"
-              style={{ fontSize: 120, color: 'rgba(160,20,20,0.07)' }} aria-hidden>♥</span>
-        <span className="absolute bottom-28 left-[4%] select-none pointer-events-none font-serif leading-none"
-              style={{ fontSize: 110, color: 'rgba(160,20,20,0.06)' }} aria-hidden>♦</span>
-        <span className="absolute bottom-20 right-[5%] select-none pointer-events-none font-serif leading-none"
-              style={{ fontSize: 130, color: 'rgba(201,168,60,0.05)' }} aria-hidden>♣</span>
+        {/* Palos decorativos — baraja española */}
+        {/* Espada */}
+        <svg className="absolute top-20 left-[5%] select-none pointer-events-none" aria-hidden
+             width="62" height="140" viewBox="0 0 30 68" fill="none">
+          <path d="M15 2 L16.6 32 L15 38 L13.4 32 Z"
+                fill="rgba(201,168,60,0.07)" stroke="rgba(201,168,60,0.22)" strokeWidth="0.7" strokeLinejoin="round"/>
+          <path d="M3 31 C6 25 10 27 15 27 C20 27 24 25 27 31 C24 36 20 34 15 34 C10 34 6 36 3 31 Z"
+                fill="rgba(201,168,60,0.07)" stroke="rgba(201,168,60,0.22)" strokeWidth="0.7"/>
+          <rect x="13.5" y="38" width="3" height="14" rx="1.5"
+                fill="rgba(201,168,60,0.06)" stroke="rgba(201,168,60,0.18)" strokeWidth="0.7"/>
+          <ellipse cx="15" cy="58" rx="7" ry="5"
+                   fill="rgba(201,168,60,0.06)" stroke="rgba(201,168,60,0.18)" strokeWidth="0.7"/>
+        </svg>
+        {/* Copa */}
+        <svg className="absolute top-12 right-[4%] select-none pointer-events-none" aria-hidden
+             width="74" height="120" viewBox="0 0 36 56" fill="none">
+          <rect x="5" y="3" width="26" height="4.5" rx="2.25"
+                fill="rgba(201,168,60,0.07)" stroke="rgba(201,168,60,0.22)" strokeWidth="0.7"/>
+          <path d="M7 7.5 C7.5 19 11 27 15.5 31 L20.5 31 C25 27 28.5 19 29 7.5 Z"
+                fill="rgba(201,168,60,0.07)" stroke="rgba(201,168,60,0.22)" strokeWidth="0.7"/>
+          <rect x="15" y="31" width="6" height="14" rx="3"
+                fill="rgba(201,168,60,0.06)" stroke="rgba(201,168,60,0.18)" strokeWidth="0.7"/>
+          <path d="M9 45 Q18 42 27 45 L25.5 52 Q18 50 10.5 52 Z"
+                fill="rgba(201,168,60,0.06)" stroke="rgba(201,168,60,0.18)" strokeWidth="0.7"/>
+        </svg>
+        {/* Oro */}
+        <svg className="absolute bottom-28 left-[4%] select-none pointer-events-none" aria-hidden
+             width="110" height="110" viewBox="0 0 46 46" fill="none">
+          <circle cx="23" cy="23" r="20" stroke="rgba(201,168,60,0.2)" strokeWidth="2.2"/>
+          <circle cx="23" cy="23" r="11.5" stroke="rgba(201,168,60,0.16)" strokeWidth="1.6"/>
+          <circle cx="23" cy="4" r="2.2" fill="rgba(201,168,60,0.22)"/>
+          <circle cx="23" cy="42" r="2.2" fill="rgba(201,168,60,0.22)"/>
+          <circle cx="4" cy="23" r="2.2" fill="rgba(201,168,60,0.22)"/>
+          <circle cx="42" cy="23" r="2.2" fill="rgba(201,168,60,0.22)"/>
+        </svg>
+        {/* Basto */}
+        <svg className="absolute bottom-20 right-[5%] select-none pointer-events-none" aria-hidden
+             width="57" height="130" viewBox="0 0 30 68" fill="none">
+          <circle cx="15" cy="10" r="10"
+                  fill="rgba(201,168,60,0.07)" stroke="rgba(201,168,60,0.22)" strokeWidth="0.8"/>
+          <circle cx="15" cy="27" r="8.5"
+                  fill="rgba(201,168,60,0.07)" stroke="rgba(201,168,60,0.22)" strokeWidth="0.8"/>
+          <circle cx="15" cy="42" r="7"
+                  fill="rgba(201,168,60,0.07)" stroke="rgba(201,168,60,0.22)" strokeWidth="0.8"/>
+          <path d="M12.5 48 C12 54 10 60 8 68 L22 68 C20 60 18 54 17.5 48 Z"
+                fill="rgba(201,168,60,0.06)" stroke="rgba(201,168,60,0.18)" strokeWidth="0.8"/>
+        </svg>
 
         <div
           className="relative z-10 max-w-4xl mx-auto flex flex-col items-center text-center gap-8"
@@ -175,8 +205,17 @@ export default function Home() {
               onMouseEnter={e => e.currentTarget.style.borderColor = GOLD}
               onMouseLeave={e => e.currentTarget.style.borderColor = GOLD_BORDER}
             >
-              <span className="absolute -bottom-6 -right-4 font-serif select-none pointer-events-none leading-none"
-                    style={{ fontSize: 110, color: 'rgba(201,168,60,0.07)' }} aria-hidden>♠</span>
+              <svg className="absolute -bottom-6 -right-4 select-none pointer-events-none" aria-hidden
+                   width="46" height="105" viewBox="0 0 30 68" fill="none">
+                <path d="M15 2 L16.6 32 L15 38 L13.4 32 Z"
+                      fill="rgba(201,168,60,0.1)" stroke="rgba(201,168,60,0.28)" strokeWidth="0.7" strokeLinejoin="round"/>
+                <path d="M3 31 C6 25 10 27 15 27 C20 27 24 25 27 31 C24 36 20 34 15 34 C10 34 6 36 3 31 Z"
+                      fill="rgba(201,168,60,0.1)" stroke="rgba(201,168,60,0.28)" strokeWidth="0.7"/>
+                <rect x="13.5" y="38" width="3" height="14" rx="1.5"
+                      fill="rgba(201,168,60,0.08)" stroke="rgba(201,168,60,0.22)" strokeWidth="0.7"/>
+                <ellipse cx="15" cy="58" rx="7" ry="5"
+                         fill="rgba(201,168,60,0.08)" stroke="rgba(201,168,60,0.22)" strokeWidth="0.7"/>
+              </svg>
 
               <div className="flex items-start justify-between">
                 <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
@@ -224,8 +263,17 @@ export default function Home() {
               onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(201,168,60,0.2)'; e.currentTarget.style.background = 'rgba(255,255,255,0.035)' }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)'; e.currentTarget.style.background = 'rgba(255,255,255,0.02)' }}
             >
-              <span className="absolute -bottom-6 -right-4 font-serif select-none pointer-events-none leading-none"
-                    style={{ fontSize: 110, color: 'rgba(255,255,255,0.03)' }} aria-hidden>♣</span>
+              <svg className="absolute -bottom-6 -right-4 select-none pointer-events-none" aria-hidden
+                   width="43" height="105" viewBox="0 0 30 68" fill="none">
+                <circle cx="15" cy="10" r="10"
+                        fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.12)" strokeWidth="0.8"/>
+                <circle cx="15" cy="27" r="8.5"
+                        fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.12)" strokeWidth="0.8"/>
+                <circle cx="15" cy="42" r="7"
+                        fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.12)" strokeWidth="0.8"/>
+                <path d="M12.5 48 C12 54 10 60 8 68 L22 68 C20 60 18 54 17.5 48 Z"
+                      fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.1)" strokeWidth="0.8"/>
+              </svg>
 
               <div className="flex items-start justify-between">
                 <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
@@ -278,7 +326,12 @@ export default function Home() {
               },
               {
                 icon: (
-                  <span className="font-serif leading-none select-none" style={{ fontSize: 32, color: GOLD }}>♠</span>
+                  <svg width="14" height="32" viewBox="0 0 30 68" fill="currentColor" style={{ color: GOLD }}>
+                    <path d="M15 2 C16 8 18 22 18 34 L15 40 L12 34 C12 22 14 8 15 2 Z"/>
+                    <path d="M3 32 C5 27 9 30 15 30 C21 30 25 27 27 32 C25 37 21 34 15 34 C9 34 5 37 3 32 Z"/>
+                    <rect x="13" y="40" width="4" height="15" rx="2"/>
+                    <circle cx="15" cy="59" r="7"/>
+                  </svg>
                 ),
                 title: 'Multijugador',
                 desc: 'Jugá 1vs1 o 2vs2 con amigos de cualquier parte. Compartí el código y listo.',
@@ -341,10 +394,28 @@ export default function Home() {
         >
           <div className="absolute inset-0 pointer-events-none"
                style={{ backgroundImage: 'radial-gradient(rgba(201,168,60,0.05) 1px, transparent 1px)', backgroundSize: '22px 22px' }} />
-          <span className="absolute top-6 left-8 font-serif select-none pointer-events-none leading-none"
-                style={{ fontSize: 72, color: 'rgba(201,168,60,0.1)' }} aria-hidden>♥</span>
-          <span className="absolute bottom-6 right-8 font-serif select-none pointer-events-none leading-none"
-                style={{ fontSize: 72, color: 'rgba(201,168,60,0.1)' }} aria-hidden>♦</span>
+          {/* Copa */}
+          <svg className="absolute top-6 left-8 select-none pointer-events-none" aria-hidden
+               width="40" height="66" viewBox="0 0 32 52" fill="none">
+            <rect x="4" y="2" width="24" height="4" rx="2"
+                  fill="rgba(201,168,60,0.12)" stroke="rgba(201,168,60,0.35)" strokeWidth="0.8"/>
+            <path d="M6 6 C6.5 17 10 25 15 28 L17 28 C22 25 25.5 17 26 6 Z"
+                  fill="rgba(201,168,60,0.1)" stroke="rgba(201,168,60,0.35)" strokeWidth="0.8"/>
+            <rect x="13.5" y="28" width="5" height="13" rx="2.5"
+                  fill="rgba(201,168,60,0.08)" stroke="rgba(201,168,60,0.28)" strokeWidth="0.8"/>
+            <path d="M7 41 Q16 38.5 25 41 L23.5 48 Q16 46 8.5 48 Z"
+                  fill="rgba(201,168,60,0.08)" stroke="rgba(201,168,60,0.28)" strokeWidth="0.8"/>
+          </svg>
+          {/* Oro */}
+          <svg className="absolute bottom-6 right-8 select-none pointer-events-none" aria-hidden
+               width="72" height="72" viewBox="0 0 46 46" fill="none">
+            <circle cx="23" cy="23" r="20" stroke="rgba(201,168,60,0.32)" strokeWidth="2.2"/>
+            <circle cx="23" cy="23" r="11.5" stroke="rgba(201,168,60,0.26)" strokeWidth="1.8"/>
+            <circle cx="23" cy="4" r="2.2" fill="rgba(201,168,60,0.32)"/>
+            <circle cx="23" cy="42" r="2.2" fill="rgba(201,168,60,0.32)"/>
+            <circle cx="4" cy="23" r="2.2" fill="rgba(201,168,60,0.32)"/>
+            <circle cx="42" cy="23" r="2.2" fill="rgba(201,168,60,0.32)"/>
+          </svg>
 
           <div className="relative z-10 flex flex-col items-center gap-6">
             <h2 className="text-4xl md:text-6xl font-extrabold leading-tight">¿Listo para jugar?</h2>

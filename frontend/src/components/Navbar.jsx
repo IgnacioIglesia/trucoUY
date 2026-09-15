@@ -12,7 +12,7 @@ const GOLD_LIGHT = '#e8c96a'
 const CardLogo = () => (
   <div style={{
     width: 26, height: 34,
-    background: '#0a150c',
+    background: '#07090d',
     border: `1.5px solid ${GOLD}`,
     borderRadius: 4,
     display: 'flex',
@@ -20,7 +20,11 @@ const CardLogo = () => (
     justifyContent: 'center',
     flexShrink: 0,
   }}>
-    <span style={{ color: GOLD, fontSize: 15, lineHeight: 1, fontFamily: 'Georgia, serif' }}>♠</span>
+    <svg width="8" height="18" viewBox="0 0 30 68" fill={GOLD}>
+      <path d="M15 2 C16 8 18 22 18 34 L15 40 L12 34 C12 22 14 8 15 2 Z"/>
+      <path d="M3 32 C5 27 9 30 15 30 C21 30 25 27 27 32 C25 37 21 34 15 34 C9 34 5 37 3 32 Z"/>
+      <rect x="13" y="40" width="4" height="15" rx="2"/><circle cx="15" cy="59" r="7"/>
+    </svg>
   </div>
 )
 
@@ -33,6 +37,12 @@ const IconUser = () => (
 const IconLogout = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4">
     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+  </svg>
+)
+
+const IconRanking = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
   </svg>
 )
 
@@ -117,15 +127,26 @@ function Navbar() {
             <button
               key={ruta}
               onClick={() => handleNavigate(ruta)}
-              className="relative text-sm px-3 py-1.5 rounded-lg transition-colors"
-              style={{ color: isActive(ruta) ? '#e8c96a' : '#6b7280' }}
-              onMouseEnter={e => { if (!isActive(ruta)) e.currentTarget.style.color = '#d4d4d4' }}
-              onMouseLeave={e => { if (!isActive(ruta)) e.currentTarget.style.color = '#6b7280' }}
+              className="text-sm px-3 py-1.5 rounded-lg transition-all duration-200"
+              style={{
+                color: isActive(ruta) ? '#e8c96a' : '#6b7280',
+                background: isActive(ruta) ? 'rgba(201,168,60,0.08)' : 'transparent',
+                border: isActive(ruta) ? '1px solid rgba(201,168,60,0.18)' : '1px solid transparent',
+              }}
+              onMouseEnter={e => {
+                if (!isActive(ruta)) {
+                  e.currentTarget.style.color = '#d4d4d4'
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.05)'
+                }
+              }}
+              onMouseLeave={e => {
+                if (!isActive(ruta)) {
+                  e.currentTarget.style.color = '#6b7280'
+                  e.currentTarget.style.background = 'transparent'
+                }
+              }}
             >
               {label}
-              {isActive(ruta) && (
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full" style={{ background: GOLD }} />
-              )}
             </button>
           ))}
         </div>
@@ -155,35 +176,71 @@ function Navbar() {
                 </button>
 
                 {menuAbierto && (
-                  <div className="absolute right-0 mt-2 w-52 rounded-2xl border bg-[#0f0f1a]/95 backdrop-blur-md shadow-2xl shadow-black/60 overflow-hidden"
-                       style={{ borderColor: 'rgba(201,168,60,0.15)' }}>
-                    <div className="flex items-center gap-3 px-4 py-3 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-                      <Avatar usuario={usuario} size="md" />
-                      <div className="min-w-0">
-                        <p className="text-white text-sm font-semibold truncate">
-                          {usuario.displayName || 'Usuario'}
-                        </p>
-                        <p className="text-gray-500 text-xs truncate">{usuario.email}</p>
+                  <div className="absolute right-0 mt-2 w-64 rounded-2xl border shadow-2xl shadow-black/70 overflow-hidden"
+                       style={{ borderColor: 'rgba(201,168,60,0.18)', background: '#0c0c14', backdropFilter: 'blur(20px)' }}>
+
+                    {/* Header con gradiente */}
+                    <div className="relative overflow-hidden px-4 py-4"
+                         style={{ background: 'linear-gradient(135deg, rgba(201,168,60,0.1) 0%, transparent 65%)' }}>
+                      <div className="absolute inset-0 pointer-events-none"
+                           style={{ backgroundImage: 'radial-gradient(rgba(201,168,60,0.06) 1px, transparent 1px)', backgroundSize: '14px 14px' }} />
+                      <div className="relative flex items-center gap-3">
+                        <div className="flex-shrink-0 rounded-full p-0.5"
+                             style={{ background: 'linear-gradient(135deg, rgba(201,168,60,0.55), rgba(201,168,60,0.15))' }}>
+                          <Avatar usuario={usuario} size="md" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-white text-sm font-bold truncate leading-snug">
+                            {usuario.displayName || 'Usuario'}
+                          </p>
+                          <p className="text-gray-500 text-xs truncate mt-0.5">{usuario.email}</p>
+                        </div>
                       </div>
                     </div>
-                    <div className="p-1">
+
+                    <div className="h-px" style={{ background: 'rgba(201,168,60,0.1)' }} />
+
+                    {/* Acciones */}
+                    <div className="p-1.5 flex flex-col gap-0.5">
                       <button
                         onClick={() => handleNavigate('/perfil')}
-                        className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/[0.05] rounded-xl transition"
+                        className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/[0.05] rounded-xl transition group"
                       >
-                        <IconUser />
+                        <span className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-white/[0.06] transition"
+                              style={{ background: 'rgba(255,255,255,0.04)' }}>
+                          <IconUser />
+                        </span>
                         Mi perfil
                       </button>
+                      <button
+                        onClick={() => handleNavigate('/ranking')}
+                        className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/[0.05] rounded-xl transition group"
+                      >
+                        <span className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-white/[0.06] transition"
+                              style={{ background: 'rgba(255,255,255,0.04)' }}>
+                          <IconRanking />
+                        </span>
+                        Ranking
+                      </button>
                     </div>
-                    <div className="h-px bg-white/[0.06] mx-2" />
-                    <div className="p-1">
+
+                    <div className="h-px mx-3" style={{ background: 'rgba(255,255,255,0.05)' }} />
+
+                    <div className="p-1.5">
                       <button
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/[0.08] rounded-xl transition"
+                        className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/[0.07] rounded-xl transition group"
                       >
-                        <IconLogout />
+                        <span className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-red-500/[0.1] transition"
+                              style={{ background: 'rgba(255,255,255,0.03)' }}>
+                          <IconLogout />
+                        </span>
                         Cerrar sesión
                       </button>
+                    </div>
+
+                    <div className="px-4 py-2.5 border-t" style={{ borderColor: 'rgba(255,255,255,0.04)' }}>
+                      <p className="text-[10px] text-gray-700">TrucoUY · v1.5</p>
                     </div>
                   </div>
                 )}

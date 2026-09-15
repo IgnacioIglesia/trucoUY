@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Navbar from '../../components/Navbar'
 import { usePageTitle } from '../../hooks/usePageTitle'
@@ -9,22 +10,31 @@ const GOLD_LIGHT = '#e8c96a'
 export default function TrucoOnlineSelector() {
   usePageTitle('Truco Online')
   const navigate = useNavigate()
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(true), 60)
+    return () => clearTimeout(t)
+  }, [])
 
   return (
-    <div className="min-h-screen bg-[#07090d] text-white flex flex-col">
+    <div className="min-h-screen text-white flex flex-col">
       <Navbar />
 
-      <div className="flex-1 flex flex-col relative overflow-hidden" style={{ minHeight: 'calc(100vh - 64px)' }}>
+      <div className="flex-1 flex flex-col relative overflow-hidden" style={{ minHeight: 'calc(100vh - 56px)' }}>
 
         {/* Header */}
-        <div className="relative z-10 flex flex-col items-center justify-center gap-3 pt-12 pb-8 px-6 text-center">
-          <span className="inline-flex items-center gap-2 text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest border"
-                style={{ background: 'rgba(201,168,60,0.07)', borderColor: 'rgba(201,168,60,0.22)', color: GOLD }}>
-            <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+        <div className="relative z-10 flex flex-col items-center justify-center gap-4 pt-10 pb-8 px-6 text-center"
+             style={{ opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(16px)', transition: 'opacity 0.7s ease, transform 0.7s ease' }}>
+          <span className="inline-flex items-center gap-2 text-[10px] font-semibold px-3 py-1.5 rounded-full uppercase tracking-widest"
+                style={{ background: 'rgba(201,168,60,0.07)', border: '1px solid rgba(201,168,60,0.22)', color: GOLD }}>
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: GOLD }} />
             Truco Online · Multijugador
           </span>
-          <h1 className="text-3xl sm:text-4xl font-extrabold">Elegí la modalidad</h1>
-          <p className="text-gray-600 text-sm">¿Duelo individual o en equipo?</p>
+          <div>
+            <h1 className="text-4xl sm:text-5xl font-black leading-none tracking-tight">Elegí la modalidad</h1>
+            <p className="text-gray-600 text-sm mt-3">¿Duelo individual o en equipo?</p>
+          </div>
         </div>
 
         {/* Split */}
@@ -34,9 +44,13 @@ export default function TrucoOnlineSelector() {
           <button
             onClick={() => navigate('/juegos/truco-online/1vs1')}
             className="group flex-1 relative flex flex-col items-center justify-center gap-8 p-10 sm:p-14 text-center overflow-hidden transition-all duration-500"
-            style={{ minHeight: '42vh', background: 'linear-gradient(160deg, #0d0f08 0%, #07090d 100%)' }}
-            onMouseEnter={e => e.currentTarget.style.background = 'linear-gradient(160deg, #111408 0%, #0a0c07 100%)'}
-            onMouseLeave={e => e.currentTarget.style.background = 'linear-gradient(160deg, #0d0f08 0%, #07090d 100%)'}
+            style={{
+              minHeight: '42vh', background: 'transparent',
+              opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateX(-20px)',
+              transition: 'opacity 0.7s ease 0.15s, transform 0.7s ease 0.15s, background 0.3s',
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,168,60,0.03)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
           >
             <div className="absolute inset-0 pointer-events-none transition-opacity duration-500 opacity-50 group-hover:opacity-100"
                  style={{ background: 'radial-gradient(ellipse 80% 80% at 50% 70%, rgba(201,168,60,0.09), transparent)' }} />
@@ -53,14 +67,15 @@ export default function TrucoOnlineSelector() {
                 <p className="text-lg font-bold text-white">Duelo individual</p>
                 <p className="text-gray-500 text-sm max-w-[200px] leading-relaxed">Vos contra un rival. El mejor truco gana.</p>
               </div>
-              <span className="inline-flex items-center gap-2 text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest bg-green-950/70 text-green-400 border border-green-700/30">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+              <span className="inline-flex items-center gap-2 text-[10px] font-semibold px-3 py-1.5 rounded-full uppercase tracking-widest"
+                    style={{ background: 'rgba(201,168,60,0.08)', border: '1px solid rgba(201,168,60,0.25)', color: GOLD }}>
+                <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: GOLD }} />
                 Disponible
               </span>
               <div className="mt-1 px-7 py-3 rounded-2xl font-bold text-sm transition-all"
                    style={{ background: GOLD, color: '#07090d' }}
-                   onMouseEnter={e => e.currentTarget.style.background = GOLD_LIGHT}
-                   onMouseLeave={e => e.currentTarget.style.background = GOLD}>
+                   onMouseEnter={e => { e.currentTarget.style.background = GOLD_LIGHT; e.currentTarget.style.boxShadow = '0 0 28px rgba(201,168,60,0.3)' }}
+                   onMouseLeave={e => { e.currentTarget.style.background = GOLD; e.currentTarget.style.boxShadow = 'none' }}>
                 Jugar 1vs1 →
               </div>
             </div>
@@ -81,9 +96,13 @@ export default function TrucoOnlineSelector() {
           <button
             onClick={() => navigate('/juegos/truco-online/2vs2')}
             className="group flex-1 relative flex flex-col items-center justify-center gap-8 p-10 sm:p-14 text-center overflow-hidden transition-all duration-500"
-            style={{ minHeight: '42vh', background: 'linear-gradient(160deg, #0a0a0d 0%, #07090d 100%)' }}
-            onMouseEnter={e => e.currentTarget.style.background = 'linear-gradient(160deg, #0d0d11 0%, #090b0e 100%)'}
-            onMouseLeave={e => e.currentTarget.style.background = 'linear-gradient(160deg, #0a0a0d 0%, #07090d 100%)'}
+            style={{
+              minHeight: '42vh', background: 'transparent',
+              opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateX(20px)',
+              transition: 'opacity 0.7s ease 0.25s, transform 0.7s ease 0.25s, background 0.3s',
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.015)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
           >
             <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                  style={{ background: 'radial-gradient(ellipse 80% 80% at 50% 70%, rgba(100,110,140,0.05), transparent)' }} />
@@ -98,8 +117,8 @@ export default function TrucoOnlineSelector() {
                 <p className="text-lg font-bold text-white">En equipo</p>
                 <p className="text-gray-500 text-sm max-w-[200px] leading-relaxed">Con un compañero. El truco como se juega de verdad.</p>
               </div>
-              <span className="inline-flex text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest border"
-                    style={{ background: 'rgba(201,168,60,0.06)', borderColor: 'rgba(201,168,60,0.2)', color: GOLD }}>
+              <span className="inline-flex text-[10px] font-semibold px-3 py-1.5 rounded-full uppercase tracking-widest"
+                    style={{ background: 'rgba(201,168,60,0.06)', border: '1px solid rgba(201,168,60,0.2)', color: GOLD }}>
                 Beta
               </span>
               <div className="mt-1 px-7 py-3 rounded-2xl font-bold text-sm border border-white/[0.1] bg-white/[0.04] text-gray-300 transition-all group-hover:border-white/[0.2] group-hover:text-white">
@@ -110,7 +129,8 @@ export default function TrucoOnlineSelector() {
         </div>
 
         {/* Back */}
-        <div className="relative z-10 flex justify-center py-6">
+        <div className="relative z-10 flex justify-center py-6"
+             style={{ opacity: visible ? 1 : 0, transition: 'opacity 0.7s ease 0.4s' }}>
           <button onClick={() => navigate('/juegos')}
             className="text-gray-700 text-xs hover:text-gray-400 transition">
             ← Volver

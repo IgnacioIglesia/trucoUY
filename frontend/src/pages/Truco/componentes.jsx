@@ -35,12 +35,12 @@ export function CartaComp({ carta, muestra, onClick, seleccionada, jugada, ocult
         outline: esPieza && !jugada
           ? '2.5px solid rgba(234,179,8,0.9)'
           : seleccionada
-            ? '2px solid rgba(168,85,247,0.9)'
+            ? '2px solid rgba(201,168,60,0.9)'
             : undefined,
         boxShadow: esPieza && !jugada
           ? '0 0 16px 5px rgba(234,179,8,0.5)'
           : seleccionada
-            ? '0 8px 20px rgba(168,85,247,0.4)'
+            ? '0 0 22px 6px rgba(201,168,60,0.38), 0 8px 16px rgba(0,0,0,0.5)'
             : '0 2px 6px rgba(0,0,0,0.4)',
       }}
     >
@@ -87,7 +87,7 @@ export function BtnCanto({ onClick, disabled, color, children }) {
   }
   return (
     <button onClick={onClick} disabled={disabled}
-      className={`${cols[color]} disabled:opacity-30 disabled:cursor-not-allowed text-white px-4 py-2 rounded-xl text-sm font-semibold transition border w-full text-center`}>
+      className={`${cols[color]} disabled:opacity-25 disabled:grayscale disabled:cursor-not-allowed text-white px-4 py-2 rounded-xl text-sm font-semibold transition border w-full text-center`}>
       {children}
     </button>
   )

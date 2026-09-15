@@ -124,14 +124,10 @@ export default function PerfilPublico() {
   const winrate = truco && truco.partidas > 0 ? Math.round(truco.victorias / truco.partidas * 100) : 0
 
   return (
-    <div className="min-h-screen bg-[#07090d] text-white flex flex-col">
+    <div className="min-h-screen text-white flex flex-col">
       <Navbar />
 
       <div className="relative flex-1">
-        <div className="absolute inset-0 pointer-events-none"
-             style={{ background: 'radial-gradient(ellipse 70% 35% at 50% 0%, rgba(201,168,60,0.09), transparent)' }} />
-        <div className="absolute inset-0 pointer-events-none"
-             style={{ backgroundImage: 'radial-gradient(rgba(201,168,60,0.035) 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
 
         <div className="relative z-10 max-w-2xl mx-auto w-full px-4 py-10 flex flex-col gap-6">
 
@@ -153,8 +149,12 @@ export default function PerfilPublico() {
                      border: `1px solid ${GOLD_BORDER}`,
                    }}>
                 <div className="relative px-6 pt-7 pb-6">
-                  <span className="absolute right-5 top-3 select-none pointer-events-none font-serif"
-                        style={{ fontSize: 100, color: 'rgba(201,168,60,0.06)', lineHeight: 1 }}>♠</span>
+                  <svg className="absolute right-5 top-3 select-none pointer-events-none" aria-hidden
+                       width="44" height="100" viewBox="0 0 30 68" fill="rgba(201,168,60,0.06)">
+                    <path d="M15 2 C16 8 18 22 18 34 L15 40 L12 34 C12 22 14 8 15 2 Z"/>
+                    <path d="M3 32 C5 27 9 30 15 30 C21 30 25 27 27 32 C25 37 21 34 15 34 C9 34 5 37 3 32 Z"/>
+                    <rect x="13" y="40" width="4" height="15" rx="2"/><circle cx="15" cy="59" r="7"/>
+                  </svg>
 
                   <div className="flex items-center gap-5 relative z-10">
                     <Avatar usuario={perfil} size="xl" />

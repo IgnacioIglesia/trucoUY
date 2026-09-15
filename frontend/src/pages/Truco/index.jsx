@@ -52,6 +52,7 @@ export default function Truco() {
   const [florCantada, setFlorCantada] = useState(null)
 
   const [timerSeg, setTimerSeg] = useState(45)
+  const [visible, setVisible] = useState(false)
   const timerRef  = useRef(null)
   const manoJRef  = useRef(manoJ)
   manoJRef.current = manoJ
@@ -279,6 +280,11 @@ export default function Truco() {
   }
 
   useEffect(() => {
+    const t = setTimeout(() => setVisible(true), 60)
+    return () => clearTimeout(t)
+  }, [])
+
+  useEffect(() => {
     clearInterval(timerRef.current)
     const activo = turno === 'jugador' && florResuelta && !mostrandoMano &&
       !esperando && !trucoPendiente && !envidoPendiente && !florPendiente
@@ -314,62 +320,89 @@ export default function Truco() {
 
   // MENÚ
   if (pantalla === 'menu') return (
-    <div className="min-h-screen bg-[#07090d] text-white flex flex-col">
+    <div className="min-h-screen text-white flex flex-col">
       <Navbar />
-      <div className="relative flex-1 flex flex-col items-center justify-center px-6 py-16 overflow-hidden">
+      <div className="relative flex-1 flex flex-col items-center justify-center px-6 py-12"
+           style={{ minHeight: 'calc(100vh - 56px)' }}>
 
-        {/* Fondos */}
+        {/* Glow central */}
         <div className="absolute inset-0 pointer-events-none"
-             style={{ background: 'radial-gradient(ellipse 65% 55% at 50% 30%, rgba(201,168,60,0.08), transparent)' }} />
-        <div className="absolute inset-0 pointer-events-none"
-             style={{ backgroundImage: 'radial-gradient(rgba(201,168,60,0.04) 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
+             style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 40%, rgba(201,168,60,0.07), transparent)' }} />
 
-        {/* Decoraciones de palos */}
-        <span className="absolute right-4 sm:right-12 top-8 font-serif select-none pointer-events-none leading-none opacity-[0.025]"
-              style={{ fontSize: 220, fontFamily: 'Georgia, serif' }} aria-hidden>♣</span>
-        <span className="absolute left-4 sm:left-12 bottom-8 font-serif select-none pointer-events-none leading-none opacity-[0.025]"
-              style={{ fontSize: 160, fontFamily: 'Georgia, serif' }} aria-hidden>♦</span>
+        {/* Basto — derecha */}
+        <svg className="hidden sm:block absolute right-16 top-1/2 -translate-y-1/2 select-none pointer-events-none" aria-hidden
+             width="90" height="200" viewBox="0 0 30 68" fill="none">
+          <circle cx="15" cy="10" r="10" fill="rgba(201,168,60,0.06)" stroke="rgba(201,168,60,0.14)" strokeWidth="0.8"/>
+          <circle cx="15" cy="27" r="8.5" fill="rgba(201,168,60,0.06)" stroke="rgba(201,168,60,0.14)" strokeWidth="0.8"/>
+          <circle cx="15" cy="42" r="7"   fill="rgba(201,168,60,0.06)" stroke="rgba(201,168,60,0.14)" strokeWidth="0.8"/>
+          <path d="M12.5 48 C12 54 10 60 8 68 L22 68 C20 60 18 54 17.5 48 Z"
+                fill="rgba(201,168,60,0.05)" stroke="rgba(201,168,60,0.11)" strokeWidth="0.8"/>
+        </svg>
+        {/* Oro — izquierda */}
+        <svg className="hidden sm:block absolute left-16 top-1/2 -translate-y-1/2 select-none pointer-events-none" aria-hidden
+             width="130" height="130" viewBox="0 0 46 46" fill="none">
+          <circle cx="23" cy="23" r="20" stroke="rgba(201,168,60,0.15)" strokeWidth="2.2"/>
+          <circle cx="23" cy="23" r="11.5" stroke="rgba(201,168,60,0.11)" strokeWidth="1.6"/>
+          <circle cx="23" cy="4"  r="2.2" fill="rgba(201,168,60,0.15)"/>
+          <circle cx="23" cy="42" r="2.2" fill="rgba(201,168,60,0.15)"/>
+          <circle cx="4"  cy="23" r="2.2" fill="rgba(201,168,60,0.15)"/>
+          <circle cx="42" cy="23" r="2.2" fill="rgba(201,168,60,0.15)"/>
+        </svg>
 
-        <div className="relative z-10 w-full max-w-md flex flex-col items-center gap-12">
+        <div className="relative z-10 w-full max-w-sm flex flex-col items-center gap-10">
 
           {/* Cabecera */}
-          <div className="flex flex-col items-center gap-4 text-center">
+          <div className="flex flex-col items-center gap-4 text-center"
+               style={{ opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(16px)', transition: 'opacity 0.7s ease, transform 0.7s ease' }}>
             <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold px-3 py-1.5 rounded-full uppercase tracking-widest"
                   style={{ background: 'rgba(201,168,60,0.07)', border: '1px solid rgba(201,168,60,0.2)', color: '#c9a83c' }}>
               1 vs Máquina
             </span>
             <div>
-              <h1 className="text-5xl sm:text-6xl font-black leading-none">Truco</h1>
-              <p className="text-gray-600 text-sm mt-2 tracking-wide">Con muestra · Envido · Flor · Uruguayo</p>
+              <h1 className="text-6xl sm:text-7xl font-black leading-none tracking-tight">Truco</h1>
+              <p className="text-gray-600 text-sm mt-3">Uruguayo · Con muestra</p>
             </div>
-          </div>
 
-          {/* Selector de puntos */}
-          <div className="w-full flex flex-col items-center gap-4">
-            <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-[0.15em]">Puntos para ganar</p>
-            <div className="flex gap-3">
-              {[10, 20, 30, 40].map(l => (
-                <button key={l} onClick={() => setLimite(l)}
-                  className="w-16 h-16 rounded-2xl font-black text-xl transition-all hover:scale-105"
-                  style={limite === l
-                    ? { border: '2px solid #c9a83c', background: 'rgba(201,168,60,0.12)', color: '#fff', boxShadow: '0 0 20px rgba(201,168,60,0.15)' }
-                    : { border: '1px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.03)', color: '#4b5563' }}>
-                  {l}
-                </button>
+            {/* Feature chips */}
+            <div className="flex flex-wrap justify-center gap-2 mt-1">
+              {['Envido', 'Flor', 'Truco', 'Retruco', 'Vale cuatro'].map(f => (
+                <span key={f} className="text-[11px] px-3 py-1 rounded-full"
+                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: '#6b7280' }}>
+                  {f}
+                </span>
               ))}
             </div>
           </div>
 
-          {/* CTA */}
-          <button
-            onClick={iniciar}
-            className="w-full max-w-xs py-4 rounded-2xl font-bold text-base transition-all hover:scale-[1.02]"
-            style={{ background: '#c9a83c', color: '#07090d' }}
-            onMouseEnter={e => e.currentTarget.style.background = '#e8c96a'}
-            onMouseLeave={e => e.currentTarget.style.background = '#c9a83c'}
-          >
-            Jugar vs Máquina →
-          </button>
+          {/* Card de opciones */}
+          <div className="w-full rounded-3xl p-7 flex flex-col gap-6"
+               style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)', opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(16px)', transition: 'opacity 0.7s ease 0.15s, transform 0.7s ease 0.15s' }}>
+
+            <div className="flex flex-col items-center gap-3">
+              <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-[0.15em]">Puntos para ganar</p>
+              <div className="flex gap-2.5 w-full justify-center">
+                {[10, 20, 30, 40].map(l => (
+                  <button key={l} onClick={() => setLimite(l)}
+                    className="flex-1 max-w-[72px] h-14 rounded-2xl font-black text-lg transition-all hover:scale-105"
+                    style={limite === l
+                      ? { border: '2px solid #c9a83c', background: 'rgba(201,168,60,0.12)', color: '#fff', boxShadow: '0 0 24px rgba(201,168,60,0.18)' }
+                      : { border: '1px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.02)', color: '#4b5563' }}>
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <button
+              onClick={iniciar}
+              className="w-full py-4 rounded-2xl font-bold text-base transition-all hover:scale-[1.02]"
+              style={{ background: '#c9a83c', color: '#07090d' }}
+              onMouseEnter={e => { e.currentTarget.style.background = '#e8c96a'; e.currentTarget.style.boxShadow = '0 0 32px rgba(201,168,60,0.3)' }}
+              onMouseLeave={e => { e.currentTarget.style.background = '#c9a83c'; e.currentTarget.style.boxShadow = 'none' }}
+            >
+              Jugar vs Máquina →
+            </button>
+          </div>
 
           <button onClick={() => navigate('/juegos')}
             className="text-gray-700 text-xs hover:text-gray-400 transition -mt-4">
@@ -385,7 +418,7 @@ export default function Truco() {
   if (pantalla === 'resultado') {
     const gano = ganador === 'jugador'
     return (
-      <div className="min-h-screen bg-[#07090d] text-white flex flex-col">
+      <div className="min-h-screen text-white flex flex-col">
         <Navbar />
         <div className="relative flex-1 flex items-center justify-center px-4 overflow-hidden">
           <div className="absolute inset-0 pointer-events-none"
@@ -458,7 +491,7 @@ export default function Truco() {
 
   // JUEGO
   return (
-    <div className="min-h-screen bg-[#07090d] text-white flex flex-col">
+    <div className="min-h-screen text-white flex flex-col">
       <Navbar />
       <MesaTruco
         manoJ={manoJ} manoM={manoM} cjJ={cjJ} cjM={cjM}

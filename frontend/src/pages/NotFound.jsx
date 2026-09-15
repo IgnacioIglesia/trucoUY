@@ -13,15 +13,10 @@ export default function NotFound() {
   const location = useLocation()
 
   return (
-    <div className="min-h-screen bg-[#07090d] text-white flex flex-col">
+    <div className="min-h-screen text-white flex flex-col">
       <Navbar />
 
-      <div className="relative flex-1 flex items-center justify-center px-4 overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none"
-             style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 40%, rgba(201,168,60,0.08), transparent)' }} />
-        <div className="absolute inset-0 pointer-events-none"
-             style={{ backgroundImage: 'radial-gradient(rgba(201,168,60,0.035) 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
-
+      <div className="relative flex-1 flex items-center justify-center px-4">
         <div className="relative z-10 flex flex-col items-center gap-8 text-center max-w-md">
 
           {/* 404 con suit decorativo */}
@@ -33,7 +28,11 @@ export default function NotFound() {
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="w-20 h-20 rounded-3xl flex items-center justify-center"
                    style={{ background: 'rgba(201,168,60,0.08)', border: `1px solid ${GOLD_BORDER}` }}>
-                <span className="font-serif text-4xl" style={{ color: GOLD }}>♠</span>
+                <svg width="22" height="48" viewBox="0 0 30 68" fill={GOLD}>
+                  <path d="M15 2 C16 8 18 22 18 34 L15 40 L12 34 C12 22 14 8 15 2 Z"/>
+                  <path d="M3 32 C5 27 9 30 15 30 C21 30 25 27 27 32 C25 37 21 34 15 34 C9 34 5 37 3 32 Z"/>
+                  <rect x="13" y="40" width="4" height="15" rx="2"/><circle cx="15" cy="59" r="7"/>
+                </svg>
               </div>
             </div>
           </div>
