@@ -181,6 +181,12 @@ export default function Perfil() {
     return () => clearTimeout(t)
   }, [])
 
+  const [, setTick] = useState(0)
+  useEffect(() => {
+    const id = setInterval(() => setTick(n => n + 1), 60_000)
+    return () => clearInterval(id)
+  }, [])
+
   useEffect(() => {
     if (!usuario) { navigate('/login'); return }
     setNombre(usuario.displayName || '')
@@ -404,23 +410,26 @@ export default function Perfil() {
           </div>
 
           {/* ══════════════ TABS ══════════════ */}
-          <div className="flex gap-1.5 rounded-2xl p-1.5"
-               style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(10px)', transition: 'opacity 0.65s ease 0.1s, transform 0.65s ease 0.1s' }}>
-            {[
-              { id: 'resumen',   label: 'Resumen'       },
-              { id: 'historial', label: 'Historial'     },
-              { id: 'logros',    label: 'Logros'        },
-              { id: 'rivales',   label: 'Rivales'       },
-              { id: 'editar',    label: 'Editar perfil' },
-            ].map(t => (
-              <button key={t.id} onClick={() => setTab(t.id)}
-                className="flex-1 py-2.5 rounded-xl text-sm font-bold transition-all"
-                style={tab === t.id ? { background: GOLD, color: '#07090d' } : { color: '#6b7280' }}
-                onMouseEnter={e => { if (tab !== t.id) e.currentTarget.style.color = '#d1d5db' }}
-                onMouseLeave={e => { if (tab !== t.id) e.currentTarget.style.color = '#6b7280' }}>
-                {t.label}
-              </button>
-            ))}
+          <div className="overflow-x-auto rounded-2xl"
+               style={{ opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(10px)', transition: 'opacity 0.65s ease 0.1s, transform 0.65s ease 0.1s' }}>
+            <div className="flex gap-1.5 p-1.5 w-max sm:w-full rounded-2xl"
+                 style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+              {[
+                { id: 'resumen',   label: 'Resumen'       },
+                { id: 'historial', label: 'Historial'     },
+                { id: 'logros',    label: 'Logros'        },
+                { id: 'rivales',   label: 'Rivales'       },
+                { id: 'editar',    label: 'Editar perfil' },
+              ].map(t => (
+                <button key={t.id} onClick={() => setTab(t.id)}
+                  className="flex-shrink-0 sm:flex-1 py-2.5 px-4 sm:px-2 rounded-xl text-sm font-bold transition-all whitespace-nowrap"
+                  style={tab === t.id ? { background: GOLD, color: '#07090d' } : { color: '#6b7280' }}
+                  onMouseEnter={e => { if (tab !== t.id) e.currentTarget.style.color = '#d1d5db' }}
+                  onMouseLeave={e => { if (tab !== t.id) e.currentTarget.style.color = '#6b7280' }}>
+                  {t.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* ══════════════ RESUMEN ══════════════ */}

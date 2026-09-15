@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { db } from '../firebase'
 import { collection, getDocs } from 'firebase/firestore'
 import Navbar from '../components/Navbar'
@@ -34,6 +35,7 @@ function Avatar({ jugador }) {
 
 export default function Ranking() {
   usePageTitle('Ranking')
+  const navigate = useNavigate()
   const [ranking, setRanking] = useState([])
   const [cargando, setCargando] = useState(true)
   const [visible, setVisible] = useState(false)
@@ -159,18 +161,22 @@ export default function Ranking() {
           ) : (
             <div className="flex flex-col gap-2.5">
               {ranking.map((jugador, i) => (
-                <div key={i}
-                  className="flex items-center gap-4 rounded-2xl px-5 py-4 transition-colors"
+                <button key={i}
+                  onClick={() => jugador.uid && navigate(`/perfil/${jugador.uid}`)}
+                  className="flex items-center gap-4 rounded-2xl px-5 py-4 w-full text-left transition-all"
                   style={{
                     background: i === 0 ? 'rgba(201,168,60,0.05)' : 'rgba(255,255,255,0.02)',
                     border: i === 0 ? '1px solid rgba(201,168,60,0.2)'
                            : i === 1 ? '1px solid rgba(192,192,192,0.12)'
                            : i === 2 ? '1px solid rgba(200,120,50,0.12)'
                            : '1px solid rgba(255,255,255,0.05)',
+                    cursor: jugador.uid ? 'pointer' : 'default',
                     opacity: visible ? 1 : 0,
                     transform: visible ? 'none' : 'translateY(12px)',
                     transition: `opacity 0.5s ease ${0.1 + i * 0.05}s, transform 0.5s ease ${0.1 + i * 0.05}s`,
-                  }}>
+                  }}
+                  onMouseEnter={e => { if (jugador.uid) e.currentTarget.style.background = i === 0 ? 'rgba(201,168,60,0.09)' : 'rgba(255,255,255,0.05)' }}
+                  onMouseLeave={e => { e.currentTarget.style.background = i === 0 ? 'rgba(201,168,60,0.05)' : 'rgba(255,255,255,0.02)' }}>
                   <MedalBadge pos={i} />
                   <Avatar jugador={jugador} />
                   <div className="flex-1 min-w-0">
@@ -191,7 +197,7 @@ export default function Ranking() {
                       <p className="text-gray-600 text-[10px] mt-0.5">winrate</p>
                     </div>
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           )}

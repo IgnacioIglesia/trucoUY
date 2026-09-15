@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { auth, googleProvider } from '../firebase'
 import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth'
@@ -32,10 +32,16 @@ export default function Login() {
   const navigate = useNavigate()
   const location = useLocation()
   const desde = location.state?.desde
+  const [visible, setVisible]   = useState(false)
   const [email, setEmail]       = useState('')
   const [password, setPassword] = useState('')
   const [error, setError]       = useState('')
   const [cargando, setCargando] = useState(false)
+
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(true), 60)
+    return () => clearTimeout(t)
+  }, [])
 
   const handleEmail = async (e) => {
     e.preventDefault()
@@ -125,7 +131,8 @@ export default function Login() {
         <div className="absolute inset-0 pointer-events-none"
              style={{ background: 'radial-gradient(ellipse 50% 35% at 50% 0%, rgba(201,168,60,0.05), transparent)' }} />
 
-        <div className="relative z-10 w-full max-w-sm flex flex-col gap-5">
+        <div className="relative z-10 w-full max-w-sm flex flex-col gap-5"
+             style={{ opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(16px)', transition: 'opacity 0.65s ease, transform 0.65s ease' }}>
 
           <button onClick={() => navigate('/')}
             className="flex items-center gap-1.5 text-gray-600 hover:text-gray-300 transition text-sm self-start mb-1">

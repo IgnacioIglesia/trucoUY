@@ -67,11 +67,23 @@ export default function PerfilPublico() {
   usePageTitle('Perfil')
   const { uid } = useParams()
 
-  const [perfil, setPerfil]   = useState(null)
-  const [truco, setTruco]     = useState(null)
-  const [elo, setElo]         = useState(null)
+  const [visible, setVisible]   = useState(false)
+  const [perfil, setPerfil]     = useState(null)
+  const [truco, setTruco]       = useState(null)
+  const [elo, setElo]           = useState(null)
   const [cargando, setCargando] = useState(true)
   const [noExiste, setNoExiste] = useState(false)
+
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(true), 60)
+    return () => clearTimeout(t)
+  }, [])
+
+  const [, setTick] = useState(0)
+  useEffect(() => {
+    const id = setInterval(() => setTick(n => n + 1), 60_000)
+    return () => clearInterval(id)
+  }, [])
 
   useEffect(() => {
     if (!uid) return
@@ -128,6 +140,8 @@ export default function PerfilPublico() {
       <Navbar />
 
       <div className="relative flex-1">
+        <div className="absolute inset-0 pointer-events-none"
+             style={{ background: 'radial-gradient(ellipse 70% 25% at 50% 0%, rgba(201,168,60,0.06), transparent)' }} />
 
         <div className="relative z-10 max-w-2xl mx-auto w-full px-4 py-10 flex flex-col gap-6">
 
@@ -147,6 +161,9 @@ export default function PerfilPublico() {
                    style={{
                      background: 'linear-gradient(135deg, rgba(201,168,60,0.08) 0%, rgba(255,255,255,0.02) 55%, rgba(201,168,60,0.04) 100%)',
                      border: `1px solid ${GOLD_BORDER}`,
+                     opacity: visible ? 1 : 0,
+                     transform: visible ? 'none' : 'translateY(14px)',
+                     transition: 'opacity 0.65s ease, transform 0.65s ease',
                    }}>
                 <div className="relative px-6 pt-7 pb-6">
                   <svg className="absolute right-5 top-3 select-none pointer-events-none" aria-hidden
@@ -203,7 +220,8 @@ export default function PerfilPublico() {
 
               {/* ── Stats detalle ── */}
               {truco && truco.partidas > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4"
+                     style={{ opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(14px)', transition: 'opacity 0.65s ease 0.1s, transform 0.65s ease 0.1s' }}>
 
                   {/* Winrate ring */}
                   <div className="rounded-2xl p-6 flex flex-col items-center justify-center gap-5"
