@@ -360,6 +360,7 @@ function procesarAccion(p, socketId, tipo, datos) {
       if (esA) { p.manoA = p.manoA.filter((_, i) => i !== idx); p.cartasJugadasA.push(carta) }
       else     { p.manoB = p.manoB.filter((_, i) => i !== idx); p.cartasJugadasB.push(carta) }
       if (esA) p.primeraJugadaA = true; else p.primeraJugadaB = true
+      p.ultimoEnCantar = null
 
       const desc = `${carta.numero} de ${carta.palo}`
       logA.push(esA ? `Vos: ${desc}` : `${nRivA}: ${desc}`)
@@ -400,10 +401,12 @@ function procesarAccion(p, socketId, tipo, datos) {
       if (tipo === 'retruco') {
         if (p.trucoCantado !== 'truco') return { ok: false, error: 'No se puede cantar Retruco ahora' }
         if (p.cantanteOriginalTruco === yo) return { ok: false, error: 'No podés subir tu propio Truco' }
+        if (p.ultimoEnCantar === yo) return { ok: false, error: 'No podés cantar Retruco después de aceptar — jugá una carta primero' }
       }
       if (tipo === 'vale4') {
         if (p.trucoCantado !== 'retruco') return { ok: false, error: 'No se puede cantar Vale 4 ahora' }
         if (p.cantanteOriginalTruco !== yo) return { ok: false, error: 'Solo quien cantó Truco puede subir a Vale 4' }
+        if (p.ultimoEnCantar === yo) return { ok: false, error: 'No podés cantar Vale 4 después de aceptar — jugá una carta primero' }
       }
       // Si había pendiente para mí, acepto implícitamente antes de subir
       if (pendingParaMi1v1) {
@@ -811,6 +814,7 @@ function procesarAccion2v2(p, socketId, tipo, datos) {
       p.manos[socketId] = miMano.filter((_, i) => i !== idx)
       p.cartasJugadas[socketId].push(carta)
       if (!p.primeraJugada) p.primeraJugada = true
+      p.ultimoEnCantar = null
 
       p.jugadasMano.push({ socketId, carta })
       const desc = `${carta.numero} de ${carta.palo}`
@@ -869,10 +873,12 @@ function procesarAccion2v2(p, socketId, tipo, datos) {
       if (tipo === 'retruco') {
         if (p.trucoCantado !== 'truco') return { ok: false, error: 'No se puede cantar Retruco ahora' }
         if (p.cantanteEquipoTruco === miEquipo) return { ok: false, error: 'No podes subir tu propio Truco' }
+        if (p.ultimoEnCantar != null && p.equipoDe[p.ultimoEnCantar] === miEquipo) return { ok: false, error: 'No podes cantar Retruco después de aceptar — jugá una carta primero' }
       }
       if (tipo === 'vale4') {
         if (p.trucoCantado !== 'retruco') return { ok: false, error: 'No se puede cantar Vale 4 ahora' }
         if (p.cantanteEquipoTruco !== miEquipo) return { ok: false, error: 'Solo el equipo que canto Truco puede subir a Vale 4' }
+        if (p.ultimoEnCantar != null && p.equipoDe[p.ultimoEnCantar] === miEquipo) return { ok: false, error: 'No podes cantar Vale 4 después de aceptar — jugá una carta primero' }
       }
       // Si había pendiente para mi equipo, acepto implícitamente antes de subir
       if (pendingParaMi2v2) {
