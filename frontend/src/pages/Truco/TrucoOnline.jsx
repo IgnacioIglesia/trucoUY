@@ -344,8 +344,16 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
       if (!socket.connected) setServidorDurmiendo(true)
     }, 5000)
 
+    const giveUpTimer = setTimeout(() => {
+      if (!socket.connected) {
+        setServidorDurmiendo(false)
+        setErrorConexion('No se pudo conectar al servidor online. Revisá tu conexión e intentá de nuevo.')
+      }
+    }, 60000)
+
     socket.on('connect', () => {
       clearTimeout(coldStartTimer)
+      clearTimeout(giveUpTimer)
       setConectado(true)
       setServidorDurmiendo(false)
       setErrorConexion('')
@@ -353,7 +361,6 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
     socket.on('disconnect', () => setConectado(false))
     socket.on('connect_error', () => {
       setConectado(false)
-      setErrorConexion('No se pudo conectar al servidor online. Revisá tu conexión e intentá de nuevo.')
     })
 
     socket.on('sala_creada', ({ salaId }) => {
@@ -485,7 +492,7 @@ export default function TrucoOnline({ modalidadFijada = null, codigoAuto = null 
       alert(mensaje); setError(mensaje); setPantalla('lobby'); socket.disconnect()
     })
 
-    return () => socket.disconnect()
+    return () => { clearTimeout(giveUpTimer); socket.disconnect() }
   }, [])
 
   useEffect(() => {
