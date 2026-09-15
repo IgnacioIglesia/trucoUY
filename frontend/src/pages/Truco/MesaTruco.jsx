@@ -1,6 +1,57 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { CartaComp, CartaMuestra, BtnCanto, TanteadorPalillos, PlayerPopup } from './componentes'
 import Avatar from '../../components/Avatar'
+import { MUESTRAS_ESPECIALES, VALOR_MUESTRA_ENV } from './constantes'
+
+function esMuestraCarta(c, muestra) {
+  if (!muestra) return false
+  if (c.palo === muestra.palo && MUESTRAS_ESPECIALES.includes(c.numero)) return true
+  if (c.numero === 12 && c.palo === muestra.palo && MUESTRAS_ESPECIALES.includes(muestra.numero)) return true
+  return false
+}
+
+function calcularEnvidoLocal(cartas, muestra) {
+  if (!cartas?.length || !muestra) return 0
+  const conVal = cartas.map(c => {
+    const esBuena = c.palo === muestra.palo && MUESTRAS_ESPECIALES.includes(c.numero)
+    const es12Pieza = c.numero === 12 && c.palo === muestra.palo && MUESTRAS_ESPECIALES.includes(muestra.numero)
+    let val
+    if (esBuena) val = VALOR_MUESTRA_ENV[c.numero]
+    else if (es12Pieza) val = VALOR_MUESTRA_ENV[muestra.numero]
+    else val = [1, 2, 3, 4, 5, 6, 7].includes(c.numero) ? c.numero : 0
+    return { c, val, esMuestra: esBuena || es12Pieza }
+  })
+  const muestras = conVal.filter(x => x.esMuestra).sort((a, b) => b.val - a.val)
+  const normales = conVal.filter(x => !x.esMuestra).sort((a, b) => b.val - a.val)
+  if (muestras.length >= 2) return muestras[0].val + muestras[1].val + (normales[0]?.val || 0)
+  if (muestras.length === 1) return muestras[0].val + (normales[0]?.val || 0)
+  const porPalo = {}
+  for (const { c, val } of normales) {
+    if (!porPalo[c.palo]) porPalo[c.palo] = []
+    porPalo[c.palo].push(val)
+  }
+  return Math.max(...Object.values(porPalo).map(vs => vs.length >= 2 ? 20 + vs[0] + vs[1] : vs[0]), 0)
+}
+
+function calcularFlorLocal(cartas, muestra) {
+  if (!cartas?.length || !muestra) return 0
+  const piezas = cartas.filter(c => esMuestraCarta(c, muestra))
+  const numVal = n => [1, 2, 3, 4, 5, 6, 7].includes(n) ? n : 0
+  if (piezas.length >= 2) {
+    const vals = piezas.map(c => VALOR_MUESTRA_ENV[c.numero === 12 ? muestra.numero : c.numero] || 0).sort((a, b) => b - a)
+    return vals[0] + vals.slice(1).reduce((s, v) => s + (v % 10), 0)
+  }
+  if (piezas.length === 1) {
+    const pp = VALOR_MUESTRA_ENV[piezas[0].numero === 12 ? muestra.numero : piezas[0].numero] || 0
+    const resto = cartas.filter(c => !esMuestraCarta(c, muestra)).sort((a, b) => numVal(b.numero) - numVal(a.numero))
+    return pp + (numVal(resto[0]?.numero || 0)) + (numVal(resto[1]?.numero || 0))
+  }
+  const pp = {}
+  for (const c of cartas) pp[c.palo] = (pp[c.palo] || []).concat(numVal(c.numero))
+  const trio = Object.values(pp).find(vs => vs.length === 3)
+  if (trio) return trio.reduce((s, v) => s + v, 0)
+  return 0
+}
 
 function LogEntry({ msg, reciente }) {
   const isChat      = msg.startsWith('[C]')
@@ -71,6 +122,15 @@ export default function MesaTruco({
   const [popupRival, setPopupRival]       = useState(false)
   const [confirmSalir, setConfirmSalir]   = useState(false)
   const [confirmMazo, setConfirmMazo]     = useState(false)
+  const [showPuntos, setShowPuntos]       = useState(false)
+  const puntosRef                         = useRef(null)
+
+  useEffect(() => {
+    if (!showPuntos) return
+    const fn = e => { if (puntosRef.current && !puntosRef.current.contains(e.target)) setShowPuntos(false) }
+    document.addEventListener('mousedown', fn)
+    return () => document.removeEventListener('mousedown', fn)
+  }, [showPuntos])
 
   const enviar = () => {
     const txt = chatInput.trim()
@@ -112,25 +172,25 @@ export default function MesaTruco({
         </div>
       )}
 
-      {/* ── MODAL CONFIRMAR IRSE AL MAZO ── */}
+      {/* ── OVERLAY CONFIRMAR IRSE AL MAZO ── */}
       {confirmMazo && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
-          <div className="bg-[#0e0c0a] border border-white/10 rounded-2xl p-6 max-w-sm w-full flex flex-col gap-5 shadow-2xl">
-            <div className="flex flex-col gap-1.5">
-              <h3 className="text-white font-extrabold text-lg">¿Irse al mazo?</h3>
-              <p className="text-gray-400 text-sm">Perdés la ronda y el rival gana los puntos de truco cantado.</p>
+        <div className="fixed inset-0 z-50 flex items-end justify-center pb-32 px-4"
+             style={{ background: 'rgba(0,0,0,0.45)' }}
+             onClick={() => setConfirmMazo(false)}>
+          <div className="w-full max-w-xs flex flex-col gap-3 items-center"
+               onClick={e => e.stopPropagation()}>
+            <div className="w-full px-5 py-4 rounded-2xl flex flex-col gap-1 text-center"
+                 style={{ background: 'rgba(15,10,8,0.92)', border: '1px solid rgba(239,68,68,0.25)', backdropFilter: 'blur(4px)' }}>
+              <p className="text-white font-extrabold text-base">¿Irse al mazo?</p>
+              <p className="text-gray-500 text-xs">Perdés la ronda y el rival gana los puntos de truco cantado.</p>
             </div>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setConfirmMazo(false)}
-                className="flex-1 py-2.5 rounded-xl border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-white text-sm font-semibold transition"
-              >
+            <div className="flex gap-2 w-full">
+              <button onClick={() => setConfirmMazo(false)}
+                className="flex-1 py-2.5 rounded-xl border border-white/10 bg-white/[0.06] hover:bg-white/[0.1] text-white text-sm font-semibold transition">
                 Cancelar
               </button>
-              <button
-                onClick={() => { setConfirmMazo(false); onIrseMazo?.() }}
-                className="flex-1 py-2.5 rounded-xl bg-red-700 hover:bg-red-600 text-white text-sm font-bold transition"
-              >
+              <button onClick={() => { setConfirmMazo(false); onIrseMazo?.() }}
+                className="flex-1 py-2.5 rounded-xl bg-red-700 hover:bg-red-600 text-white text-sm font-bold transition">
                 Sí, me voy
               </button>
             </div>
@@ -630,8 +690,8 @@ export default function MesaTruco({
 
         {cartaSel && <p className="text-yellow-500 text-xs animate-pulse">Clickeá de nuevo para jugar</p>}
 
-        {/* Irse al mazo + Salir */}
-        <div className="flex items-center gap-3">
+        {/* Irse al mazo + Calcular Puntos */}
+        <div className="flex items-center gap-2 flex-wrap justify-center">
           {onIrseMazo && !rondaTerminada && !bloqueado && (
             <button
               onClick={() => setConfirmMazo(true)}
@@ -643,17 +703,48 @@ export default function MesaTruco({
               Irse al mazo
             </button>
           )}
-          <button
-            onClick={() => setConfirmSalir(true)}
-            className="flex items-center gap-1.5 text-gray-600 hover:text-red-400 text-xs font-semibold uppercase tracking-widest transition-all px-3 py-2 rounded-xl hover:bg-red-950/20"
-            title="Abandonar partida"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-            Salir
-          </button>
+
+          {/* Calcular Puntos */}
+          <div className="relative" ref={puntosRef}>
+            <button
+              onClick={() => setShowPuntos(v => !v)}
+              className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest transition-all px-4 py-2 rounded-xl"
+              style={{ color: 'rgba(201,168,60,0.75)', border: '1px solid rgba(201,168,60,0.2)', background: showPuntos ? 'rgba(201,168,60,0.08)' : 'transparent' }}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008zm0 3h.008v.008H8.25v-.008zm0 3h.008v.008H8.25v-.008zm3-6h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm3-6h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm3-6h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zM5.25 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zm8.25 0a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0z"/>
+              </svg>
+              Mis puntos
+            </button>
+            {showPuntos && (() => {
+              const todaLaMano = [...manoJ, ...cjJ]
+              const ptsEnv = calcularEnvidoLocal(todaLaMano, muestra)
+              const ptsFlor = florJ ? calcularFlorLocal(todaLaMano, muestra) : null
+              return (
+                <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-52 rounded-2xl px-4 py-3.5 flex flex-col gap-2.5 z-40 shadow-2xl"
+                     style={{ background: 'rgba(12,10,7,0.96)', border: '1px solid rgba(201,168,60,0.22)', backdropFilter: 'blur(8px)' }}>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-center" style={{ color: 'rgba(201,168,60,0.6)' }}>Mis puntos</p>
+                  <div className="flex flex-col gap-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-400 text-xs">Envido</span>
+                      <span className="text-white font-extrabold text-lg tabular-nums" style={{ color: '#c9a83c' }}>{ptsEnv}</span>
+                    </div>
+                    {ptsFlor !== null && (
+                      <div className="flex items-center justify-between border-t border-yellow-900/30 pt-1.5">
+                        <span className="text-yellow-400/70 text-xs">Flor</span>
+                        <span className="text-yellow-300 font-extrabold text-lg tabular-nums">{ptsFlor}</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="absolute left-1/2 -translate-x-1/2 -bottom-1.5 w-3 h-3 rotate-45"
+                       style={{ background: 'rgba(12,10,7,0.96)', border: '0 0 1px 1px solid rgba(201,168,60,0.22)', borderTop: 'none', borderLeft: 'none', borderRight: '1px solid rgba(201,168,60,0.22)', borderBottom: '1px solid rgba(201,168,60,0.22)' }} />
+                </div>
+              )
+            })()}
+          </div>
         </div>
+
+        {/* Salir — abajo del avatar */}
 
         {/* Avatar jugador */}
         <div className="flex flex-col items-center gap-1 mt-1">
@@ -667,6 +758,16 @@ export default function MesaTruco({
             )}
           </div>
           <span className="text-gray-400 text-xs font-semibold">{miNombre}</span>
+          <button
+            onClick={() => setConfirmSalir(true)}
+            className="flex items-center gap-1 text-gray-700 hover:text-red-400 text-[10px] font-semibold uppercase tracking-widest transition-all px-2 py-1 rounded-lg hover:bg-red-950/20 mt-0.5"
+            title="Abandonar partida"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3 h-3">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+            Salir
+          </button>
         </div>
 
         {/* ── BOTONES DE ACCIÓN — mobile ── */}
